@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rename & Upload Drive Pro</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Bổ sung thư viện Google API cho Picker -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <!-- BỔ SUNG HTML SPLASH SCREEN -->
+    <div id="splash-screen">
+      <div class="splash-logo animate__animated animate__bounceIn">🚀</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="splash-bar"></div>
+      </div>
+      <div
+        class="splash-text animate__animated animate__pulse animate__infinite"
+      >
+        LOADING SYSTEM...
+      </div>
+    </div>
+
+    <div class="container animate__animated animate__fadeIn" id="main-app">
+      <header>
+        <h2 id="txt-title">Rename & Upload Drive</h2>
+        <div style="display: flex; gap: 10px">
+          <select id="langSelector" style="width: auto">
+            <option value="vi">🇻🇳 Tiếng Việt</option>
+            <option value="en">🇺🇸 English</option>
+          </select>
+          <select id="themeSelector" style="width: auto">
+            <option value="light" id="opt-light">Sáng</option>
+            <option value="dark" id="opt-dark">Tối</option>
+            <option value="device" id="opt-device">Hệ thống</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="drive-config">
+        <label id="lbl-drive-config">Cấu hình Google Drive</label>
+        <div class="config-grid" style="margin-top: 10px">
+          <div class="input-box">
+            <label>Client ID</label>
+            <div class="input-with-clear">
+              <input
+                type="text"
+                id="clientId"
+                placeholder="Nhập Client ID..."
+              />
+              <button class="btn-clear-input" onclick="clearInput('clientId')">
+                &times;
+              </button>
+            </div>
+          </div>
+          <div class="input-box">
+            <label>API Key</label>
+            <div class="input-with-clear">
+              <input type="text" id="apiKey" placeholder="Nhập API Key..." />
+              <button class="btn-clear-input" onclick="clearInput('apiKey')">
+                &times;
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="input-box" style="margin-bottom: 15px">
+          <label id="lbl-folder-link">Link Thư mục Google Drive</label>
+          <div class="folder-input-group">
+            <div class="input-with-clear" style="flex: 1">
+              <input
+                type="text"
+                id="folderId"
+                placeholder="Dán link thư mục hoặc ID thư mục"
+              />
+              <button class="btn-clear-input" onclick="clearInput('folderId')">
+                &times;
+              </button>
+            </div>
+            <button
+              class="btn-picker"
+              id="btn-open-picker"
+              onclick="showPicker()"
+              title="Chọn từ Drive"
+            >
+              📁
+            </button>
+          </div>
+          <div
+            id="folderNameDisplay"
+            style="font-size: 0.85em; margin-top: 5px; font-weight: 600"
+          ></div>
+        </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <button
+            class="btn-primary"
+            id="btn-connect-drive"
+            onclick="handleAuthClick()"
+          >
+            Kết nối Drive
+          </button>
+          <div id="driveStatus" class="drive-status">
+            <div class="status-dot"></div>
+            <span id="statusText">Chưa kết nối</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-box">
+          <label id="lbl-prefix">Tiền tố</label>
+          <select id="prefix">
+            <option value="None">None</option>
+            <option value="ZL">ZL</option>
+            <option value="LURC">LURC</option>
+            <option value="FT">FT</option>
+            <option value="P">P</option>
+            <option value="S">S</option>
+          </select>
+        </div>
+        <div class="input-box">
+          <label id="lbl-code">Mã (Code)</label>
+          <input
+            type="text"
+            id="codeInput"
+            class="uppercase"
+            placeholder="751621"
+          />
+        </div>
+        <div class="input-box">
+          <label id="lbl-order">Thứ tự</label>
+          <select id="orderSelect">
+            <option value="none">No Order</option>
+            <option value="asc">ASC</option>
+            <option value="desc">DESC</option>
+          </select>
+        </div>
+        <div class="input-box">
+          <label id="lbl-street">Đường</label>
+          <input
+            type="text"
+            id="streetInput"
+            class="uppercase"
+            placeholder="GD"
+          />
+        </div>
+        <div class="input-box">
+          <label id="lbl-ward">Phường</label>
+          <input
+            type="text"
+            id="wardInput"
+            class="uppercase"
+            placeholder="TP"
+          />
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <div>
+          <span id="lbl-preview">Xem trước:</span>
+          <strong
+            id="namePreview"
+            style="color: var(--primary-color); margin-left: 5px"
+          ></strong>
+          <button
+            onclick="resetNamingConfig()"
+            style="
+              background: none;
+              border: 1px solid #ccc;
+              cursor: pointer;
+              font-size: 10px;
+              margin-left: 10px;
+              border-radius: 4px;
+            "
+          >
+            ↺ Reset
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <button
+            class="btn-primary"
+            style="
+              background: var(--danger-color);
+              padding: 5px 10px;
+              font-size: 0.8em;
+            "
+            id="btnClearAll"
+            onclick="confirmClearAll()"
+          >
+            Xóa tất cả
+          </button>
+          <span style="font-size: 0.85em; font-weight: 600"
+            ><span id="lbl-count-text">Số file:</span>
+            <span id="fileCountDisplay">0</span></span
+          >
+        </div>
+      </div>
+
+      <div id="dropzone">
+        <p id="txt-drop">Kéo thả ảnh vào đây hoặc Click để chọn file</p>
+        <div class="loader" id="loader"></div>
+        <input
+          type="file"
+          id="fileInput"
+          multiple
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
+
+      <ul class="file-list" id="fileList"></ul>
+
+      <button
+        id="btnUploadDrive"
+        class="btn-primary btn-upload"
+        style="display: none"
+        onclick="uploadAllToDrive()"
+      >
+        <div class="loader" id="uploadLoader"></div>
+        <span id="btnUploadText">🚀 Tải lên Google Drive</span>
+      </button>
+    </div>
+
+    <div id="customModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3 id="modalTitle">Thông báo</h3>
+        <p id="modalMsg"></p>
+        <div
+          id="modalBtns"
+          style="
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
