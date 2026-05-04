@@ -59,6 +59,8 @@ const translations = {
     themeLight: "Sáng",
     themeDark: "Tối",
     themeDevice: "Hệ thống",
+    netOnline: "🌐 Đã khôi phục kết nối Internet!",
+    netOffline: "⚠️ Mất kết nối Internet. Vui lòng kiểm tra đường truyền!",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -95,6 +97,8 @@ const translations = {
     themeLight: "Light",
     themeDark: "Dark",
     themeDevice: "System",
+    netOnline: "🌐 Internet connection restored!",
+    netOffline: "⚠️ No Internet connection. Please check your network!",
   },
 };
 
