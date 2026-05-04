@@ -1,60 +1,107 @@
 // connectivity-monitor.js
-(function() {
-    // 1. Tạo phần tử hiển thị thông báo
-    const banner = document.createElement('div');
-    banner.id = 'network-status-banner';
-    Object.assign(banner.style, {
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100%',
-        padding: '12px',
-        textAlign: 'center',
-        zIndex: '10000',
-        fontWeight: 'bold',
-        display: 'none',
-        transition: 'all 0.4s ease',
-        fontFamily: 'sans-serif'
-    });
-    document.body.appendChild(banner);
+(function () {
+  // 1. Tạo phần tử hiển thị thông báo với hỗ trợ Responsive
+  const banner = document.createElement("div");
+  banner.id = "network-status-banner";
 
-    // 2. Hàm lấy bản dịch dựa trên ngôn ngữ hiện tại
-    function getMessage(type) {
-        const lang = localStorage.getItem('app-lang') || 'vi';
-        
-        // Truy xuất từ đối tượng translations trong file chính
-        if (typeof translations !== 'undefined' && translations[lang]) {
-            return type === 'online' ? translations[lang].netOnline : translations[lang].netOffline;
+  // Thiết lập Style cơ bản và Responsive
+  Object.assign(banner.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "100%",
+    padding: "12px 15px",
+    textAlign: "center",
+    zIndex: "10000",
+    fontWeight: "bold",
+    display: "none",
+    transition: "all 0.4s ease",
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    fontSize: "14px", // Mặc định cho mobile
+    boxSizing: "border-box",
+  });
+
+  // Thêm media query bằng JS để đảm bảo tính responsive
+  const styleSheet = document.createElement("style");
+  styleSheet.innerText = `
+        @media (min-width: 768px) {
+            #network-status-banner { font-size: 16px !important; padding: 15px !important; }
         }
-        
-        const fallback = {
-            vi: { online: "🌐 Đã khôi phục kết nối Internet!", offline: "⚠️ Mất kết nối Internet. Vui lòng kiểm tra đường truyền!" },
-            en: { online: "🌐 Internet connection restored!", offline: "⚠️ No Internet connection. Please check your network!" }
-        };
-        return type === 'online' ? fallback[lang].online : fallback[lang].offline;
+    `;
+  document.head.appendChild(styleSheet);
+  document.body.appendChild(banner);
+
+  // 2. Hàm lấy bản dịch dựa trên ngôn ngữ hiện tại (Bổ sung Thái, Nhật, Trung, Pháp)
+  function getMessage(type) {
+    const lang = localStorage.getItem("app-lang") || "vi";
+
+    // Ưu tiên truy xuất từ đối tượng translations toàn cục trong rename.html nếu có
+    if (typeof translations !== "undefined" && translations[lang]) {
+      return type === "online"
+        ? translations[lang].netOnline
+        : translations[lang].netOffline;
     }
 
-    function updateStatus() {
-        if (navigator.onLine) {
-            banner.innerText = getMessage('online');
-            banner.style.backgroundColor = "#28a745";
-            banner.style.color = "white";
-            banner.style.display = 'block';
-            setTimeout(() => {
-                banner.style.display = 'none';
-            }, 3000);
-        } else {
-            banner.innerText = getMessage('offline');
-            banner.style.backgroundColor = "#ff4d4d";
-            banner.style.color = "white";
-            banner.style.display = 'block';
-        }
-    }
+    // Bản dịch dự phòng (Fallback) đầy đủ 6 ngôn ngữ
+    const fallback = {
+      vi: {
+        online: "🌐 Đã khôi phục kết nối Internet!",
+        offline: "⚠️ Mất kết nối Internet. Vui lòng kiểm tra đường truyền!",
+      },
+      en: {
+        online: "🌐 Internet connection restored!",
+        offline: "⚠️ No Internet connection. Please check your network!",
+      },
+      th: {
+        online: "🌐 การเชื่อมต่ออินเทอร์เน็ตกลับมาแล้ว!",
+        offline: "⚠️ ขาดการเชื่อมต่ออินเทอร์เน็ต โปรดตรวจสอบเครือข่ายของคุณ!",
+      },
+      ja: {
+        online: "🌐 インターネット接続が復旧しました！",
+        offline:
+          "⚠️ インターネット接続がありません。ネットワークを確認してください。",
+      },
+      zh: {
+        online: "🌐 网络连接已恢复！",
+        offline: "⚠️ 无网络连接，请检查您的网络！",
+      },
+      fr: {
+        online: "🌐 Connexion Internet rétablie !",
+        offline:
+          "⚠️ Pas de connexion Internet. Veuillez vérifier votre réseau !",
+      },
+    };
 
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
+    const selectedLang = fallback[lang] || fallback["en"];
+    return type === "online" ? selectedLang.online : selectedLang.offline;
+  }
 
-    if (!navigator.onLine) {
-        updateStatus();
+  function updateStatus() {
+    if (navigator.onLine) {
+      banner.innerText = getMessage("online");
+      banner.style.backgroundColor = "#28a745";
+      banner.style.color = "white";
+      banner.style.display = "block";
+
+      // Tự động ẩn sau 3 giây khi có mạng lại[cite: 2]
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 3000);
+    } else {
+      banner.innerText = getMessage("offline");
+      banner.style.backgroundColor = "#ff4d4d";
+      banner.style.color = "white";
+      banner.style.display = "block";
     }
+  }
+
+  // Lắng nghe sự kiện kết nối[cite: 2]
+  window.addEventListener("online", updateStatus);
+  window.addEventListener("offline", updateStatus);
+
+  // Kiểm tra trạng thái ngay khi load file[cite: 2]
+  if (!navigator.onLine) {
+    updateStatus();
+  }
 })();
