@@ -12,8 +12,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Bổ sung thư viện Google API cho Picker -->
     <script src="https://apis.google.com/js/api.js"></script>
-    <!-- <link rel="stylesheet" href="style.css" /> -->
-     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
   </head>
   <body>
@@ -37,6 +36,10 @@
           <select id="langSelector" style="width: auto">
             <option value="vi">🇻🇳 Tiếng Việt</option>
             <option value="en">🇺🇸 English</option>
+            <option value="th">🇹🇭 ไทย</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="fr">🇫🇷 Français</option>
           </select>
           <select id="themeSelector" style="width: auto">
             <option value="light" id="opt-light">Sáng</option>
@@ -250,10 +253,8 @@
         ></div>
       </div>
     </div>
-
     <script src="translations.js"></script>
-    <script src="connectivity-monitor.js"></script>
+    <script src="./connectivity-monitor.js"></script>
     <script src="script.js"></script>
-    <!-- <script src="script.js"></script> -->
   </body>
 </html>
