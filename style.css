@@ -377,3 +377,19 @@ input {
   z-index: 10000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+/* Thêm class mới cho nút Reset để xử lý tương phản giao diện tối */
+.btn-reset {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 11px;
+  margin-left: 10px;
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.btn-reset:hover {
+  background: var(--item-bg);
+  border-color: var(--accent-color);
+}

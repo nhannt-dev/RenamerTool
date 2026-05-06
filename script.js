@@ -106,7 +106,7 @@ function copyToClipboard(text) {
 
   navigator.clipboard.writeText(text).then(() => {
     const toast = document.getElementById("copyToast");
-    toast.innerText = t.copySuccess; // Cập nhật nội dung dịch cho Toast
+    toast.innerText = t.copySuccess;
     toast.style.display = "block";
     toast.classList.add("animate__animated", "animate__fadeInUp");
     setTimeout(() => {

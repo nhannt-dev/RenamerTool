@@ -391,6 +391,22 @@
         z-index: 10000;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
+
+      /* Thêm class mới cho nút Reset để xử lý tương phản giao diện tối */
+      .btn-reset {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 11px;
+        margin-left: 10px;
+        border-radius: 4px;
+        padding: 3px 8px;
+      }
+      .btn-reset:hover {
+        background: var(--item-bg);
+        border-color: var(--accent-color);
+      }
     </style>
   </head>
   <body>
@@ -556,17 +572,8 @@
             id="namePreview"
             style="color: var(--primary-color); margin-left: 5px"
           ></strong>
-          <button
-            onclick="resetNamingConfig()"
-            style="
-              background: none;
-              border: 1px solid #ccc;
-              cursor: pointer;
-              font-size: 10px;
-              margin-left: 10px;
-              border-radius: 4px;
-            "
-          >
+          <!-- Thay inline-style bằng class btn-reset -->
+          <button class="btn-reset" onclick="resetNamingConfig()">
             ↺ Reset
           </button>
         </div>
@@ -968,7 +975,7 @@
 
         navigator.clipboard.writeText(text).then(() => {
           const toast = document.getElementById("copyToast");
-          toast.innerText = t.copySuccess; // Cập nhật nội dung dịch cho Toast
+          toast.innerText = t.copySuccess;
           toast.style.display = "block";
           toast.classList.add("animate__animated", "animate__fadeInUp");
           setTimeout(() => {
