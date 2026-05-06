@@ -24,6 +24,9 @@ let filesArray = [];
 let accessToken = null;
 let pickerApiLoaded = false;
 
+// Detect OS
+const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+
 gapi.load("picker", () => {
   pickerApiLoaded = true;
 });
@@ -57,7 +60,7 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs[0]; // Sửa lấy phần tử đầu tiên
+    const doc = data.docs[0];
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
@@ -184,6 +187,8 @@ function clearInput(id) {
 function setLang(lang) {
   localStorage.setItem("app-lang", lang);
   const t = translations[lang] || translations["en"];
+  const modKey = isMac ? "option" : "Alt"; // Dynamic modifier key for tooltip
+
   document.getElementById("txt-title").innerText = t.title;
   document.getElementById("lbl-prefix").innerText = t.prefix;
   document.getElementById("lbl-code").innerText = t.code;
@@ -210,6 +215,11 @@ function setLang(lang) {
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
 
+  document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
+    "{mod}",
+    modKey,
+  );
+
   renderFileList();
 }
 
@@ -226,9 +236,8 @@ function setTheme(theme) {
 
 function extractFolderId(input) {
   if (!input) return null;
-  // Kiểm tra xem là link hay ID thuần
   const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-  return match ? match[1] : input.trim(); // Trả về match[1] thay vì toàn bộ mảng match
+  return match ? match[1] : input.trim();
 }
 
 async function fetchFolderName() {
@@ -252,7 +261,9 @@ async function fetchFolderName() {
   try {
     const res = await fetch(
       `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
-      { headers: { Authorization: "Bearer " + accessToken } },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      },
     );
     if (res.ok) {
       const data = await res.json();
@@ -504,6 +515,30 @@ function resetNamingConfig() {
   renderFileList();
 }
 
+function showShortcutList() {
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+  const ctrlLabel = isMac ? "⌘" : "Ctrl";
+  const altLabel = isMac ? "Option" : "Alt";
+
+  const listHtml = `
+            <div class="shortcut-list-modal">
+                <div><kbd>${altLabel}</kbd> + <kbd>Space</kbd> : ${t.scSelect}</div>
+                <div><kbd>${altLabel}</kbd> + <kbd>C</kbd> : ${t.scConnect}</div>
+                <div><kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scReset}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearAll}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearConfig}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>O</kbd> : ${t.scOpenPicker}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>Enter</kbd> : ${t.scUpload}</div>
+                <hr style="margin:10px 0; border:0; border-top:1px solid var(--border-color)">
+                <div><kbd>${altLabel}</kbd> + <kbd>H</kbd> : ${t.scShowThis}</div>
+                <div><kbd>Esc</kbd> : ${t.scCloseEsc}</div>
+            </div>
+          `;
+  showModal(listHtml);
+  document.getElementById("modalTitle").innerText = t.scTitle;
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     const modal = document.getElementById("customModal");
@@ -542,6 +577,12 @@ document.addEventListener("keydown", function (e) {
       e.preventDefault();
       navButtons.click();
     }
+    return;
+  }
+
+  if (e.altKey && e.code === "KeyH") {
+    e.preventDefault();
+    showShortcutList();
     return;
   }
 

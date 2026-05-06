@@ -295,7 +295,6 @@
         box-shadow: var(--shadow);
       }
 
-      /* CSS cho việc focus các nút trong modal */
       .modal-btn-nav:focus {
         outline: 3px solid var(--primary-color);
         outline-offset: 2px;
@@ -412,9 +411,103 @@
         background: var(--item-bg);
         border-color: var(--accent-color);
       }
+
+      .shortcut-icon-container {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        z-index: 900;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .shortcut-tooltip {
+        background: #333;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 13px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(10px);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        pointer-events: none;
+      }
+
+      .shortcut-btn {
+        width: 50px;
+        height: 50px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+        border: none;
+      }
+
+      .shortcut-btn:hover {
+        transform: scale(1.1);
+        background: #0056b3;
+      }
+
+      .shortcut-icon-container:hover .shortcut-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+      }
+
+      @media (max-width: 600px) {
+        .shortcut-icon-container {
+          right: 15px;
+          bottom: 15px;
+        }
+        .shortcut-tooltip {
+          display: none;
+        }
+        .shortcut-btn {
+          width: 45px;
+          height: 45px;
+        }
+      }
+
+      .shortcut-list-modal {
+        text-align: left;
+        font-size: 14px;
+        line-height: 1.8;
+      }
+      .shortcut-list-modal kbd {
+        background: var(--item-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-family: monospace;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
+    <div
+      class="shortcut-icon-container animate__animated animate__fadeInUp animate__delay-2s"
+    >
+      <div class="shortcut-tooltip" id="shortcut-tip">
+        Nhấn option + H để bật danh sách phím tắt
+      </div>
+      <button
+        class="shortcut-btn"
+        onclick="showShortcutList()"
+        title="Shortcuts"
+      >
+        ⌨️
+      </button>
+    </div>
+
     <div id="splash-screen">
       <div class="splash-logo animate__animated animate__bounceIn">🚀</div>
       <div class="progress-container">
@@ -704,6 +797,17 @@
           themeDark: "Tối",
           themeDevice: "Hệ thống",
           copySuccess: "✅ Đã copy vào bộ nhớ tạm!",
+          shortcutTip: "Nhấn {mod} + H để bật danh sách phím tắt",
+          scTitle: "Danh sách phím tắt",
+          scSelect: "Chọn file",
+          scConnect: "Kết nối Google Drive",
+          scReset: "Reset cấu hình đặt tên",
+          scClearAll: "Xóa tất cả file",
+          scClearConfig: "Xóa nhanh ID/Key config",
+          scOpenPicker: "Mở bảng chọn thư mục",
+          scUpload: "Bắt đầu tải lên",
+          scShowThis: "Mở bảng phím tắt này",
+          scCloseEsc: "Đóng thông báo nhanh",
         },
         en: {
           title: "Rename & Upload Drive",
@@ -741,6 +845,17 @@
           themeDark: "Dark",
           themeDevice: "System",
           copySuccess: "✅ Copied to clipboard!",
+          shortcutTip: "Press {mod} + H to show shortcuts",
+          scTitle: "Shortcut Keys",
+          scSelect: "Select files",
+          scConnect: "Connect Google Drive",
+          scReset: "Reset naming config",
+          scClearAll: "Clear all files",
+          scClearConfig: "Clear ID/Key config",
+          scOpenPicker: "Open folder picker",
+          scUpload: "Start upload",
+          scShowThis: "Show this shortcuts list",
+          scCloseEsc: "Quick close notification",
         },
         th: {
           title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
@@ -778,6 +893,17 @@
           themeDark: "มืด",
           themeDevice: "ระบบ",
           copySuccess: "✅ คัดลอกไปยังคลิปบอร์ดแล้ว!",
+          shortcutTip: "กด {mod} + H เพื่อดูปุ่มลัด",
+          scTitle: "ปุ่มลัด",
+          scSelect: "เลือกไฟล์",
+          scConnect: "เชื่อมต่อ Google Drive",
+          scReset: "รีเซ็ตการตั้งชื่อ",
+          scClearAll: "ลบไฟล์ทั้งหมด",
+          scClearConfig: "ล้าง ID/Key config",
+          scOpenPicker: "เปิดตัวเลือกโฟลเดอร์",
+          scUpload: "เริ่มอัปโหลด",
+          scShowThis: "แสดงรายการปุ่มลัดนี้",
+          scCloseEsc: "ปิดการแจ้งเตือนด่วน",
         },
         ja: {
           title: "名前変更とドライブへのアップロード",
@@ -815,6 +941,17 @@
           themeDark: "ダーク",
           themeDevice: "システム設定",
           copySuccess: "✅ クリップボードにコピーしました！",
+          shortcutTip: "{mod} + H を押してショートカットを表示",
+          scTitle: "ショートカットキー",
+          scSelect: "ファイルを選択",
+          scConnect: "Googleドライブに接続",
+          scReset: "命名設定をリセット",
+          scClearAll: "全ファイルをクリア",
+          scClearConfig: "設定をクリア",
+          scOpenPicker: "フォルダ選択を開く",
+          scUpload: "アップロード開始",
+          scShowThis: "ショートカット一覧を表示",
+          scCloseEsc: "通知を閉じる",
         },
         zh: {
           title: "重命名并上传至云端硬盘",
@@ -852,6 +989,17 @@
           themeDark: "深色",
           themeDevice: "系统",
           copySuccess: "✅ 已复制到剪贴板！",
+          shortcutTip: "按 {mod} + H 显示快捷键",
+          scTitle: "快捷键列表",
+          scSelect: "选择文件",
+          scConnect: "连接 Google 云端硬盘",
+          scReset: "重置命名配置",
+          scClearAll: "清除所有文件",
+          scClearConfig: "清除配置信息",
+          scOpenPicker: "打开文件夹选择器",
+          scUpload: "开始上传",
+          scShowThis: "显示此快捷键列表",
+          scCloseEsc: "快速关闭通知",
         },
         fr: {
           title: "Renommer & Télécharger vers Drive",
@@ -888,13 +1036,27 @@
           themeLight: "Clair",
           themeDark: "Sombre",
           themeDevice: "Système",
-          copySuccess: "✅ Copié dans le presse-papier !",
+          copySuccess: "✅ Copié trong le presse-papier !",
+          shortcutTip: "Appuyez sur {mod} + H pour voir les raccourcis",
+          scTitle: "Raccourcis clavier",
+          scSelect: "Sélectionner des fichiers",
+          scConnect: "Connecter Google Drive",
+          scReset: "Réinitialiser la config",
+          scClearAll: "Effacer tous les fichiers",
+          scClearConfig: "Effacer la config ID/Key",
+          scOpenPicker: "Ouvrir le sélecteur",
+          scUpload: "Démarrer l'envoi",
+          scShowThis: "Afficher ces raccourcis",
+          scCloseEsc: "Fermer rapidement",
         },
       };
 
       let filesArray = [];
       let accessToken = null;
       let pickerApiLoaded = false;
+
+      // Detect OS
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
       gapi.load("picker", () => {
         pickerApiLoaded = true;
@@ -929,7 +1091,7 @@
 
       function pickerCallback(data) {
         if (data.action === google.picker.Action.PICKED) {
-          const doc = data.docs[0]; // Sửa lấy phần tử đầu tiên
+          const doc = data.docs[0];
           document.getElementById("folderId").value = doc.id;
           fetchFolderName();
         }
@@ -1069,6 +1231,8 @@
       function setLang(lang) {
         localStorage.setItem("app-lang", lang);
         const t = translations[lang] || translations["en"];
+        const modKey = isMac ? "option" : "Alt"; // Dynamic modifier key for tooltip
+
         document.getElementById("txt-title").innerText = t.title;
         document.getElementById("lbl-prefix").innerText = t.prefix;
         document.getElementById("lbl-code").innerText = t.code;
@@ -1095,6 +1259,9 @@
         document.getElementById("opt-dark").innerText = t.themeDark;
         document.getElementById("opt-device").innerText = t.themeDevice;
 
+        document.getElementById("shortcut-tip").innerText =
+          t.shortcutTip.replace("{mod}", modKey);
+
         renderFileList();
       }
 
@@ -1113,9 +1280,8 @@
 
       function extractFolderId(input) {
         if (!input) return null;
-        // Kiểm tra xem là link hay ID thuần
         const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-        return match ? match[1] : input.trim(); // Trả về match[1] thay vì toàn bộ mảng match
+        return match ? match[1] : input.trim();
       }
 
       async function fetchFolderName() {
@@ -1139,7 +1305,9 @@
         try {
           const res = await fetch(
             `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
-            { headers: { Authorization: "Bearer " + accessToken } },
+            {
+              headers: { Authorization: "Bearer " + accessToken },
+            },
           );
           if (res.ok) {
             const data = await res.json();
@@ -1397,6 +1565,30 @@
         renderFileList();
       }
 
+      function showShortcutList() {
+        const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+        const ctrlLabel = isMac ? "⌘" : "Ctrl";
+        const altLabel = isMac ? "Option" : "Alt";
+
+        const listHtml = `
+            <div class="shortcut-list-modal">
+                <div><kbd>${altLabel}</kbd> + <kbd>Space</kbd> : ${t.scSelect}</div>
+                <div><kbd>${altLabel}</kbd> + <kbd>C</kbd> : ${t.scConnect}</div>
+                <div><kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scReset}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearAll}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearConfig}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>O</kbd> : ${t.scOpenPicker}</div>
+                <div><kbd>${ctrlLabel}</kbd> + <kbd>Enter</kbd> : ${t.scUpload}</div>
+                <hr style="margin:10px 0; border:0; border-top:1px solid var(--border-color)">
+                <div><kbd>${altLabel}</kbd> + <kbd>H</kbd> : ${t.scShowThis}</div>
+                <div><kbd>Esc</kbd> : ${t.scCloseEsc}</div>
+            </div>
+          `;
+        showModal(listHtml);
+        document.getElementById("modalTitle").innerText = t.scTitle;
+      }
+
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
           const modal = document.getElementById("customModal");
@@ -1440,6 +1632,12 @@
             e.preventDefault();
             navButtons.click();
           }
+          return;
+        }
+
+        if (e.altKey && e.code === "KeyH") {
+          e.preventDefault();
+          showShortcutList();
           return;
         }
 
