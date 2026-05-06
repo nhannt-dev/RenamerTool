@@ -57,7 +57,7 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs;
+    const doc = data.docs[0]; // Sửa nhẹ logic để lấy đúng object
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
@@ -222,7 +222,7 @@ function setTheme(theme) {
 function extractFolderId(input) {
   if (!input) return null;
   const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-  return match ? match : input.trim();
+  return match ? match[1] : input.trim();
 }
 
 async function fetchFolderName() {
@@ -506,5 +506,22 @@ document.addEventListener("keydown", function (event) {
         renderFileList();
       }
     }
+  }
+});
+
+// --- BỔ SUNG PHÍM TẮT THEO YÊU CẦU ---
+document.addEventListener("keydown", function (e) {
+  // Phím tắt Option + C: Kết nối Drive
+  // (Trong một số trình duyệt Mac, Alt chính là Option)
+  if (e.altKey && e.code === "KeyC") {
+    e.preventDefault(); // Ngăn chặn hành động mặc định nếu có
+    handleAuthClick();
+  }
+
+  // Phím tắt Command + Option + O: Mở Picker chọn thư mục
+  // (Meta là Command trên Mac, Ctrl trên Win)
+  if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
+    e.preventDefault();
+    showPicker();
   }
 });
