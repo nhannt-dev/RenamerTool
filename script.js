@@ -57,7 +57,7 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs[0];
+    const doc = data.docs;
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
@@ -139,6 +139,7 @@ window.onload = () => {
     updatePreview();
     renderFileList();
   });
+  renderFileList(); // Khởi tạo để disable nút clear ban đầu
 };
 
 function initDragAndDrop() {
@@ -221,7 +222,7 @@ function setTheme(theme) {
 function extractFolderId(input) {
   if (!input) return null;
   const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-  return match ? match[1] : input.trim();
+  return match ? match : input.trim();
 }
 
 async function fetchFolderName() {
@@ -317,7 +318,22 @@ function renderFileList() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   list.innerHTML = "";
-  document.getElementById("fileCountDisplay").innerText = filesArray.length;
+
+  const count = filesArray.length;
+  document.getElementById("fileCountDisplay").innerText = count;
+
+  // Xử lý bug: Disable nút Xóa tất cả khi danh sách trống
+  const btnClear = document.getElementById("btnClearAll");
+  if (count === 0) {
+    btnClear.disabled = true;
+    btnClear.style.opacity = "0.5";
+    btnClear.style.cursor = "not-allowed";
+  } else {
+    btnClear.disabled = false;
+    btnClear.style.opacity = "1";
+    btnClear.style.cursor = "pointer";
+  }
+
   filesArray.forEach((file, i) => {
     const li = document.createElement("li");
     li.className = "file-item";

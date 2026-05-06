@@ -206,7 +206,7 @@ const translations = {
     uploadSuccess: "Téléchargement réussi !",
     placeholderClientId: "Entrez le Client ID...",
     placeholderApiKey: "Entrez l'API Key...",
-    placeholderFolder: "Collez le lien ou l'ID du dossier",
+    placeholderFolder: "Collez le lien hoặc l'ID du dossier",
     confirmClear: "Voulez-vous vraiment vider la liste ?",
     fetching: "🔍 Récupération du nom du dossier...",
     notFound: "❌ Dossier non trouvé",

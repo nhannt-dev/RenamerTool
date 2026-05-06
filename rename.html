@@ -392,7 +392,6 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
 
-      /* Thêm class mới cho nút Reset để xử lý tương phản giao diện tối */
       .btn-reset {
         background: transparent;
         border: 1px solid var(--border-color);
@@ -572,7 +571,6 @@
             id="namePreview"
             style="color: var(--primary-color); margin-left: 5px"
           ></strong>
-          <!-- Thay inline-style bằng class btn-reset -->
           <button class="btn-reset" onclick="resetNamingConfig()">
             ↺ Reset
           </button>
@@ -872,7 +870,7 @@
           uploadSuccess: "Téléchargement réussi !",
           placeholderClientId: "Entrez le Client ID...",
           placeholderApiKey: "Entrez l'API Key...",
-          placeholderFolder: "Collez le lien ou l'ID du dossier",
+          placeholderFolder: "Collez le lien hoặc l'ID du dossier",
           confirmClear: "Voulez-vous vraiment vider la liste ?",
           fetching: "🔍 Récupération du nom du dossier...",
           notFound: "❌ Dossier non trouvé",
@@ -926,7 +924,7 @@
 
       function pickerCallback(data) {
         if (data.action === google.picker.Action.PICKED) {
-          const doc = data.docs[0];
+          const doc = data.docs;
           document.getElementById("folderId").value = doc.id;
           fetchFolderName();
         }
@@ -1015,6 +1013,7 @@
           updatePreview();
           renderFileList();
         });
+        renderFileList(); // Khởi tạo để disable nút clear ban đầu
       };
 
       function initDragAndDrop() {
@@ -1105,7 +1104,7 @@
       function extractFolderId(input) {
         if (!input) return null;
         const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-        return match ? match[1] : input.trim();
+        return match ? match : input.trim();
       }
 
       async function fetchFolderName() {
@@ -1203,8 +1202,22 @@
         const lang = localStorage.getItem("app-lang") || "vi";
         const t = translations[lang] || translations["en"];
         list.innerHTML = "";
-        document.getElementById("fileCountDisplay").innerText =
-          filesArray.length;
+
+        const count = filesArray.length;
+        document.getElementById("fileCountDisplay").innerText = count;
+
+        // Xử lý bug: Disable nút Xóa tất cả khi danh sách trống
+        const btnClear = document.getElementById("btnClearAll");
+        if (count === 0) {
+          btnClear.disabled = true;
+          btnClear.style.opacity = "0.5";
+          btnClear.style.cursor = "not-allowed";
+        } else {
+          btnClear.disabled = false;
+          btnClear.style.opacity = "1";
+          btnClear.style.cursor = "pointer";
+        }
+
         filesArray.forEach((file, i) => {
           const li = document.createElement("li");
           li.className = "file-item";
