@@ -61,7 +61,7 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs[0];
+    const doc = data.docs;
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
@@ -243,7 +243,7 @@ function setTheme(theme) {
 function extractFolderId(input) {
   if (!input) return null;
   const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-  return match ? match[1] : input.trim();
+  return match ? match : input.trim();
 }
 
 /**
@@ -291,7 +291,7 @@ async function fetchFolderName() {
       pathParts.unshift(folderName);
 
       if (data.parents && data.parents.length > 0) {
-        currentId = data.parents[0];
+        currentId = data.parents;
       } else {
         // Thêm My Drive vào đầu nếu nó chưa có (trong trường hợp folder nằm ngay ngoài cùng)
         if (data.id !== "root" && !pathParts.includes("My Drive")) {

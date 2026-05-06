@@ -474,17 +474,10 @@
         transform: translateX(0);
       }
 
-      @media (max-width: 600px) {
+      /* Responsive CSS Bug Fix: Ẩn nút phím tắt trên iPhone/iPad/Thiết bị cảm ứng */
+      @media (max-width: 1024px) or (pointer: coarse) {
         .shortcut-icon-container {
-          right: 15px;
-          bottom: 15px;
-        }
-        .shortcut-tooltip {
-          display: none;
-        }
-        .shortcut-btn {
-          width: 45px;
-          height: 45px;
+          display: none !important;
         }
       }
 
@@ -1112,7 +1105,7 @@
 
       function pickerCallback(data) {
         if (data.action === google.picker.Action.PICKED) {
-          const doc = data.docs[0];
+          const doc = data.docs;
           document.getElementById("folderId").value = doc.id;
           fetchFolderName();
         }
@@ -1307,7 +1300,7 @@
       function extractFolderId(input) {
         if (!input) return null;
         const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-        return match ? match[1] : input.trim();
+        return match ? match : input.trim();
       }
 
       /**
@@ -1355,7 +1348,7 @@
             pathParts.unshift(folderName);
 
             if (data.parents && data.parents.length > 0) {
-              currentId = data.parents[0];
+              currentId = data.parents;
             } else {
               // Thêm My Drive vào đầu nếu nó chưa có (trong trường hợp folder nằm ngay ngoài cùng)
               if (data.id !== "root" && !pathParts.includes("My Drive")) {

@@ -460,17 +460,10 @@ input {
   transform: translateX(0);
 }
 
-@media (max-width: 600px) {
+/* Responsive CSS Bug Fix: Ẩn nút phím tắt trên iPhone/iPad/Thiết bị cảm ứng */
+@media (max-width: 1024px) or (pointer: coarse) {
   .shortcut-icon-container {
-    right: 15px;
-    bottom: 15px;
-  }
-  .shortcut-tooltip {
-    display: none;
-  }
-  .shortcut-btn {
-    width: 45px;
-    height: 45px;
+    display: none !important;
   }
 }
 
