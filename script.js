@@ -1,4 +1,3 @@
-// ... Giữ nguyên toàn bộ logic cũ ...
 function startSplashScreen() {
   const splash = document.getElementById("splash-screen");
   const bar = document.getElementById("splash-bar");
@@ -58,7 +57,7 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs[0]; // Sửa nhẹ logic để lấy đúng object
+    const doc = data.docs[0];
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
@@ -140,7 +139,7 @@ window.onload = () => {
     updatePreview();
     renderFileList();
   });
-  renderFileList(); // Khởi tạo để disable nút clear ban đầu
+  renderFileList();
 };
 
 function initDragAndDrop() {
@@ -323,7 +322,6 @@ function renderFileList() {
   const count = filesArray.length;
   document.getElementById("fileCountDisplay").innerText = count;
 
-  // Xử lý bug: Disable nút Xóa tất cả khi danh sách trống
   const btnClear = document.getElementById("btnClearAll");
   if (count === 0) {
     btnClear.disabled = true;
@@ -456,9 +454,19 @@ document.getElementById("themeSelector").onchange = (e) =>
   setTheme(e.target.value);
 document.getElementById("langSelector").onchange = (e) =>
   setLang(e.target.value);
+
+// --- PHẦN FIX LỖI THỨ TỰ (ORDER) ---
 ["prefix", "orderSelect", "streetInput", "wardInput"].forEach(
   (id) =>
     (document.getElementById(id).oninput = () => {
+      // FIX: Thực hiện sắp xếp lại mảng filesArray khi người dùng thay đổi Order
+      if (id === "orderSelect") {
+        const order = document.getElementById("orderSelect").value;
+        if (order === "asc")
+          filesArray.sort((a, b) => a.name.localeCompare(b.name));
+        else if (order === "desc")
+          filesArray.sort((a, b) => b.name.localeCompare(a.name));
+      }
       updatePreview();
       renderFileList();
     }),
@@ -489,7 +497,6 @@ function resetNamingConfig() {
   renderFileList();
 }
 
-// Fix bug: Đóng modal khi nhấn phím Esc
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     const modal = document.getElementById("customModal");
@@ -497,11 +504,7 @@ document.addEventListener("keydown", function (event) {
       const modalTitle = document.getElementById("modalTitle").innerText;
       const lang = localStorage.getItem("app-lang") || "vi";
       const t = translations[lang] || translations["en"];
-
-      // Đóng modal
       modal.style.display = "none";
-
-      // Nếu là modal thông báo thành công, reset danh sách file theo logic gốc
       if (modalTitle === t.uploadSuccess) {
         filesArray = [];
         renderFileList();
@@ -510,23 +513,20 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-// --- BỔ SUNG PHÍM TẮT THEO YÊU CẦU ---
 document.addEventListener("keydown", function (e) {
-  // Phím tắt Option + C: Kết nối Drive
+  if (e.altKey && e.code === "Space") {
+    e.preventDefault();
+    document.getElementById("fileInput").click();
+  }
   if (e.altKey && e.code === "KeyC") {
     e.preventDefault();
     handleAuthClick();
   }
-
-  // Phím tắt Command + Option + O: Mở Picker chọn thư mục
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
     showPicker();
   }
-
-  // MỚI: Phím tắt Command + Enter (hoặc Ctrl + Enter) để Tải lên Drive
   if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-    // Chỉ thực thi khi nút Upload đang hiển thị (có file và đã kết nối)
     const btnUpload = document.getElementById("btnUploadDrive");
     if (
       window.getComputedStyle(btnUpload).display !== "none" &&

@@ -188,7 +188,7 @@ const translations = {
     title: "Renommer & Télécharger vers Drive",
     prefix: "Préfixe",
     code: "Code",
-    order: "Ordre",
+    ordre: "Ordre",
     street: "Rue",
     ward: "Quartier",
     preview: "Aperçu:",
