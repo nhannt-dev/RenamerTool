@@ -528,6 +528,15 @@ document.addEventListener("keydown", function (e) {
     e.preventDefault();
     resetNamingConfig();
   }
+
+  // --- BỔ SUNG PHÍM TẮT COMMAND/CTRL + BACKSPACE ĐỂ XÓA INPUT ---
+  if ((e.metaKey || e.ctrlKey) && e.key === "Backspace") {
+    e.preventDefault();
+    clearInput("clientId");
+    clearInput("apiKey");
+    clearInput("folderId");
+  }
+
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
     showPicker();
