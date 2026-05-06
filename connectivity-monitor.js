@@ -18,11 +18,10 @@
     transition: "all 0.4s ease",
     fontFamily: "system-ui, -apple-system, sans-serif",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    fontSize: "14px", // Mặc định cho mobile
+    fontSize: "14px",
     boxSizing: "border-box",
   });
 
-  // Thêm media query bằng JS để đảm bảo tính responsive
   const styleSheet = document.createElement("style");
   styleSheet.innerText = `
         @media (min-width: 768px) {
@@ -32,18 +31,11 @@
   document.head.appendChild(styleSheet);
   document.body.appendChild(banner);
 
-  // 2. Hàm lấy bản dịch dựa trên ngôn ngữ hiện tại (Bổ sung Thái, Nhật, Trung, Pháp)
+  // 2. Hàm lấy bản dịch đã fix lỗi undefined
   function getMessage(type) {
     const lang = localStorage.getItem("app-lang") || "vi";
 
-    // Ưu tiên truy xuất từ đối tượng translations toàn cục trong rename.html nếu có
-    if (typeof translations !== "undefined" && translations[lang]) {
-      return type === "online"
-        ? translations[lang].netOnline
-        : translations[lang].netOffline;
-    }
-
-    // Bản dịch dự phòng (Fallback) đầy đủ 6 ngôn ngữ
+    // Bảng dịch dự phòng (Fallback) đầy đủ 6 ngôn ngữ
     const fallback = {
       vi: {
         online: "🌐 Đã khôi phục kết nối Internet!",
@@ -73,6 +65,18 @@
       },
     };
 
+    // FIX: Kiểm tra xem translations có tồn tại VÀ có chứa key netOnline/netOffline không
+    if (
+      typeof translations !== "undefined" &&
+      translations[lang] &&
+      translations[lang].netOnline
+    ) {
+      return type === "online"
+        ? translations[lang].netOnline
+        : translations[lang].netOffline;
+    }
+
+    // Nếu file rename.html chưa cập nhật key, sử dụng fallback ngay tại đây
     const selectedLang = fallback[lang] || fallback["en"];
     return type === "online" ? selectedLang.online : selectedLang.offline;
   }

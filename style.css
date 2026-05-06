@@ -38,7 +38,6 @@ body {
   overflow-x: hidden;
 }
 
-/* SPLASH SCREEN STYLES */
 #splash-screen {
   position: fixed;
   top: 0;
@@ -87,7 +86,7 @@ body {
   padding: 35px;
   border-radius: 16px;
   box-shadow: var(--shadow);
-  display: none; /* Ẩn lúc đầu để splash screen chạy */
+  display: none;
 }
 
 header {
@@ -278,7 +277,7 @@ input {
   border-radius: 12px;
   text-align: center;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
   box-shadow: var(--shadow);
 }
 
@@ -331,4 +330,50 @@ input {
   display: flex;
   gap: 8px;
   width: 100%;
+}
+
+/* Kết quả Modal & Toast */
+.copy-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--item-bg);
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+.copy-item input {
+  flex: 1;
+  height: 32px;
+  font-size: 13px;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+.btn-copy-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.toast-copy {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  display: none;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

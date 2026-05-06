@@ -10,13 +10,10 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Bổ sung thư viện Google API cho Picker -->
     <script src="https://apis.google.com/js/api.js"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon" />
   </head>
   <body>
-    <!-- BỔ SUNG HTML SPLASH SCREEN -->
     <div id="splash-screen">
       <div class="splash-logo animate__animated animate__bounceIn">🚀</div>
       <div class="progress-container">
@@ -241,11 +238,11 @@
     <div id="customModal" class="modal-overlay">
       <div class="modal-content">
         <h3 id="modalTitle">Thông báo</h3>
-        <p id="modalMsg"></p>
+        <div id="modalMsg" style="margin-top: 15px"></div>
         <div
           id="modalBtns"
           style="
-            margin-top: 20px;
+            margin-top: 25px;
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -253,8 +250,11 @@
         ></div>
       </div>
     </div>
+
+    <div id="copyToast" class="toast-copy">✅ Đã copy vào bộ nhớ tạm!</div>
+
+    <script src="connectivity-monitor.js"></script>
     <script src="translations.js"></script>
-    <script src="./connectivity-monitor.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

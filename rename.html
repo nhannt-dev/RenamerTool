@@ -10,7 +10,6 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Bổ sung thư viện Google API cho Picker -->
     <script src="https://apis.google.com/js/api.js"></script>
     <style>
       :root {
@@ -53,7 +52,6 @@
         overflow-x: hidden;
       }
 
-      /* SPLASH SCREEN STYLES */
       #splash-screen {
         position: fixed;
         top: 0;
@@ -102,7 +100,7 @@
         padding: 35px;
         border-radius: 16px;
         box-shadow: var(--shadow);
-        display: none; /* Ẩn lúc đầu để splash screen chạy */
+        display: none;
       }
 
       header {
@@ -293,7 +291,7 @@
         border-radius: 12px;
         text-align: center;
         width: 90%;
-        max-width: 400px;
+        max-width: 500px;
         box-shadow: var(--shadow);
       }
 
@@ -347,11 +345,55 @@
         gap: 8px;
         width: 100%;
       }
+
+      /* Kết quả Modal & Toast */
+      .copy-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--item-bg);
+        padding: 8px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+      .copy-item input {
+        flex: 1;
+        height: 32px;
+        font-size: 13px;
+        background: transparent;
+        border: none;
+        outline: none;
+      }
+      .btn-copy-small {
+        padding: 6px 12px;
+        font-size: 12px;
+        background: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .toast-copy {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        display: none;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
     </style>
-    <link rel="icon" href="favicon.ico" type="image/x-icon" />
   </head>
   <body>
-    <!-- BỔ SUNG HTML SPLASH SCREEN -->
     <div id="splash-screen">
       <div class="splash-logo animate__animated animate__bounceIn">🚀</div>
       <div class="progress-container">
@@ -576,11 +618,11 @@
     <div id="customModal" class="modal-overlay">
       <div class="modal-content">
         <h3 id="modalTitle">Thông báo</h3>
-        <p id="modalMsg"></p>
+        <div id="modalMsg" style="margin-top: 15px"></div>
         <div
           id="modalBtns"
           style="
-            margin-top: 20px;
+            margin-top: 25px;
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -588,29 +630,29 @@
         ></div>
       </div>
     </div>
-    <script src="./connectivity-monitor.js"></script>
+
+    <div id="copyToast" class="toast-copy">✅ Đã copy vào bộ nhớ tạm!</div>
+
+    <script src="connectivity-monitor.js"></script>
     <script>
-      // --- LOGIC SPLASH SCREEN ---
       function startSplashScreen() {
         const splash = document.getElementById("splash-screen");
         const bar = document.getElementById("splash-bar");
         const app = document.getElementById("main-app");
         let width = 0;
-        const duration = 3500; // 3.5 giây
-        const intervalTime = 35;
+        const duration = 2000;
+        const intervalTime = 20;
         const step = 100 / (duration / intervalTime);
-
         const timer = setInterval(() => {
           width += step;
           bar.style.width = width + "%";
           if (width >= 100) {
             clearInterval(timer);
-            // Hiệu ứng ẩn splash screen
             splash.classList.add("animate__animated", "animate__fadeOut");
             setTimeout(() => {
               splash.style.display = "none";
-              app.style.display = "block"; // Hiện giao diện chính
-            }, 800);
+              app.style.display = "block";
+            }, 500);
           }
         }, intervalTime);
       }
@@ -651,8 +693,7 @@
           themeLight: "Sáng",
           themeDark: "Tối",
           themeDevice: "Hệ thống",
-          netOnline: "🌐 Đã khôi phục kết nối Internet!",
-          netOffline: "⚠️ Mất kết nối Internet. Vui lòng kiểm tra đường truyền!",
+          copySuccess: "✅ Đã copy vào bộ nhớ tạm!",
         },
         en: {
           title: "Rename & Upload Drive",
@@ -689,36 +730,35 @@
           themeLight: "Light",
           themeDark: "Dark",
           themeDevice: "System",
-          netOnline: "🌐 Internet connection restored!",
-          netOffline: "⚠️ No Internet connection. Please check your network!",
+          copySuccess: "✅ Copied to clipboard!",
         },
         th: {
-          title: "เปลี่ยนชื่อและอัปโหลด Drive",
+          title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
           prefix: "คำนำหน้า",
-          code: "รหัส (Code)",
+          code: "รหัส",
           order: "ลำดับ",
           street: "ถนน",
-          ward: "แขวง/ตำบล",
-          preview: "ตัวอย่าง:",
+          ward: "แขวง",
+          preview: "ดูตัวอย่าง:",
           drop: "ลากและวางรูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์",
           countText: "จำนวนไฟล์:",
           remove: "ลบ",
-          clearAll: "ลบทั้งหมด",
-          connect: "เชื่อมต่อ Drive",
+          clearAll: "ล้างทั้งหมด",
+          connect: "เชื่อมต่อไดรฟ์",
           connected: "เชื่อมต่อแล้ว",
-          notConnected: "ยังไม่ได้เชื่อมต่อ",
-          driveConfig: "การตั้งค่า Google Drive",
+          notConnected: "ไม่ได้เชื่อมต่อ",
+          driveConfig: "การกำหนดค่า Google Drive",
           folderLink: "ลิงก์โฟลเดอร์ Google Drive",
           uploadButton: "🚀 อัปโหลดไปยัง Google Drive",
           uploading: "กำลังอัปโหลด...",
           uploadSuccess: "อัปโหลดสำเร็จ!",
-          placeholderClientId: "ใส่ Client ID...",
-          placeholderApiKey: "ใส่ API Key...",
+          placeholderClientId: "ป้อน Client ID...",
+          placeholderApiKey: "ป้อน API Key...",
           placeholderFolder: "วางลิงก์โฟลเดอร์หรือ ID โฟลเดอร์",
           confirmClear: "คุณแน่ใจหรือไม่ว่าต้องการล้างรายการทั้งหมด?",
           fetching: "🔍 กำลังดึงชื่อโฟลเดอร์...",
           notFound: "❌ ไม่พบโฟลเดอร์",
-          needConnect: "⚠️ โปรดคลิกเชื่อมต่อ Drive ก่อน",
+          needConnect: "⚠️ โปรดคลิกเชื่อมต่อไดรฟ์ก่อน",
           modalTitle: "การแจ้งเตือน",
           close: "ปิด",
           confirm: "ยืนยัน",
@@ -726,96 +766,93 @@
           errorMissing: "ไม่มี Client ID/API Key",
           themeLight: "สว่าง",
           themeDark: "มืด",
-          themeDevice: "ตามระบบ",
-          netOnline: "🌐 การเชื่อมต่ออินเทอร์เน็ตกลับมาแล้ว!",
-          netOffline: "⚠️ ขาดการเชื่อมต่ออินเทอร์เน็ต โปรดตรวจสอบเครือข่ายของคุณ!",
+          themeDevice: "ระบบ",
+          copySuccess: "✅ คัดลอกไปยังคลิปบอร์ดแล้ว!",
         },
         ja: {
-          title: "リネーム＆ドライブアップロード",
-          prefix: "接頭辞",
+          title: "名前変更とドライブへのアップロード",
+          prefix: "プレフィックス",
           code: "コード",
           order: "順序",
           street: "通り",
-          ward: "区/町",
+          ward: "区",
           preview: "プレビュー:",
-          drop: "ここに画像をドラッグ＆ドロップするか、クリックして選択してください",
+          drop: "ここに画像をドラッグ＆ドロップするか、クリックしてファイルを選択してください",
           countText: "ファイル数:",
           remove: "削除",
-          clearAll: "すべて削除",
-          connect: "Driveに接続",
+          clearAll: "すべてクリア",
+          connect: "ドライブに接続",
           connected: "接続済み",
           notConnected: "未接続",
-          driveConfig: "Google Drive設定",
-          folderLink: "Google Driveフォルダリンク",
-          uploadButton: "🚀 Google Driveにアップロード",
+          driveConfig: "Google ドライブの設定",
+          folderLink: "Google ドライブのフォルダリンク",
+          uploadButton: "🚀 Google ドライブにアップロード",
           uploading: "アップロード中...",
           uploadSuccess: "アップロード成功！",
-          placeholderClientId: "Client IDを入力...",
-          placeholderApiKey: "API Keyを入力...",
-          placeholderFolder: "フォルダリンクまたはIDを貼り付け",
-          confirmClear: "リストをすべて消去してもよろしいですか？",
+          placeholderClientId: "クライアントIDを入力...",
+          placeholderApiKey: "APIキーを入力...",
+          placeholderFolder: "フォルダリンクまたはフォルダIDを貼り付け",
+          confirmClear: "リストをすべてクリアしてもよろしいですか？",
           fetching: "🔍 フォルダ名を取得中...",
           notFound: "❌ フォルダが見つかりません",
-          needConnect: "⚠️ 最初にDriveに接続してください",
+          needConnect: "⚠️ 最初に「ドライブに接続」をクリックしてください",
           modalTitle: "通知",
           close: "閉じる",
           confirm: "確認",
           cancel: "キャンセル",
-          errorMissing: "Client IDまたはAPI Keyが不足しています",
+          errorMissing: "クライアントIDまたはAPIキーが不足しています",
           themeLight: "ライト",
           themeDark: "ダーク",
           themeDevice: "システム設定",
-          netOnline: "🌐 インターネット接続が復旧しました！",
-          netOffline: "⚠️ インターネット接続がありません。ネットワークを確認してください。",
+          copySuccess: "✅ クリップボードにコピーしました！",
         },
         zh: {
-          title: "重命名并上传 Drive",
+          title: "重命名并上传至云端硬盘",
           prefix: "前缀",
-          code: "代码 (Code)",
-          order: "排序",
+          code: "代码",
+          order: "顺序",
           street: "街道",
-          ward: "行政区",
+          ward: "区/镇",
           preview: "预览:",
           drop: "将图片拖放到此处或点击选择文件",
           countText: "文件数:",
           remove: "删除",
           clearAll: "全部清除",
-          connect: "连接 Drive",
+          connect: "连接云端硬盘",
           connected: "已连接",
           notConnected: "未连接",
-          driveConfig: "Google Drive 配置",
-          folderLink: "Google Drive 文件夹链接",
-          uploadButton: "🚀 上传到 Google Drive",
+          driveConfig: "Google 云端硬盘配置",
+          folderLink: "Google 云端硬盘文件夹链接",
+          uploadButton: "🚀 上传至 Google 云端硬盘",
           uploading: "正在上传...",
           uploadSuccess: "上传成功！",
-          placeholderClientId: "请输入 Client ID...",
-          placeholderApiKey: "请输入 API Key...",
+          placeholderClientId: "输入客户端 ID...",
+          placeholderApiKey: "输入 API 密钥...",
           placeholderFolder: "粘贴文件夹链接或 ID",
           confirmClear: "您确定要清除所有列表吗？",
           fetching: "🔍 正在获取文件夹名称...",
           notFound: "❌ 未找到文件夹",
-          needConnect: "⚠️ 请先点击连接 Drive",
-          modalTitle: "提示",
+          needConnect: "⚠️ 请先点击连接云端硬盘",
+          modalTitle: "通知",
           close: "关闭",
           confirm: "确认",
           cancel: "取消",
-          errorMissing: "缺少 Client ID/API Key",
-          themeLight: "浅色",
+          errorMissing: "缺少客户端 ID/API 密钥",
+          themeLight: "明亮",
           themeDark: "深色",
-          themeDevice: "系统默认",
-          netOnline: "🌐 网络连接已恢复！",
-          netOffline: "⚠️ 无网络连接，请检查您的网络！",
+          themeDevice: "系统",
+          copySuccess: "✅ 已复制到剪贴板！",
         },
         fr: {
-          title: "Renommer & Télécharger Drive",
+          title: "Renommer & Télécharger vers Drive",
           prefix: "Préfixe",
           code: "Code",
           order: "Ordre",
           street: "Rue",
           ward: "Quartier",
-          preview: "Aperçu :",
-          drop: "Glissez-déposez des images ici ou cliquez pour sélectionner",
-          countText: "Fichiers :",
+          preview: "Aperçu:",
+          drop: "Faites glisser des images ici ou cliquez pour sélectionner",
+          countText: "Fichiers:",
           remove: "Supprimer",
           clearAll: "Tout effacer",
           connect: "Connecter Drive",
@@ -823,27 +860,26 @@
           notConnected: "Non connecté",
           driveConfig: "Configuration Google Drive",
           folderLink: "Lien du dossier Google Drive",
-          uploadButton: "🚀 Télécharger sur Google Drive",
+          uploadButton: "🚀 Télécharger vers Google Drive",
           uploading: "Téléchargement...",
           uploadSuccess: "Téléchargement réussi !",
           placeholderClientId: "Entrez le Client ID...",
           placeholderApiKey: "Entrez l'API Key...",
           placeholderFolder: "Collez le lien ou l'ID du dossier",
-          confirmClear: "Êtes-vous sûr de vouloir vider la liste ?",
+          confirmClear: "Voulez-vous vraiment vider la liste ?",
           fetching: "🔍 Récupération du nom du dossier...",
-          notFound: "❌ Dossier introuvable",
-          needConnect: "⚠️ Veuillez d'abord connecter le Drive",
+          notFound: "❌ Dossier non trouvé",
+          needConnect: "⚠️ Veuillez d'abord cliquer sur Connecter Drive",
           modalTitle: "Notification",
           close: "Fermer",
           confirm: "Confirmer",
           cancel: "Annuler",
-          errorMissing: "Client ID/API Key manquant",
+          errorMissing: "Client ID ou API Key manquant",
           themeLight: "Clair",
           themeDark: "Sombre",
           themeDevice: "Système",
-          netOnline: "🌐 Connexion Internet rétablie !",
-          netOffline: "⚠️ Pas de connexion Internet. Veuillez vérifier votre réseau !",
-        }
+          copySuccess: "✅ Copié dans le presse-papier !",
+        },
       };
 
       let filesArray = [];
@@ -856,8 +892,9 @@
 
       function showPicker() {
         const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
         if (!accessToken) {
-          showModal(translations[lang].needConnect);
+          showModal(t.needConnect);
           return;
         }
         createPicker();
@@ -870,7 +907,6 @@
             .setIncludeFolders(true)
             .setSelectFolderEnabled(true)
             .setMimeTypes("application/vnd.google-apps.folder");
-
           const picker = new google.picker.PickerBuilder()
             .addView(view)
             .setOAuthToken(accessToken)
@@ -884,8 +920,7 @@
       function pickerCallback(data) {
         if (data.action === google.picker.Action.PICKED) {
           const doc = data.docs[0];
-          const folderIdInput = document.getElementById("folderId");
-          folderIdInput.value = doc.id;
+          document.getElementById("folderId").value = doc.id;
           fetchFolderName();
         }
       }
@@ -896,10 +931,10 @@
         const msgEl = document.getElementById("modalMsg");
         const btnContainer = document.getElementById("modalBtns");
         const lang = localStorage.getItem("app-lang") || "vi";
-        const t = translations[lang];
+        const t = translations[lang] || translations["en"];
 
         titleEl.innerText = t.modalTitle;
-        msgEl.innerText = msg;
+        msgEl.innerHTML = msg;
         btnContainer.innerHTML = "";
 
         if (type === "alert") {
@@ -916,46 +951,60 @@
             modal.style.display = "none";
             if (onConfirm) onConfirm();
           };
-
           const btnCancel = document.createElement("button");
           btnCancel.className = "btn-primary";
           btnCancel.style.background = "var(--accent-color)";
           btnCancel.innerText = t.cancel;
           btnCancel.onclick = () => (modal.style.display = "none");
-
           btnContainer.appendChild(btnOk);
           btnContainer.appendChild(btnCancel);
         }
         modal.style.display = "flex";
       }
 
-      window.onload = () => {
-        // Chạy Splash Screen đầu tiên
-        startSplashScreen();
+      function copyToClipboard(text) {
+        const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
 
+        navigator.clipboard.writeText(text).then(() => {
+          const toast = document.getElementById("copyToast");
+          toast.innerText = t.copySuccess; // Cập nhật nội dung dịch cho Toast
+          toast.style.display = "block";
+          toast.classList.add("animate__animated", "animate__fadeInUp");
+          setTimeout(() => {
+            toast.classList.replace(
+              "animate__fadeInUp",
+              "animate__fadeOutDown",
+            );
+            setTimeout(() => {
+              toast.style.display = "none";
+              toast.classList.remove(
+                "animate__animated",
+                "animate__fadeOutDown",
+              );
+            }, 500);
+          }, 2000);
+        });
+      }
+
+      window.onload = () => {
+        startSplashScreen();
         const savedLang = localStorage.getItem("app-lang") || "vi";
         document.getElementById("langSelector").value = savedLang;
         setLang(savedLang);
-
         const savedTheme = localStorage.getItem("app-theme") || "light";
         document.getElementById("themeSelector").value = savedTheme;
         setTheme(savedTheme);
-
         loadSavedConfig();
         updatePreview();
         initSortable();
         initDragAndDrop();
-
         document
           .getElementById("folderId")
           .addEventListener("input", fetchFolderName);
-
-        const codeInput = document.getElementById("codeInput");
-        codeInput.addEventListener("input", (e) => {
-          let val = e.target.value;
-          if (val.length > 6) {
-            e.target.value = val.slice(-6);
-          }
+        document.getElementById("codeInput").addEventListener("input", (e) => {
+          if (e.target.value.length > 6)
+            e.target.value = e.target.value.slice(-6);
           updatePreview();
           renderFileList();
         });
@@ -963,36 +1012,24 @@
 
       function initDragAndDrop() {
         const dropzone = document.getElementById("dropzone");
-        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-          dropzone.addEventListener(
-            eventName,
-            (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            },
-            false,
-          );
-        });
-        ["dragenter", "dragover"].forEach((eventName) => {
-          dropzone.addEventListener(
-            eventName,
-            () => dropzone.classList.add("dragover"),
-            false,
-          );
-        });
-        ["dragleave", "drop"].forEach((eventName) => {
-          dropzone.addEventListener(
-            eventName,
-            () => dropzone.classList.remove("dragover"),
-            false,
-          );
-        });
-        dropzone.addEventListener(
-          "drop",
-          (e) => {
-            handleFiles(e.dataTransfer.files);
-          },
-          false,
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((ev) =>
+          dropzone.addEventListener(ev, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }),
+        );
+        ["dragenter", "dragover"].forEach((ev) =>
+          dropzone.addEventListener(ev, () =>
+            dropzone.classList.add("dragover"),
+          ),
+        );
+        ["dragleave", "drop"].forEach((ev) =>
+          dropzone.addEventListener(ev, () =>
+            dropzone.classList.remove("dragover"),
+          ),
+        );
+        dropzone.addEventListener("drop", (e) =>
+          handleFiles(e.dataTransfer.files),
         );
       }
 
@@ -1007,16 +1044,15 @@
 
       function clearInput(id) {
         document.getElementById(id).value = "";
-        localStorage.removeItem(
-          "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()),
-        );
+        let key = "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
+        localStorage.removeItem(key);
         if (id === "folderId")
           document.getElementById("folderNameDisplay").innerText = "";
       }
 
       function setLang(lang) {
         localStorage.setItem("app-lang", lang);
-        const t = translations[lang];
+        const t = translations[lang] || translations["en"];
         document.getElementById("txt-title").innerText = t.title;
         document.getElementById("lbl-prefix").innerText = t.prefix;
         document.getElementById("lbl-code").innerText = t.code;
@@ -1033,14 +1069,16 @@
         document.getElementById("statusText").innerText = accessToken
           ? t.connected
           : t.notConnected;
-        document.getElementById("modalTitle").innerText = t.modalTitle;
-        document.getElementById("opt-light").innerText = t.themeLight;
-        document.getElementById("opt-dark").innerText = t.themeDark;
-        document.getElementById("opt-device").innerText = t.themeDevice;
+
         document.getElementById("clientId").placeholder = t.placeholderClientId;
         document.getElementById("apiKey").placeholder = t.placeholderApiKey;
         document.getElementById("folderId").placeholder = t.placeholderFolder;
         document.getElementById("btnUploadText").innerText = t.uploadButton;
+
+        document.getElementById("opt-light").innerText = t.themeLight;
+        document.getElementById("opt-dark").innerText = t.themeDark;
+        document.getElementById("opt-device").innerText = t.themeDevice;
+
         renderFileList();
       }
 
@@ -1054,9 +1092,7 @@
             "data-theme",
             isDark ? "dark" : "light",
           );
-        } else {
-          document.documentElement.setAttribute("data-theme", theme);
-        }
+        } else document.documentElement.setAttribute("data-theme", theme);
       }
 
       function extractFolderId(input) {
@@ -1069,32 +1105,32 @@
         const input = document.getElementById("folderId").value.trim();
         const display = document.getElementById("folderNameDisplay");
         const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+
         if (!input) {
           display.innerText = "";
           return;
         }
         if (!accessToken) {
-          display.innerText = translations[lang].needConnect;
+          display.innerText = t.needConnect;
           display.style.color = "orange";
           return;
         }
-        const folderId = extractFolderId(input);
-        if (folderId.length < 20) return;
-        display.innerText = translations[lang].fetching;
-        display.style.color = "var(--accent-color)";
+        const fId = extractFolderId(input);
+        if (fId.length < 20) return;
+        display.innerText = t.fetching;
         try {
           const res = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${folderId}?fields=name`,
-            {
-              headers: { Authorization: "Bearer " + accessToken },
-            },
+            `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
+            { headers: { Authorization: "Bearer " + accessToken } },
           );
           if (res.ok) {
             const data = await res.json();
             display.innerText = "📁 " + data.name;
             display.style.color = "var(--success-color)";
+            localStorage.setItem("drive-folder-id", input);
           } else {
-            display.innerText = translations[lang].notFound;
+            display.innerText = t.notFound;
             display.style.color = "var(--danger-color)";
           }
         } catch {
@@ -1106,8 +1142,10 @@
         const cid = document.getElementById("clientId").value.trim();
         const key = document.getElementById("apiKey").value.trim();
         const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+
         if (!cid || !key) {
-          showModal(translations[lang].errorMissing);
+          showModal(t.errorMissing);
           return;
         }
         localStorage.setItem("drive-client-id", cid);
@@ -1115,14 +1153,14 @@
         const client = google.accounts.oauth2.initTokenClient({
           client_id: cid,
           scope:
-            "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly",
+            "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly",
           callback: (res) => {
             if (res.access_token) {
               accessToken = res.access_token;
               document
                 .getElementById("driveStatus")
                 .classList.add("status-connected");
-              setLang(localStorage.getItem("app-lang") || "vi");
+              setLang(lang);
               fetchFolderName();
               renderFileList();
             }
@@ -1156,22 +1194,19 @@
       function renderFileList() {
         const list = document.getElementById("fileList");
         const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
         list.innerHTML = "";
         document.getElementById("fileCountDisplay").innerText =
           filesArray.length;
         filesArray.forEach((file, i) => {
           const li = document.createElement("li");
-          li.className = "file-item animate__animated animate__fadeIn";
+          li.className = "file-item";
           const newName = generateFileName(i, file.name);
-          const thumb = URL.createObjectURL(file);
           li.innerHTML = `
-            <img src="${thumb}" class="file-thumb">
-            <div class="file-info">
-                <span class="new-name">${newName || file.name}</span>
-                <span class="old-name">${file.name}</span>
-            </div>
-            <button class="btn-primary" style="background:var(--danger-color); padding:5px;" onclick="removeFile(${i})">${translations[lang].remove}</button>
-        `;
+            <img src="${URL.createObjectURL(file)}" class="file-thumb">
+            <div class="file-info"><span class="new-name">${newName || file.name}</span><span class="old-name">${file.name}</span></div>
+            <button class="btn-primary" style="background:var(--danger-color); padding:5px;" onclick="removeFile(${i})">${t.remove}</button>
+          `;
           list.appendChild(li);
         });
         document.getElementById("btnUploadDrive").style.display =
@@ -1179,23 +1214,13 @@
       }
 
       function handleFiles(files) {
-        const loader = document.getElementById("loader");
-        const dropText = document.getElementById("txt-drop");
-        loader.style.display = "block";
-        loader.style.borderColor = "transparent";
-        loader.style.borderTopColor = "var(--primary-color)";
-        dropText.style.opacity = "0.3";
-        setTimeout(() => {
-          filesArray = [...filesArray, ...Array.from(files)];
-          const order = document.getElementById("orderSelect").value;
-          if (order === "asc")
-            filesArray.sort((a, b) => a.name.localeCompare(b.name));
-          if (order === "desc")
-            filesArray.sort((a, b) => b.name.localeCompare(a.name));
-          renderFileList();
-          loader.style.display = "none";
-          dropText.style.opacity = "1";
-        }, 300);
+        filesArray = [...filesArray, ...Array.from(files)];
+        const order = document.getElementById("orderSelect").value;
+        if (order === "asc")
+          filesArray.sort((a, b) => a.name.localeCompare(b.name));
+        if (order === "desc")
+          filesArray.sort((a, b) => b.name.localeCompare(a.name));
+        renderFileList();
       }
 
       function removeFile(i) {
@@ -1205,63 +1230,92 @@
 
       function confirmClearAll() {
         const lang = localStorage.getItem("app-lang") || "vi";
-        showModal(translations[lang].confirmClear, "confirm", () => {
+        const t = translations[lang] || translations["en"];
+        showModal(t.confirmClear, "confirm", () => {
           filesArray = [];
           renderFileList();
         });
       }
 
       async function uploadAllToDrive() {
-        const folderId = extractFolderId(
-          document.getElementById("folderId").value,
-        );
+        const fId = extractFolderId(document.getElementById("folderId").value);
         const btn = document.getElementById("btnUploadDrive");
         const btnText = document.getElementById("btnUploadText");
-        const uploadLoader = document.getElementById("uploadLoader");
         const lang = localStorage.getItem("app-lang") || "vi";
-        const t = translations[lang];
+        const t = translations[lang] || translations["en"];
+        const currentPrefix = document
+          .getElementById("prefix")
+          .value.toUpperCase();
 
         btn.disabled = true;
         btnText.innerText = t.uploading;
-        uploadLoader.style.display = "block";
+        document.getElementById("uploadLoader").style.display = "block";
 
+        let links = [];
         try {
           for (let i = 0; i < filesArray.length; i++) {
             const file = filesArray[i];
-            const name = generateFileName(i, file.name);
-            const metadata = { name: name, parents: [folderId] };
+            const meta = {
+              name: generateFileName(i, file.name),
+              parents: [fId],
+            };
             const form = new FormData();
             form.append(
               "metadata",
-              new Blob([JSON.stringify(metadata)], {
-                type: "application/json",
-              }),
+              new Blob([JSON.stringify(meta)], { type: "application/json" }),
             );
             form.append("file", file);
 
-            await fetch(
-              "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+            const res = await fetch(
+              "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink",
               {
                 method: "POST",
                 headers: { Authorization: "Bearer " + accessToken },
                 body: form,
               },
             );
+            const data = await res.json();
+            if (currentPrefix === "P") {
+              let fLink = `https://drive.google.com/drive/u/0/folders/${fId}`;
+              if (!links.includes(fLink)) links.push(fLink);
+            } else links.push(data.webViewLink);
           }
-          showModal(t.uploadSuccess);
+          showResultModal(links);
         } catch (e) {
           showModal("Error: " + e.message);
         } finally {
           btn.disabled = false;
           btnText.innerText = t.uploadButton;
-          uploadLoader.style.display = "none";
+          document.getElementById("uploadLoader").style.display = "none";
         }
       }
 
+      function showResultModal(links) {
+        const modal = document.getElementById("customModal");
+        const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+        document.getElementById("modalTitle").innerText = t.uploadSuccess;
+        let html = `<div style="text-align:left; max-height:300px; overflow-y:auto;">`;
+        links.forEach((l) => {
+          html += `<div class="copy-item"><input type="text" value="${l}" readonly><button class="btn-copy-small" onclick="copyToClipboard('${l}')">Copy</button></div>`;
+        });
+        document.getElementById("modalMsg").innerHTML = html + `</div>`;
+        const btn = document.createElement("button");
+        btn.className = "btn-primary";
+        btn.innerText = t.close;
+        btn.onclick = () => {
+          modal.style.display = "none";
+          filesArray = [];
+          renderFileList();
+        };
+        document.getElementById("modalBtns").innerHTML = "";
+        document.getElementById("modalBtns").appendChild(btn);
+        modal.style.display = "flex";
+      }
+
       document.getElementById("dropzone").onclick = (e) => {
-        if (e.target.id === "dropzone" || e.target.id === "txt-drop") {
+        if (e.target.id === "dropzone" || e.target.id === "txt-drop")
           document.getElementById("fileInput").click();
-        }
       };
       document.getElementById("fileInput").onchange = (e) =>
         handleFiles(e.target.files);
@@ -1269,12 +1323,13 @@
         setTheme(e.target.value);
       document.getElementById("langSelector").onchange = (e) =>
         setLang(e.target.value);
-      ["prefix", "orderSelect", "streetInput", "wardInput"].forEach((id) => {
-        document.getElementById(id).oninput = () => {
-          updatePreview();
-          renderFileList();
-        };
-      });
+      ["prefix", "orderSelect", "streetInput", "wardInput"].forEach(
+        (id) =>
+          (document.getElementById(id).oninput = () => {
+            updatePreview();
+            renderFileList();
+          }),
+      );
 
       function initSortable() {
         new Sortable(document.getElementById("fileList"), {

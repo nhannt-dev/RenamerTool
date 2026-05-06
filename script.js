@@ -1,28 +1,24 @@
-// --- LOGIC SPLASH SCREEN ---
 function startSplashScreen() {
   const splash = document.getElementById("splash-screen");
   const bar = document.getElementById("splash-bar");
   const app = document.getElementById("main-app");
   let width = 0;
-  const duration = 3500; // 3.5 giây
-  const intervalTime = 35;
+  const duration = 2000;
+  const intervalTime = 20;
   const step = 100 / (duration / intervalTime);
-
   const timer = setInterval(() => {
     width += step;
     bar.style.width = width + "%";
     if (width >= 100) {
       clearInterval(timer);
-      // Hiệu ứng ẩn splash screen
       splash.classList.add("animate__animated", "animate__fadeOut");
       setTimeout(() => {
         splash.style.display = "none";
-        app.style.display = "block"; // Hiện giao diện chính
-      }, 800);
+        app.style.display = "block";
+      }, 500);
     }
   }, intervalTime);
 }
-
 
 let filesArray = [];
 let accessToken = null;
@@ -34,8 +30,9 @@ gapi.load("picker", () => {
 
 function showPicker() {
   const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
   if (!accessToken) {
-    showModal(translations[lang].needConnect);
+    showModal(t.needConnect);
     return;
   }
   createPicker();
@@ -48,7 +45,6 @@ function createPicker() {
       .setIncludeFolders(true)
       .setSelectFolderEnabled(true)
       .setMimeTypes("application/vnd.google-apps.folder");
-
     const picker = new google.picker.PickerBuilder()
       .addView(view)
       .setOAuthToken(accessToken)
@@ -62,8 +58,7 @@ function createPicker() {
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
     const doc = data.docs[0];
-    const folderIdInput = document.getElementById("folderId");
-    folderIdInput.value = doc.id;
+    document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
 }
@@ -74,10 +69,10 @@ function showModal(msg, type = "alert", onConfirm = null) {
   const msgEl = document.getElementById("modalMsg");
   const btnContainer = document.getElementById("modalBtns");
   const lang = localStorage.getItem("app-lang") || "vi";
-  const t = translations[lang];
+  const t = translations[lang] || translations["en"];
 
   titleEl.innerText = t.modalTitle;
-  msgEl.innerText = msg;
+  msgEl.innerHTML = msg;
   btnContainer.innerHTML = "";
 
   if (type === "alert") {
@@ -94,46 +89,53 @@ function showModal(msg, type = "alert", onConfirm = null) {
       modal.style.display = "none";
       if (onConfirm) onConfirm();
     };
-
     const btnCancel = document.createElement("button");
     btnCancel.className = "btn-primary";
     btnCancel.style.background = "var(--accent-color)";
     btnCancel.innerText = t.cancel;
     btnCancel.onclick = () => (modal.style.display = "none");
-
     btnContainer.appendChild(btnOk);
     btnContainer.appendChild(btnCancel);
   }
   modal.style.display = "flex";
 }
 
-window.onload = () => {
-  // Chạy Splash Screen đầu tiên
-  startSplashScreen();
+function copyToClipboard(text) {
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
 
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById("copyToast");
+    toast.innerText = t.copySuccess; // Cập nhật nội dung dịch cho Toast
+    toast.style.display = "block";
+    toast.classList.add("animate__animated", "animate__fadeInUp");
+    setTimeout(() => {
+      toast.classList.replace("animate__fadeInUp", "animate__fadeOutDown");
+      setTimeout(() => {
+        toast.style.display = "none";
+        toast.classList.remove("animate__animated", "animate__fadeOutDown");
+      }, 500);
+    }, 2000);
+  });
+}
+
+window.onload = () => {
+  startSplashScreen();
   const savedLang = localStorage.getItem("app-lang") || "vi";
   document.getElementById("langSelector").value = savedLang;
   setLang(savedLang);
-
   const savedTheme = localStorage.getItem("app-theme") || "light";
   document.getElementById("themeSelector").value = savedTheme;
   setTheme(savedTheme);
-
   loadSavedConfig();
   updatePreview();
   initSortable();
   initDragAndDrop();
-
   document
     .getElementById("folderId")
     .addEventListener("input", fetchFolderName);
-
-  const codeInput = document.getElementById("codeInput");
-  codeInput.addEventListener("input", (e) => {
-    let val = e.target.value;
-    if (val.length > 6) {
-      e.target.value = val.slice(-6);
-    }
+  document.getElementById("codeInput").addEventListener("input", (e) => {
+    if (e.target.value.length > 6) e.target.value = e.target.value.slice(-6);
     updatePreview();
     renderFileList();
   });
@@ -141,37 +143,19 @@ window.onload = () => {
 
 function initDragAndDrop() {
   const dropzone = document.getElementById("dropzone");
-  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-    dropzone.addEventListener(
-      eventName,
-      (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      },
-      false,
-    );
-  });
-  ["dragenter", "dragover"].forEach((eventName) => {
-    dropzone.addEventListener(
-      eventName,
-      () => dropzone.classList.add("dragover"),
-      false,
-    );
-  });
-  ["dragleave", "drop"].forEach((eventName) => {
-    dropzone.addEventListener(
-      eventName,
-      () => dropzone.classList.remove("dragover"),
-      false,
-    );
-  });
-  dropzone.addEventListener(
-    "drop",
-    (e) => {
-      handleFiles(e.dataTransfer.files);
-    },
-    false,
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((ev) =>
+    dropzone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }),
   );
+  ["dragenter", "dragover"].forEach((ev) =>
+    dropzone.addEventListener(ev, () => dropzone.classList.add("dragover")),
+  );
+  ["dragleave", "drop"].forEach((ev) =>
+    dropzone.addEventListener(ev, () => dropzone.classList.remove("dragover")),
+  );
+  dropzone.addEventListener("drop", (e) => handleFiles(e.dataTransfer.files));
 }
 
 function loadSavedConfig() {
@@ -185,16 +169,15 @@ function loadSavedConfig() {
 
 function clearInput(id) {
   document.getElementById(id).value = "";
-  localStorage.removeItem(
-    "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()),
-  );
+  let key = "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
+  localStorage.removeItem(key);
   if (id === "folderId")
     document.getElementById("folderNameDisplay").innerText = "";
 }
 
 function setLang(lang) {
   localStorage.setItem("app-lang", lang);
-  const t = translations[lang];
+  const t = translations[lang] || translations["en"];
   document.getElementById("txt-title").innerText = t.title;
   document.getElementById("lbl-prefix").innerText = t.prefix;
   document.getElementById("lbl-code").innerText = t.code;
@@ -211,14 +194,16 @@ function setLang(lang) {
   document.getElementById("statusText").innerText = accessToken
     ? t.connected
     : t.notConnected;
-  document.getElementById("modalTitle").innerText = t.modalTitle;
-  document.getElementById("opt-light").innerText = t.themeLight;
-  document.getElementById("opt-dark").innerText = t.themeDark;
-  document.getElementById("opt-device").innerText = t.themeDevice;
+
   document.getElementById("clientId").placeholder = t.placeholderClientId;
   document.getElementById("apiKey").placeholder = t.placeholderApiKey;
   document.getElementById("folderId").placeholder = t.placeholderFolder;
   document.getElementById("btnUploadText").innerText = t.uploadButton;
+
+  document.getElementById("opt-light").innerText = t.themeLight;
+  document.getElementById("opt-dark").innerText = t.themeDark;
+  document.getElementById("opt-device").innerText = t.themeDevice;
+
   renderFileList();
 }
 
@@ -230,9 +215,7 @@ function setTheme(theme) {
       "data-theme",
       isDark ? "dark" : "light",
     );
-  } else {
-    document.documentElement.setAttribute("data-theme", theme);
-  }
+  } else document.documentElement.setAttribute("data-theme", theme);
 }
 
 function extractFolderId(input) {
@@ -245,32 +228,32 @@ async function fetchFolderName() {
   const input = document.getElementById("folderId").value.trim();
   const display = document.getElementById("folderNameDisplay");
   const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+
   if (!input) {
     display.innerText = "";
     return;
   }
   if (!accessToken) {
-    display.innerText = translations[lang].needConnect;
+    display.innerText = t.needConnect;
     display.style.color = "orange";
     return;
   }
-  const folderId = extractFolderId(input);
-  if (folderId.length < 20) return;
-  display.innerText = translations[lang].fetching;
-  display.style.color = "var(--accent-color)";
+  const fId = extractFolderId(input);
+  if (fId.length < 20) return;
+  display.innerText = t.fetching;
   try {
     const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${folderId}?fields=name`,
-      {
-        headers: { Authorization: "Bearer " + accessToken },
-      },
+      `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
+      { headers: { Authorization: "Bearer " + accessToken } },
     );
     if (res.ok) {
       const data = await res.json();
       display.innerText = "📁 " + data.name;
       display.style.color = "var(--success-color)";
+      localStorage.setItem("drive-folder-id", input);
     } else {
-      display.innerText = translations[lang].notFound;
+      display.innerText = t.notFound;
       display.style.color = "var(--danger-color)";
     }
   } catch {
@@ -282,8 +265,10 @@ function handleAuthClick() {
   const cid = document.getElementById("clientId").value.trim();
   const key = document.getElementById("apiKey").value.trim();
   const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+
   if (!cid || !key) {
-    showModal(translations[lang].errorMissing);
+    showModal(t.errorMissing);
     return;
   }
   localStorage.setItem("drive-client-id", cid);
@@ -291,14 +276,14 @@ function handleAuthClick() {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: cid,
     scope:
-      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly",
     callback: (res) => {
       if (res.access_token) {
         accessToken = res.access_token;
         document
           .getElementById("driveStatus")
           .classList.add("status-connected");
-        setLang(localStorage.getItem("app-lang") || "vi");
+        setLang(lang);
         fetchFolderName();
         renderFileList();
       }
@@ -330,21 +315,18 @@ function updatePreview() {
 function renderFileList() {
   const list = document.getElementById("fileList");
   const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
   list.innerHTML = "";
   document.getElementById("fileCountDisplay").innerText = filesArray.length;
   filesArray.forEach((file, i) => {
     const li = document.createElement("li");
-    li.className = "file-item animate__animated animate__fadeIn";
+    li.className = "file-item";
     const newName = generateFileName(i, file.name);
-    const thumb = URL.createObjectURL(file);
     li.innerHTML = `
-            <img src="${thumb}" class="file-thumb">
-            <div class="file-info">
-                <span class="new-name">${newName || file.name}</span>
-                <span class="old-name">${file.name}</span>
-            </div>
-            <button class="btn-primary" style="background:var(--danger-color); padding:5px;" onclick="removeFile(${i})">${translations[lang].remove}</button>
-        `;
+            <img src="${URL.createObjectURL(file)}" class="file-thumb">
+            <div class="file-info"><span class="new-name">${newName || file.name}</span><span class="old-name">${file.name}</span></div>
+            <button class="btn-primary" style="background:var(--danger-color); padding:5px;" onclick="removeFile(${i})">${t.remove}</button>
+          `;
     list.appendChild(li);
   });
   document.getElementById("btnUploadDrive").style.display =
@@ -352,23 +334,11 @@ function renderFileList() {
 }
 
 function handleFiles(files) {
-  const loader = document.getElementById("loader");
-  const dropText = document.getElementById("txt-drop");
-  loader.style.display = "block";
-  loader.style.borderColor = "transparent";
-  loader.style.borderTopColor = "var(--primary-color)";
-  dropText.style.opacity = "0.3";
-  setTimeout(() => {
-    filesArray = [...filesArray, ...Array.from(files)];
-    const order = document.getElementById("orderSelect").value;
-    if (order === "asc")
-      filesArray.sort((a, b) => a.name.localeCompare(b.name));
-    if (order === "desc")
-      filesArray.sort((a, b) => b.name.localeCompare(a.name));
-    renderFileList();
-    loader.style.display = "none";
-    dropText.style.opacity = "1";
-  }, 300);
+  filesArray = [...filesArray, ...Array.from(files)];
+  const order = document.getElementById("orderSelect").value;
+  if (order === "asc") filesArray.sort((a, b) => a.name.localeCompare(b.name));
+  if (order === "desc") filesArray.sort((a, b) => b.name.localeCompare(a.name));
+  renderFileList();
 }
 
 function removeFile(i) {
@@ -378,61 +348,90 @@ function removeFile(i) {
 
 function confirmClearAll() {
   const lang = localStorage.getItem("app-lang") || "vi";
-  showModal(translations[lang].confirmClear, "confirm", () => {
+  const t = translations[lang] || translations["en"];
+  showModal(t.confirmClear, "confirm", () => {
     filesArray = [];
     renderFileList();
   });
 }
 
 async function uploadAllToDrive() {
-  const folderId = extractFolderId(document.getElementById("folderId").value);
+  const fId = extractFolderId(document.getElementById("folderId").value);
   const btn = document.getElementById("btnUploadDrive");
   const btnText = document.getElementById("btnUploadText");
-  const uploadLoader = document.getElementById("uploadLoader");
   const lang = localStorage.getItem("app-lang") || "vi";
-  const t = translations[lang];
+  const t = translations[lang] || translations["en"];
+  const currentPrefix = document.getElementById("prefix").value.toUpperCase();
 
   btn.disabled = true;
   btnText.innerText = t.uploading;
-  uploadLoader.style.display = "block";
+  document.getElementById("uploadLoader").style.display = "block";
 
+  let links = [];
   try {
     for (let i = 0; i < filesArray.length; i++) {
       const file = filesArray[i];
-      const name = generateFileName(i, file.name);
-      const metadata = { name: name, parents: [folderId] };
+      const meta = {
+        name: generateFileName(i, file.name),
+        parents: [fId],
+      };
       const form = new FormData();
       form.append(
         "metadata",
-        new Blob([JSON.stringify(metadata)], {
-          type: "application/json",
-        }),
+        new Blob([JSON.stringify(meta)], { type: "application/json" }),
       );
       form.append("file", file);
 
-      await fetch(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+      const res = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink",
         {
           method: "POST",
           headers: { Authorization: "Bearer " + accessToken },
           body: form,
         },
       );
+      const data = await res.json();
+      if (currentPrefix === "P") {
+        let fLink = `https://drive.google.com/drive/u/0/folders/${fId}`;
+        if (!links.includes(fLink)) links.push(fLink);
+      } else links.push(data.webViewLink);
     }
-    showModal(t.uploadSuccess);
+    showResultModal(links);
   } catch (e) {
     showModal("Error: " + e.message);
   } finally {
     btn.disabled = false;
     btnText.innerText = t.uploadButton;
-    uploadLoader.style.display = "none";
+    document.getElementById("uploadLoader").style.display = "none";
   }
 }
 
+function showResultModal(links) {
+  const modal = document.getElementById("customModal");
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+  document.getElementById("modalTitle").innerText = t.uploadSuccess;
+  let html = `<div style="text-align:left; max-height:300px; overflow-y:auto;">`;
+  links.forEach((l) => {
+    html += `<div class="copy-item"><input type="text" value="${l}" readonly><button class="btn-copy-small" onclick="copyToClipboard('${l}')">Copy</button></div>`;
+  });
+  document.getElementById("modalMsg").innerHTML = html + `</div>`;
+  const btn = document.createElement("button");
+  btn.className = "btn-primary";
+  btn.innerText = t.close;
+  btn.onclick = () => {
+    modal.style.display = "none";
+    filesArray = [];
+    renderFileList();
+  };
+  document.getElementById("modalBtns").innerHTML = "";
+  document.getElementById("modalBtns").appendChild(btn);
+  modal.style.display = "flex";
+}
+
 document.getElementById("dropzone").onclick = (e) => {
-  if (e.target.id === "dropzone" || e.target.id === "txt-drop") {
+  if (e.target.id === "dropzone" || e.target.id === "txt-drop")
     document.getElementById("fileInput").click();
-  }
 };
 document.getElementById("fileInput").onchange = (e) =>
   handleFiles(e.target.files);
@@ -440,12 +439,13 @@ document.getElementById("themeSelector").onchange = (e) =>
   setTheme(e.target.value);
 document.getElementById("langSelector").onchange = (e) =>
   setLang(e.target.value);
-["prefix", "orderSelect", "streetInput", "wardInput"].forEach((id) => {
-  document.getElementById(id).oninput = () => {
-    updatePreview();
-    renderFileList();
-  };
-});
+["prefix", "orderSelect", "streetInput", "wardInput"].forEach(
+  (id) =>
+    (document.getElementById(id).oninput = () => {
+      updatePreview();
+      renderFileList();
+    }),
+);
 
 function initSortable() {
   new Sortable(document.getElementById("fileList"), {
