@@ -57,12 +57,13 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs[0];
+    const doc = data.docs;
     document.getElementById("folderId").value = doc.id;
     fetchFolderName();
   }
 }
 
+// --- CẬP NHẬT HÀM SHOW MODAL ĐỂ HỖ TRỢ PHÍM ĐIỀU HƯỚNG ---
 function showModal(msg, type = "alert", onConfirm = null) {
   const modal = document.getElementById("customModal");
   const titleEl = document.getElementById("modalTitle");
@@ -77,20 +78,20 @@ function showModal(msg, type = "alert", onConfirm = null) {
 
   if (type === "alert") {
     const btn = document.createElement("button");
-    btn.className = "btn-primary";
+    btn.className = "btn-primary modal-btn-nav"; // Thêm class nav
     btn.innerText = t.close;
     btn.onclick = () => (modal.style.display = "none");
     btnContainer.appendChild(btn);
   } else if (type === "confirm") {
     const btnOk = document.createElement("button");
-    btnOk.className = "btn-primary";
+    btnOk.className = "btn-primary modal-btn-nav";
     btnOk.innerText = t.confirm;
     btnOk.onclick = () => {
       modal.style.display = "none";
       if (onConfirm) onConfirm();
     };
     const btnCancel = document.createElement("button");
-    btnCancel.className = "btn-primary";
+    btnCancel.className = "btn-primary modal-btn-nav";
     btnCancel.style.background = "var(--accent-color)";
     btnCancel.innerText = t.cancel;
     btnCancel.onclick = () => (modal.style.display = "none");
@@ -98,6 +99,12 @@ function showModal(msg, type = "alert", onConfirm = null) {
     btnContainer.appendChild(btnCancel);
   }
   modal.style.display = "flex";
+
+  // Tự động focus nút đầu tiên để sẵn sàng cho Enter/Mũi tên
+  setTimeout(() => {
+    const firstBtn = btnContainer.querySelector(".modal-btn-nav");
+    if (firstBtn) firstBtn.focus();
+  }, 100);
 }
 
 function copyToClipboard(text) {
@@ -222,7 +229,7 @@ function setTheme(theme) {
 function extractFolderId(input) {
   if (!input) return null;
   const match = input.match(/(?:folders\/|id=)([a-zA-Z0-9-_]{25,})/);
-  return match ? match[1] : input.trim();
+  return match ? match : input.trim();
 }
 
 async function fetchFolderName() {
@@ -432,7 +439,7 @@ function showResultModal(links) {
   });
   document.getElementById("modalMsg").innerHTML = html + `</div>`;
   const btn = document.createElement("button");
-  btn.className = "btn-primary";
+  btn.className = "btn-primary modal-btn-nav"; // Thêm class nav
   btn.innerText = t.close;
   btn.onclick = () => {
     modal.style.display = "none";
@@ -442,6 +449,9 @@ function showResultModal(links) {
   document.getElementById("modalBtns").innerHTML = "";
   document.getElementById("modalBtns").appendChild(btn);
   modal.style.display = "flex";
+
+  // Focus nút đóng
+  setTimeout(() => btn.focus(), 100);
 }
 
 document.getElementById("dropzone").onclick = (e) => {
@@ -459,7 +469,6 @@ document.getElementById("langSelector").onchange = (e) =>
 ["prefix", "orderSelect", "streetInput", "wardInput"].forEach(
   (id) =>
     (document.getElementById(id).oninput = () => {
-      // FIX: Thực hiện sắp xếp lại mảng filesArray khi người dùng thay đổi Order
       if (id === "orderSelect") {
         const order = document.getElementById("orderSelect").value;
         if (order === "asc")
@@ -498,6 +507,7 @@ function resetNamingConfig() {
   renderFileList();
 }
 
+// Xử lý Escape
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     const modal = document.getElementById("customModal");
@@ -514,7 +524,49 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+// --- PHẦN XỬ LÝ ĐIỀU HƯỚNG MODAL (MŨI TÊN, ENTER, SPACE) ---
 document.addEventListener("keydown", function (e) {
+  const modal = document.getElementById("customModal");
+
+  // Nếu Modal đang hiển thị
+  if (window.getComputedStyle(modal).display !== "none") {
+    const navButtons = Array.from(modal.querySelectorAll(".modal-btn-nav"));
+    if (navButtons.length === 0) return;
+
+    let currentIndex = navButtons.indexOf(document.activeElement);
+
+    // Nhấn mũi tên Phải
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      let nextIndex = (currentIndex + 1) % navButtons.length;
+      navButtons[nextIndex].focus();
+    }
+    // Nhấn mũi tên Trái
+    else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      let prevIndex =
+        (currentIndex - 1 + navButtons.length) % navButtons.length;
+      navButtons[prevIndex].focus();
+    }
+    // Enter hoặc Space để chọn (Trình duyệt tự click nếu đã focus, ta bổ sung logic nếu chưa focus)
+    else if ((e.key === "Enter" || e.key === " ") && currentIndex === -1) {
+      e.preventDefault();
+      navButtons.click();
+    }
+    return; // Không thực hiện phím tắt bên dưới khi modal đang mở
+  }
+
+  // --- CÁC PHÍM TẮT CŨ ---
+  if (
+    (e.metaKey || e.ctrlKey) &&
+    e.altKey &&
+    (e.key === "Backspace" || e.code === "Backspace")
+  ) {
+    e.preventDefault();
+    confirmClearAll();
+    return;
+  }
+
   if (e.altKey && e.code === "Space") {
     e.preventDefault();
     document.getElementById("fileInput").click();
@@ -523,20 +575,16 @@ document.addEventListener("keydown", function (e) {
     e.preventDefault();
     handleAuthClick();
   }
-  // Bổ sung phím tắt Option + Backspace (Alt + Backspace) để reset config
   if (e.altKey && e.code === "Backspace") {
     e.preventDefault();
     resetNamingConfig();
   }
-
-  // --- BỔ SUNG PHÍM TẮT COMMAND/CTRL + BACKSPACE ĐỂ XÓA INPUT ---
   if ((e.metaKey || e.ctrlKey) && e.key === "Backspace") {
     e.preventDefault();
     clearInput("clientId");
     clearInput("apiKey");
     clearInput("folderId");
   }
-
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
     showPicker();

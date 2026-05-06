@@ -281,6 +281,13 @@ input {
   box-shadow: var(--shadow);
 }
 
+/* CSS cho việc focus các nút trong modal */
+.modal-btn-nav:focus {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
 .loader {
   display: none;
   border: 3px solid rgba(255, 255, 255, 0.3);

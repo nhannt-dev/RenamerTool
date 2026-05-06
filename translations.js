@@ -207,7 +207,7 @@ const translations = {
     placeholderClientId: "Entrez le Client ID...",
     placeholderApiKey: "Entrez l'API Key...",
     placeholderFolder: "Collez le lien ou l'ID du dossier",
-    confirmClear: "Voulez-vous vraiment vider la liste ?",
+    confirmClear: "Voulez-vous thật sự vider la liste ?",
     fetching: "🔍 Récupération du nom du dossier...",
     notFound: "❌ Dossier non trouvé",
     needConnect: "⚠️ Veuillez d'abord cliquer sur Connecter Drive",
