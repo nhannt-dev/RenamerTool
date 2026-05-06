@@ -487,3 +487,24 @@ function resetNamingConfig() {
   updatePreview();
   renderFileList();
 }
+
+// Fix bug: Đóng modal khi nhấn phím Esc
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    const modal = document.getElementById("customModal");
+    if (window.getComputedStyle(modal).display !== "none") {
+      const modalTitle = document.getElementById("modalTitle").innerText;
+      const lang = localStorage.getItem("app-lang") || "vi";
+      const t = translations[lang] || translations["en"];
+
+      // Đóng modal
+      modal.style.display = "none";
+
+      // Nếu là modal thông báo thành công, reset danh sách file theo logic gốc
+      if (modalTitle === t.uploadSuccess) {
+        filesArray = [];
+        renderFileList();
+      }
+    }
+  }
+});

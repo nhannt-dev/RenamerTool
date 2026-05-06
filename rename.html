@@ -871,7 +871,7 @@
           placeholderClientId: "Entrez le Client ID...",
           placeholderApiKey: "Entrez l'API Key...",
           placeholderFolder: "Collez le lien hoặc l'ID du dossier",
-          confirmClear: "Voulez-vous vraiment vider la liste ?",
+          confirmClear: "Voulez-vous thật sự vider la liste ?",
           fetching: "🔍 Récupération du nom du dossier...",
           notFound: "❌ Dossier non trouvé",
           needConnect: "⚠️ Veuillez d'abord cliquer sur Connecter Drive",
@@ -1375,6 +1375,27 @@
         updatePreview();
         renderFileList();
       }
+
+      // Fix bug: Đóng modal khi nhấn phím Esc
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          const modal = document.getElementById("customModal");
+          if (window.getComputedStyle(modal).display !== "none") {
+            const modalTitle = document.getElementById("modalTitle").innerText;
+            const lang = localStorage.getItem("app-lang") || "vi";
+            const t = translations[lang] || translations["en"];
+
+            // Đóng modal
+            modal.style.display = "none";
+
+            // Nếu là modal thông báo thành công, reset danh sách file theo logic gốc
+            if (modalTitle === t.uploadSuccess) {
+              filesArray = [];
+              renderFileList();
+            }
+          }
+        }
+      });
     </script>
   </body>
 </html>
