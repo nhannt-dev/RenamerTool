@@ -132,7 +132,7 @@ const translations = {
     uploadSuccess: "アップロード成功！",
     placeholderClientId: "クライアントIDを入力...",
     placeholderApiKey: "APIキーを入力...",
-    placeholderFolder: "フォルダリンクまたはフォルダIDを貼り付け",
+    placeholderFolder: "フォルダリンク hoặc フォルダIDを貼り付け",
     confirmClear: "リストをすべてクリアしてもよろしいですか？",
     fetching: "🔍 フォルダ名を取得中...",
     notFound: "❌ フォルダが見つかりません",
