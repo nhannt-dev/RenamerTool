@@ -1,3 +1,4 @@
+// ... Giữ nguyên toàn bộ logic cũ ...
 function startSplashScreen() {
   const splash = document.getElementById("splash-screen");
   const bar = document.getElementById("splash-bar");
@@ -512,16 +513,27 @@ document.addEventListener("keydown", function (event) {
 // --- BỔ SUNG PHÍM TẮT THEO YÊU CẦU ---
 document.addEventListener("keydown", function (e) {
   // Phím tắt Option + C: Kết nối Drive
-  // (Trong một số trình duyệt Mac, Alt chính là Option)
   if (e.altKey && e.code === "KeyC") {
-    e.preventDefault(); // Ngăn chặn hành động mặc định nếu có
+    e.preventDefault();
     handleAuthClick();
   }
 
   // Phím tắt Command + Option + O: Mở Picker chọn thư mục
-  // (Meta là Command trên Mac, Ctrl trên Win)
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
     showPicker();
+  }
+
+  // MỚI: Phím tắt Command + Enter (hoặc Ctrl + Enter) để Tải lên Drive
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    // Chỉ thực thi khi nút Upload đang hiển thị (có file và đã kết nối)
+    const btnUpload = document.getElementById("btnUploadDrive");
+    if (
+      window.getComputedStyle(btnUpload).display !== "none" &&
+      !btnUpload.disabled
+    ) {
+      e.preventDefault();
+      uploadAllToDrive();
+    }
   }
 });

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rename & Upload Drive Pro</title>
+    <!-- ... (Giữ nguyên phần CSS và thư viện) ... -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -12,6 +13,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <style>
+      /* ... Giữ nguyên toàn bộ CSS ... */
       :root {
         --bg-color: #f0f2f5;
         --container-bg: #ffffff;
@@ -409,6 +411,7 @@
     </style>
   </head>
   <body>
+    <!-- ... Giữ nguyên toàn bộ HTML ... -->
     <div id="splash-screen">
       <div class="splash-logo animate__animated animate__bounceIn">🚀</div>
       <div class="progress-container">
@@ -640,6 +643,7 @@
 
     <script src="connectivity-monitor.js"></script>
     <script>
+      // ... Giữ nguyên toàn bộ logic cũ ...
       function startSplashScreen() {
         const splash = document.getElementById("splash-screen");
         const bar = document.getElementById("splash-bar");
@@ -870,8 +874,8 @@
           uploadSuccess: "Téléchargement réussi !",
           placeholderClientId: "Entrez le Client ID...",
           placeholderApiKey: "Entrez l'API Key...",
-          placeholderFolder: "Collez le lien hoặc l'ID du dossier",
-          confirmClear: "Voulez-vous thật sự vider la liste ?",
+          placeholderFolder: "Collez le lien ou l'ID du dossier",
+          confirmClear: "Voulez-vous vraiment vider la liste ?",
           fetching: "🔍 Récupération du nom du dossier...",
           notFound: "❌ Dossier non trouvé",
           needConnect: "⚠️ Veuillez d'abord cliquer sur Connecter Drive",
@@ -1400,17 +1404,28 @@
       // --- BỔ SUNG PHÍM TẮT THEO YÊU CẦU ---
       document.addEventListener("keydown", function (e) {
         // Phím tắt Option + C: Kết nối Drive
-        // (Trong một số trình duyệt Mac, Alt chính là Option)
         if (e.altKey && e.code === "KeyC") {
-          e.preventDefault(); // Ngăn chặn hành động mặc định nếu có
+          e.preventDefault();
           handleAuthClick();
         }
 
         // Phím tắt Command + Option + O: Mở Picker chọn thư mục
-        // (Meta là Command trên Mac, Ctrl trên Win)
         if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
           e.preventDefault();
           showPicker();
+        }
+
+        // MỚI: Phím tắt Command + Enter (hoặc Ctrl + Enter) để Tải lên Drive
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+          // Chỉ thực thi khi nút Upload đang hiển thị (có file và đã kết nối)
+          const btnUpload = document.getElementById("btnUploadDrive");
+          if (
+            window.getComputedStyle(btnUpload).display !== "none" &&
+            !btnUpload.disabled
+          ) {
+            e.preventDefault();
+            uploadAllToDrive();
+          }
         }
       });
     </script>
