@@ -23,7 +23,7 @@ const translations = {
     placeholderApiKey: "Nhập API Key...",
     placeholderFolder: "Dán link thư mục hoặc ID thư mục",
     confirmClear: "Bạn có chắc chắn muốn xóa toàn bộ danh sách?",
-    fetching: "🔍 Đang lấy tên thư mục...",
+    fetching: "🔍 Đang lấy đường dẫn thư mục...",
     notFound: "❌ Không tìm thấy thư mục",
     needConnect: "⚠️ Hãy nhấn Kết nối Drive trước",
     modalTitle: "Thông báo",
@@ -46,6 +46,7 @@ const translations = {
     scUpload: "Bắt đầu tải lên",
     scShowThis: "Mở bảng phím tắt này",
     scCloseEsc: "Đóng thông báo nhanh",
+    account: "Tài khoản: ",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -71,7 +72,7 @@ const translations = {
     placeholderApiKey: "Enter API Key...",
     placeholderFolder: "Paste folder link or Folder ID",
     confirmClear: "Are you sure you want to clear the list?",
-    fetching: "🔍 Fetching folder name...",
+    fetching: "🔍 Fetching folder path...",
     notFound: "❌ Folder not found",
     needConnect: "⚠️ Please click Connect Drive first",
     modalTitle: "Notification",
@@ -94,6 +95,7 @@ const translations = {
     scUpload: "Start upload",
     scShowThis: "Show this shortcuts list",
     scCloseEsc: "Quick close notification",
+    account: "Account: ",
   },
   th: {
     title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
@@ -142,6 +144,7 @@ const translations = {
     scUpload: "เริ่มอัปโหลด",
     scShowThis: "แสดงรายการปุ่มลัดนี้",
     scCloseEsc: "ปิดการแจ้งเตือนด่วน",
+    account: "บัญชี: ",
   },
   ja: {
     title: "名前変更とドライブへのアップロード",
@@ -190,6 +193,7 @@ const translations = {
     scUpload: "アップロード開始",
     scShowThis: "ショートカット一覧を表示",
     scCloseEsc: "通知を閉じる",
+    account: "アカウント: ",
   },
   zh: {
     title: "重命名并上传至云端硬盘",
@@ -238,6 +242,7 @@ const translations = {
     scUpload: "开始上传",
     scShowThis: "显示此快捷键列表",
     scCloseEsc: "快速关闭通知",
+    account: "账户: ",
   },
   fr: {
     title: "Renommer & Télécharger vers Drive",
@@ -286,5 +291,6 @@ const translations = {
     scUpload: "Démarrer l'envoi",
     scShowThis: "Afficher ces raccourcis",
     scCloseEsc: "Fermer rapidement",
+    account: "Compte: ",
   },
 };

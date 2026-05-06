@@ -23,6 +23,7 @@ function startSplashScreen() {
 let filesArray = [];
 let accessToken = null;
 let pickerApiLoaded = false;
+let connectedUserEmail = "";
 
 // Detect OS
 const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
@@ -206,6 +207,11 @@ function setLang(lang) {
     ? t.connected
     : t.notConnected;
 
+  if (connectedUserEmail) {
+    document.getElementById("connectedEmail").innerText =
+      t.account + connectedUserEmail;
+  }
+
   document.getElementById("clientId").placeholder = t.placeholderClientId;
   document.getElementById("apiKey").placeholder = t.placeholderApiKey;
   document.getElementById("folderId").placeholder = t.placeholderFolder;
@@ -240,6 +246,9 @@ function extractFolderId(input) {
   return match ? match[1] : input.trim();
 }
 
+/**
+ * HIỂN THỊ ĐƯỜNG DẪN ĐẦY ĐỦ TỪ MY DRIVE
+ */
 async function fetchFolderName() {
   const input = document.getElementById("folderId").value.trim();
   const display = document.getElementById("folderNameDisplay");
@@ -258,24 +267,65 @@ async function fetchFolderName() {
   const fId = extractFolderId(input);
   if (fId.length < 20) return;
   display.innerText = t.fetching;
+
   try {
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
-      {
-        headers: { Authorization: "Bearer " + accessToken },
-      },
-    );
+    let currentId = fId;
+    let pathParts = [];
+    let depthLimit = 10; // Giới hạn cấp độ thư mục để tránh treo
+
+    while (currentId && depthLimit > 0) {
+      const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${currentId}?fields=id,name,parents`,
+        {
+          headers: { Authorization: "Bearer " + accessToken },
+        },
+      );
+
+      if (!res.ok) break;
+
+      const data = await res.json();
+      let folderName = data.name;
+
+      // Nếu là gốc của My Drive
+      if (data.id === "root") folderName = "My Drive";
+      pathParts.unshift(folderName);
+
+      if (data.parents && data.parents.length > 0) {
+        currentId = data.parents[0];
+      } else {
+        // Thêm My Drive vào đầu nếu nó chưa có (trong trường hợp folder nằm ngay ngoài cùng)
+        if (data.id !== "root" && !pathParts.includes("My Drive")) {
+          pathParts.unshift("My Drive");
+        }
+        currentId = null;
+      }
+      depthLimit--;
+    }
+
+    display.innerText = "📁 " + pathParts.join(" > ");
+    display.style.color = "var(--success-color)";
+    localStorage.setItem("drive-folder-id", input);
+  } catch (e) {
+    display.innerText = t.notFound;
+    display.style.color = "var(--danger-color)";
+  }
+}
+
+async function fetchUserEmail() {
+  try {
+    const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
     if (res.ok) {
       const data = await res.json();
-      display.innerText = "📁 " + data.name;
-      display.style.color = "var(--success-color)";
-      localStorage.setItem("drive-folder-id", input);
-    } else {
-      display.innerText = t.notFound;
-      display.style.color = "var(--danger-color)";
+      connectedUserEmail = data.email;
+      const lang = localStorage.getItem("app-lang") || "vi";
+      const t = translations[lang] || translations["en"];
+      document.getElementById("connectedEmail").innerText =
+        t.account + connectedUserEmail;
     }
-  } catch {
-    display.innerText = "Error";
+  } catch (e) {
+    console.error("Failed to fetch user email", e);
   }
 }
 
@@ -294,7 +344,7 @@ function handleAuthClick() {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: cid,
     scope:
-      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly",
+      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email",
     callback: (res) => {
       if (res.access_token) {
         accessToken = res.access_token;
@@ -303,6 +353,7 @@ function handleAuthClick() {
           .classList.add("status-connected");
         setLang(lang);
         fetchFolderName();
+        fetchUserEmail();
         renderFileList();
       }
     },
