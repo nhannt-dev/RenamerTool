@@ -491,6 +491,7 @@ function initSortable() {
 function resetNamingConfig() {
   document.getElementById("prefix").value = "None";
   document.getElementById("codeInput").value = "";
+  document.getElementById("orderSelect").value = "none";
   document.getElementById("streetInput").value = "";
   document.getElementById("wardInput").value = "";
   updatePreview();
@@ -521,6 +522,11 @@ document.addEventListener("keydown", function (e) {
   if (e.altKey && e.code === "KeyC") {
     e.preventDefault();
     handleAuthClick();
+  }
+  // Bổ sung phím tắt Option + Backspace (Alt + Backspace) để reset config
+  if (e.altKey && e.code === "Backspace") {
+    e.preventDefault();
+    resetNamingConfig();
   }
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
