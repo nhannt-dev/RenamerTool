@@ -22,50 +22,91 @@ function startSplashScreen() {
 
 let filesArray = [];
 let accessToken = null;
-let pickerApiLoaded = false;
 let connectedUserEmail = "";
-
-// Detect OS
 const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
-gapi.load("picker", () => {
-  pickerApiLoaded = true;
-});
+// --- NEW CUSTOM FILE EXPLORER LOGIC ---
+let currentExplorerFolder = "root";
+let explorerStack = [{ id: "root", name: "My Drive" }];
 
-function showPicker() {
+async function showPicker() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   if (!accessToken) {
     showModal(t.needConnect);
     return;
   }
-  createPicker();
+  currentExplorerFolder = "root";
+  explorerStack = [{ id: "root", name: "My Drive" }];
+  renderExplorerModal();
 }
 
-function createPicker() {
-  if (pickerApiLoaded && accessToken) {
-    const apiKey = document.getElementById("apiKey").value.trim();
-    const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-      .setIncludeFolders(true)
-      .setSelectFolderEnabled(true)
-      .setMimeTypes("application/vnd.google-apps.folder");
-    const picker = new google.picker.PickerBuilder()
-      .addView(view)
-      .setOAuthToken(accessToken)
-      .setDeveloperKey(apiKey)
-      .setCallback(pickerCallback)
-      .build();
-    picker.setVisible(true);
+async function renderExplorerModal() {
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+  showModal(
+    `<div id="explorer-container"><div class="loader" style="display:block"></div></div>`,
+    "alert",
+  );
+  document.getElementById("modalTitle").innerText = t.exTitle;
+  await refreshExplorerList();
+}
+
+async function refreshExplorerList() {
+  const container = document.getElementById("explorer-container");
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+  if (!container) return;
+  try {
+    let html = `<div class="breadcrumb-nav">`;
+    explorerStack.forEach((folder, idx) => {
+      html += `<span onclick="navigateToStack(${idx})">${folder.name}</span> ${idx < explorerStack.length - 1 ? ">" : ""} `;
+    });
+    html += `</div><ul class="explorer-list">`;
+
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q='${currentExplorerFolder}'+in+parents+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false&fields=files(id,name)&orderBy=name`,
+      { headers: { Authorization: "Bearer " + accessToken } },
+    );
+    const data = await response.json();
+
+    if (data.files && data.files.length > 0) {
+      data.files.forEach((folder) => {
+        html += `<li class="explorer-item" onclick="enterFolder('${folder.id}', '${folder.name}')">📁 ${folder.name}</li>`;
+      });
+    } else {
+      html += `<li class="explorer-item" style="cursor:default; color:gray;">${t.exEmpty}</li>`;
+    }
+    html += `</ul>`;
+    const currentFolder = explorerStack[explorerStack.length - 1];
+    html += `<div style="margin-top:15px; border-top:1px solid var(--border-color); padding-top:15px;">
+            <p style="font-size:0.85em; margin-bottom:10px;">${t.exSelecting} <strong>${currentFolder.name}</strong></p>
+            <button class="btn-primary" onclick="confirmPickerSelection('${currentFolder.id}')">${t.exBtnConfirm}</button>
+          </div>`;
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<p style="color:red">Error loading data: ${e.message}</p>`;
   }
 }
 
-function pickerCallback(data) {
-  if (data.action === google.picker.Action.PICKED) {
-    const doc = data.docs;
-    document.getElementById("folderId").value = doc.id;
-    fetchFolderName();
-  }
+async function enterFolder(id, name) {
+  currentExplorerFolder = id;
+  explorerStack.push({ id, name });
+  await refreshExplorerList();
 }
+
+async function navigateToStack(index) {
+  explorerStack = explorerStack.slice(0, index + 1);
+  currentExplorerFolder = explorerStack[index].id;
+  await refreshExplorerList();
+}
+
+function confirmPickerSelection(id) {
+  document.getElementById("folderId").value = id;
+  document.getElementById("customModal").style.display = "none";
+  fetchFolderName();
+}
+// --- END CUSTOM EXPLORER ---
 
 function showModal(msg, type = "alert", onConfirm = null) {
   const modal = document.getElementById("customModal");
@@ -102,7 +143,6 @@ function showModal(msg, type = "alert", onConfirm = null) {
     btnContainer.appendChild(btnCancel);
   }
   modal.style.display = "flex";
-
   setTimeout(() => {
     const firstBtn = btnContainer.querySelector(".modal-btn-nav");
     if (firstBtn) firstBtn.focus();
@@ -112,7 +152,6 @@ function showModal(msg, type = "alert", onConfirm = null) {
 function copyToClipboard(text) {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
-
   navigator.clipboard.writeText(text).then(() => {
     const toast = document.getElementById("copyToast");
     toast.innerText = t.copySuccess;
@@ -188,8 +227,7 @@ function clearInput(id) {
 function setLang(lang) {
   localStorage.setItem("app-lang", lang);
   const t = translations[lang] || translations["en"];
-  const modKey = isMac ? "option" : "Alt"; // Dynamic modifier key for tooltip
-
+  const modKey = isMac ? "option" : "Alt";
   document.getElementById("txt-title").innerText = t.title;
   document.getElementById("lbl-prefix").innerText = t.prefix;
   document.getElementById("lbl-code").innerText = t.code;
@@ -206,26 +244,20 @@ function setLang(lang) {
   document.getElementById("statusText").innerText = accessToken
     ? t.connected
     : t.notConnected;
-
-  if (connectedUserEmail) {
+  if (connectedUserEmail)
     document.getElementById("connectedEmail").innerText =
       t.account + connectedUserEmail;
-  }
-
   document.getElementById("clientId").placeholder = t.placeholderClientId;
   document.getElementById("apiKey").placeholder = t.placeholderApiKey;
   document.getElementById("folderId").placeholder = t.placeholderFolder;
   document.getElementById("btnUploadText").innerText = t.uploadButton;
-
   document.getElementById("opt-light").innerText = t.themeLight;
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
-
   document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
     "{mod}",
     modKey,
   );
-
   renderFileList();
 }
 
@@ -246,15 +278,11 @@ function extractFolderId(input) {
   return match ? match : input.trim();
 }
 
-/**
- * HIỂN THỊ ĐƯỜNG DẪN ĐẦY ĐỦ TỪ MY DRIVE
- */
 async function fetchFolderName() {
   const input = document.getElementById("folderId").value.trim();
   const display = document.getElementById("folderNameDisplay");
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
-
   if (!input) {
     display.innerText = "";
     return;
@@ -267,41 +295,28 @@ async function fetchFolderName() {
   const fId = extractFolderId(input);
   if (fId.length < 20) return;
   display.innerText = t.fetching;
-
   try {
     let currentId = fId;
     let pathParts = [];
-    let depthLimit = 10; // Giới hạn cấp độ thư mục để tránh treo
-
+    let depthLimit = 10;
     while (currentId && depthLimit > 0) {
       const res = await fetch(
         `https://www.googleapis.com/drive/v3/files/${currentId}?fields=id,name,parents`,
-        {
-          headers: { Authorization: "Bearer " + accessToken },
-        },
+        { headers: { Authorization: "Bearer " + accessToken } },
       );
-
       if (!res.ok) break;
-
       const data = await res.json();
       let folderName = data.name;
-
-      // Nếu là gốc của My Drive
       if (data.id === "root") folderName = "My Drive";
       pathParts.unshift(folderName);
-
-      if (data.parents && data.parents.length > 0) {
-        currentId = data.parents;
-      } else {
-        // Thêm My Drive vào đầu nếu nó chưa có (trong trường hợp folder nằm ngay ngoài cùng)
-        if (data.id !== "root" && !pathParts.includes("My Drive")) {
+      if (data.parents && data.parents.length > 0) currentId = data.parents;
+      else {
+        if (data.id !== "root" && !pathParts.includes("My Drive"))
           pathParts.unshift("My Drive");
-        }
         currentId = null;
       }
       depthLimit--;
     }
-
     display.innerText = "📁 " + pathParts.join(" > ");
     display.style.color = "var(--success-color)";
     localStorage.setItem("drive-folder-id", input);
@@ -334,7 +349,6 @@ function handleAuthClick() {
   const key = document.getElementById("apiKey").value.trim();
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
-
   if (!cid || !key) {
     showModal(t.errorMissing);
     return;
@@ -386,10 +400,8 @@ function renderFileList() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   list.innerHTML = "";
-
   const count = filesArray.length;
   document.getElementById("fileCountDisplay").innerText = count;
-
   const btnClear = document.getElementById("btnClearAll");
   if (count === 0) {
     btnClear.disabled = true;
@@ -445,11 +457,9 @@ async function uploadAllToDrive() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   const currentPrefix = document.getElementById("prefix").value.toUpperCase();
-
   btn.disabled = true;
   btnText.innerText = t.uploading;
   document.getElementById("uploadLoader").style.display = "block";
-
   let links = [];
   try {
     for (let i = 0; i < filesArray.length; i++) {
@@ -464,7 +474,6 @@ async function uploadAllToDrive() {
         new Blob([JSON.stringify(meta)], { type: "application/json" }),
       );
       form.append("file", file);
-
       const res = await fetch(
         "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink",
         {
@@ -510,7 +519,6 @@ function showResultModal(links) {
   document.getElementById("modalBtns").innerHTML = "";
   document.getElementById("modalBtns").appendChild(btn);
   modal.style.display = "flex";
-
   setTimeout(() => btn.focus(), 100);
 }
 
@@ -571,21 +579,18 @@ function showShortcutList() {
   const t = translations[lang] || translations["en"];
   const ctrlLabel = isMac ? "⌘" : "Ctrl";
   const altLabel = isMac ? "Option" : "Alt";
-
-  const listHtml = `
-            <div class="shortcut-list-modal">
-                <div><kbd>${altLabel}</kbd> + <kbd>Space</kbd> : ${t.scSelect}</div>
-                <div><kbd>${altLabel}</kbd> + <kbd>C</kbd> : ${t.scConnect}</div>
-                <div><kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scReset}</div>
-                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearAll}</div>
-                <div><kbd>${ctrlLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearConfig}</div>
-                <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>O</kbd> : ${t.scOpenPicker}</div>
-                <div><kbd>${ctrlLabel}</kbd> + <kbd>Enter</kbd> : ${t.scUpload}</div>
-                <hr style="margin:10px 0; border:0; border-top:1px solid var(--border-color)">
-                <div><kbd>${altLabel}</kbd> + <kbd>H</kbd> : ${t.scShowThis}</div>
-                <div><kbd>Esc</kbd> : ${t.scCloseEsc}</div>
-            </div>
-          `;
+  const listHtml = `<div class="shortcut-list-modal">
+            <div><kbd>${altLabel}</kbd> + <kbd>Space</kbd> : ${t.scSelect}</div>
+            <div><kbd>${altLabel}</kbd> + <kbd>C</kbd> : ${t.scConnect}</div>
+            <div><kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scReset}</div>
+            <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearAll}</div>
+            <div><kbd>${ctrlLabel}</kbd> + <kbd>Backspace</kbd> : ${t.scClearConfig}</div>
+            <div><kbd>${ctrlLabel}</kbd> + <kbd>${altLabel}</kbd> + <kbd>O</kbd> : ${t.scOpenPicker}</div>
+            <div><kbd>${ctrlLabel}</kbd> + <kbd>Enter</kbd> : ${t.scUpload}</div>
+            <hr style="margin:10px 0; border:0; border-top:1px solid var(--border-color)">
+            <div><kbd>${altLabel}</kbd> + <kbd>H</kbd> : ${t.scShowThis}</div>
+            <div><kbd>Esc</kbd> : ${t.scCloseEsc}</div>
+        </div>`;
   showModal(listHtml);
   document.getElementById("modalTitle").innerText = t.scTitle;
 }
@@ -595,9 +600,9 @@ document.addEventListener("keydown", function (event) {
     const modal = document.getElementById("customModal");
     if (window.getComputedStyle(modal).display !== "none") {
       const modalTitle = document.getElementById("modalTitle").innerText;
+      modal.style.display = "none";
       const lang = localStorage.getItem("app-lang") || "vi";
       const t = translations[lang] || translations["en"];
-      modal.style.display = "none";
       if (modalTitle === t.uploadSuccess) {
         filesArray = [];
         renderFileList();
@@ -608,35 +613,26 @@ document.addEventListener("keydown", function (event) {
 
 document.addEventListener("keydown", function (e) {
   const modal = document.getElementById("customModal");
-
   if (window.getComputedStyle(modal).display !== "none") {
     const navButtons = Array.from(modal.querySelectorAll(".modal-btn-nav"));
     if (navButtons.length === 0) return;
-
     let currentIndex = navButtons.indexOf(document.activeElement);
-
     if (e.key === "ArrowRight") {
       e.preventDefault();
-      let nextIndex = (currentIndex + 1) % navButtons.length;
-      navButtons[nextIndex].focus();
+      navButtons[(currentIndex + 1) % navButtons.length].focus();
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
-      let prevIndex =
-        (currentIndex - 1 + navButtons.length) % navButtons.length;
-      navButtons[prevIndex].focus();
-    } else if ((e.key === "Enter" || e.key === " ") && currentIndex === -1) {
-      e.preventDefault();
-      navButtons.click();
+      navButtons[
+        (currentIndex - 1 + navButtons.length) % navButtons.length
+      ].focus();
     }
     return;
   }
-
   if (e.altKey && e.code === "KeyH") {
     e.preventDefault();
     showShortcutList();
     return;
   }
-
   if (
     (e.metaKey || e.ctrlKey) &&
     e.altKey &&
@@ -646,7 +642,6 @@ document.addEventListener("keydown", function (e) {
     confirmClearAll();
     return;
   }
-
   if (e.altKey && e.code === "Space") {
     e.preventDefault();
     document.getElementById("fileInput").click();

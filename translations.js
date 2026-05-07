@@ -47,6 +47,11 @@ const translations = {
     scShowThis: "Mở bảng phím tắt này",
     scCloseEsc: "Đóng thông báo nhanh",
     account: "Tài khoản: ",
+    // Explorer translations
+    exTitle: "Google Drive Explorer",
+    exEmpty: "(Thư mục trống)",
+    exSelecting: "Đang chọn:",
+    exBtnConfirm: "Chọn thư mục này",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -96,6 +101,11 @@ const translations = {
     scShowThis: "Show this shortcuts list",
     scCloseEsc: "Quick close notification",
     account: "Account: ",
+    // Explorer translations
+    exTitle: "Google Drive Explorer",
+    exEmpty: "(Empty Folder)",
+    exSelecting: "Selecting:",
+    exBtnConfirm: "Select this folder",
   },
   th: {
     title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
@@ -145,6 +155,11 @@ const translations = {
     scShowThis: "แสดงรายการปุ่มลัดนี้",
     scCloseEsc: "ปิดการแจ้งเตือนด่วน",
     account: "บัญชี: ",
+    // Explorer translations
+    exTitle: "Google Drive Explorer",
+    exEmpty: "(โฟลเดอร์ว่างเปล่า)",
+    exSelecting: "กำลังเลือก:",
+    exBtnConfirm: "เลือกโฟลเดอร์นี้",
   },
   ja: {
     title: "名前変更とドライブへのアップロード",
@@ -194,6 +209,11 @@ const translations = {
     scShowThis: "ショートカット一覧を表示",
     scCloseEsc: "通知を閉じる",
     account: "アカウント: ",
+    // Explorer translations
+    exTitle: "Googleドライブエクスプローラー",
+    exEmpty: "(空のフォルダ)",
+    exSelecting: "選択中:",
+    exBtnConfirm: "このフォルダを選択",
   },
   zh: {
     title: "重命名并上传至云端硬盘",
@@ -243,6 +263,11 @@ const translations = {
     scShowThis: "显示此快捷键列表",
     scCloseEsc: "快速关闭通知",
     account: "账户: ",
+    // Explorer translations
+    exTitle: "Google 云端硬盘浏览器",
+    exEmpty: "(空文件夹)",
+    exSelecting: "当前选择:",
+    exBtnConfirm: "选择此文件夹",
   },
   fr: {
     title: "Renommer & Télécharger vers Drive",
@@ -292,5 +317,10 @@ const translations = {
     scShowThis: "Afficher ces raccourcis",
     scCloseEsc: "Fermer rapidement",
     account: "Compte: ",
+    // Explorer translations
+    exTitle: "Explorateur Google Drive",
+    exEmpty: "(Dossier vide)",
+    exSelecting: "Sélection :",
+    exBtnConfirm: "Choisir ce dossier",
   },
 };
