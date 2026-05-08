@@ -253,7 +253,6 @@ function setLang(lang) {
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
 
-  // Correcting tooltip by replacing {mod} with system-specific key
   document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
     "{mod}",
     modKey,
@@ -417,11 +416,21 @@ function renderFileList() {
   filesArray.forEach((file, i) => {
     const li = document.createElement("li");
     li.className = "file-item";
+    li.id = `item-${i}`;
     const newName = generateFileName(i, file.name);
     li.innerHTML = `
-            <img src="${URL.createObjectURL(file)}" class="file-thumb">
-            <div class="file-info"><span class="new-name">${newName || file.name}</span><span class="old-name">${file.name}</span></div>
-            <button class="btn-primary" style="background:var(--danger-color); padding:5px;" onclick="removeFile(${i})">${t.remove}</button>
+            <div class="file-main-info">
+              <img src="${URL.createObjectURL(file)}" class="file-thumb">
+              <div class="file-info">
+                <span class="new-name">${newName || file.name}</span>
+                <span class="old-name">${file.name}</span>
+              </div>
+              <div class="status-icon" id="status-${i}">✅</div>
+              <button class="btn-primary" id="btn-remove-${i}" style="background:var(--danger-color); padding:5px; margin-left:10px;" onclick="removeFile(${i})">${t.remove}</button>
+            </div>
+            <div class="item-progress-container" id="progress-cont-${i}">
+              <div class="item-progress-bar" id="progress-bar-${i}"></div>
+            </div>
           `;
     list.appendChild(li);
   });
@@ -451,6 +460,62 @@ function confirmClearAll() {
   });
 }
 
+// Hàm upload file có báo cáo tiến độ
+async function uploadFileWithProgress(file, metadata, index) {
+  const progressCont = document.getElementById(`progress-cont-${index}`);
+  const progressBar = document.getElementById(`progress-bar-${index}`);
+  const statusIcon = document.getElementById(`status-${index}`);
+  const btnRemove = document.getElementById(`btn-remove-${index}`);
+
+  progressCont.style.display = "block";
+  if (btnRemove) btnRemove.style.display = "none";
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      "POST",
+      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink",
+      true,
+    );
+    xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percentComplete = (e.loaded / e.total) * 100;
+        progressBar.style.width = percentComplete + "%";
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const response = JSON.parse(xhr.responseText);
+        progressBar.style.width = "100%";
+        statusIcon.style.display = "block";
+        statusIcon.innerText = "✅";
+        resolve(response);
+      } else {
+        statusIcon.style.display = "block";
+        statusIcon.innerText = "❌";
+        reject(new Error(xhr.responseText));
+      }
+    };
+
+    xhr.onerror = () => {
+      statusIcon.style.display = "block";
+      statusIcon.innerText = "❌";
+      reject(new Error("Network Error"));
+    };
+
+    const form = new FormData();
+    form.append(
+      "metadata",
+      new Blob([JSON.stringify(metadata)], { type: "application/json" }),
+    );
+    form.append("file", file);
+    xhr.send(form);
+  });
+}
+
 async function uploadAllToDrive() {
   const fId = extractFolderId(document.getElementById("folderId").value);
   const btn = document.getElementById("btnUploadDrive");
@@ -458,9 +523,14 @@ async function uploadAllToDrive() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   const currentPrefix = document.getElementById("prefix").value.toUpperCase();
+
+  // Tự động cuộn xuống khu vực tải lên
+  btn.scrollIntoView({ behavior: "smooth", block: "center" });
+
   btn.disabled = true;
   btnText.innerText = t.uploading;
   document.getElementById("uploadLoader").style.display = "block";
+
   let links = [];
   try {
     for (let i = 0; i < filesArray.length; i++) {
@@ -469,25 +539,15 @@ async function uploadAllToDrive() {
         name: generateFileName(i, file.name),
         parents: [fId],
       };
-      const form = new FormData();
-      form.append(
-        "metadata",
-        new Blob([JSON.stringify(meta)], { type: "application/json" }),
-      );
-      form.append("file", file);
-      const res = await fetch(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink",
-        {
-          method: "POST",
-          headers: { Authorization: "Bearer " + accessToken },
-          body: form,
-        },
-      );
-      const data = await res.json();
+
+      const data = await uploadFileWithProgress(file, meta, i);
+
       if (currentPrefix === "P") {
         let fLink = `https://drive.google.com/drive/u/0/folders/${fId}`;
         if (!links.includes(fLink)) links.push(fLink);
-      } else links.push(data.webViewLink);
+      } else {
+        links.push(data.webViewLink);
+      }
     }
     showResultModal(links);
   } catch (e) {
