@@ -545,9 +545,7 @@
     <div
       class="shortcut-icon-container animate__animated animate__fadeInUp animate__delay-2s"
     >
-      <div class="shortcut-tooltip" id="shortcut-tip">
-        Nhấn option + H để bật danh sách phím tắt
-      </div>
+      <div class="shortcut-tooltip" id="shortcut-tip"></div>
       <button
         class="shortcut-btn"
         onclick="showShortcutList()"
@@ -861,7 +859,6 @@
           scShowThis: "Mở bảng phím tắt này",
           scCloseEsc: "Đóng thông báo nhanh",
           account: "Tài khoản: ",
-          // Explorer translations
           exTitle: "Google Drive Explorer",
           exEmpty: "(Thư mục trống)",
           exSelecting: "Đang chọn:",
@@ -915,7 +912,6 @@
           scShowThis: "Show this shortcuts list",
           scCloseEsc: "Quick close notification",
           account: "Account: ",
-          // Explorer translations
           exTitle: "Google Drive Explorer",
           exEmpty: "(Empty Folder)",
           exSelecting: "Selecting:",
@@ -969,7 +965,6 @@
           scShowThis: "แสดงรายการปุ่มลัดนี้",
           scCloseEsc: "ปิดการแจ้งเตือนด่วน",
           account: "บัญชี: ",
-          // Explorer translations
           exTitle: "Google Drive Explorer",
           exEmpty: "(โฟลเดอร์ว่างเปล่า)",
           exSelecting: "กำลังเลือก:",
@@ -1023,7 +1018,6 @@
           scShowThis: "ショートカット一覧を表示",
           scCloseEsc: "通知を閉じる",
           account: "アカウント: ",
-          // Explorer translations
           exTitle: "Googleドライブエクスプローラー",
           exEmpty: "(空のフォルダ)",
           exSelecting: "選択中:",
@@ -1077,7 +1071,6 @@
           scShowThis: "显示此快捷键列表",
           scCloseEsc: "快速关闭通知",
           account: "账户: ",
-          // Explorer translations
           exTitle: "Google 云端硬盘浏览器",
           exEmpty: "(空文件夹)",
           exSelecting: "当前选择:",
@@ -1131,7 +1124,6 @@
           scShowThis: "Afficher ces raccourcis",
           scCloseEsc: "Fermer rapidement",
           account: "Compte: ",
-          // Explorer translations
           exTitle: "Explorateur Google Drive",
           exEmpty: "(Dossier vide)",
           exSelecting: "Sélection :",
@@ -1144,7 +1136,6 @@
       let connectedUserEmail = "";
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
-      // --- NEW CUSTOM FILE EXPLORER LOGIC ---
       let currentExplorerFolder = "root";
       let explorerStack = [{ id: "root", name: "My Drive" }];
 
@@ -1225,7 +1216,6 @@
         document.getElementById("customModal").style.display = "none";
         fetchFolderName();
       }
-      // --- END CUSTOM EXPLORER ---
 
       function showModal(msg, type = "alert", onConfirm = null) {
         const modal = document.getElementById("customModal");
@@ -1386,8 +1376,11 @@
         document.getElementById("opt-light").innerText = t.themeLight;
         document.getElementById("opt-dark").innerText = t.themeDark;
         document.getElementById("opt-device").innerText = t.themeDevice;
+
+        // Correcting tooltip by replacing {mod} with system-specific key
         document.getElementById("shortcut-tip").innerText =
           t.shortcutTip.replace("{mod}", modKey);
+
         renderFileList();
       }
 

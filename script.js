@@ -25,7 +25,6 @@ let accessToken = null;
 let connectedUserEmail = "";
 const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
-// --- NEW CUSTOM FILE EXPLORER LOGIC ---
 let currentExplorerFolder = "root";
 let explorerStack = [{ id: "root", name: "My Drive" }];
 
@@ -106,7 +105,6 @@ function confirmPickerSelection(id) {
   document.getElementById("customModal").style.display = "none";
   fetchFolderName();
 }
-// --- END CUSTOM EXPLORER ---
 
 function showModal(msg, type = "alert", onConfirm = null) {
   const modal = document.getElementById("customModal");
@@ -254,10 +252,13 @@ function setLang(lang) {
   document.getElementById("opt-light").innerText = t.themeLight;
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
+
+  // Correcting tooltip by replacing {mod} with system-specific key
   document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
     "{mod}",
     modKey,
   );
+
   renderFileList();
 }
 
