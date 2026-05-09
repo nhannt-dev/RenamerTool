@@ -462,7 +462,9 @@
         gap: 12px;
       }
 
-      .shortcut-tooltip {
+      /* Đổi tên hoặc dùng chung class tooltip cho các nút khác */
+      .shortcut-tooltip,
+      .btn-tooltip {
         background: #333;
         color: #fff;
         padding: 8px 15px;
@@ -471,10 +473,40 @@
         white-space: nowrap;
         opacity: 0;
         visibility: hidden;
-        transform: translateX(10px);
         transition: all 0.3s ease;
         box-shadow: var(--shadow);
         pointer-events: none;
+        position: absolute;
+        z-index: 1000;
+      }
+
+      /* Tooltip mặc định của nút shortcut ở góc */
+      .shortcut-tooltip {
+        transform: translateX(10px);
+        right: 60px;
+        bottom: 10px;
+      }
+      .shortcut-icon-container:hover .shortcut-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+      }
+
+      /* Tooltip cho các nút chức năng (hiển thị phía trên) */
+      .btn-tooltip {
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+      }
+      .btn-container-rel:hover .btn-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .btn-container-rel {
+        position: relative;
+        display: inline-block;
       }
 
       .shortcut-btn {
@@ -495,12 +527,6 @@
       .shortcut-btn:hover {
         transform: scale(1.1);
         background: #0056b3;
-      }
-
-      .shortcut-icon-container:hover .shortcut-tooltip {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(0);
       }
 
       @media (max-width: 1024px) or (pointer: coarse) {
@@ -675,13 +701,17 @@
             justify-content: space-between;
           "
         >
-          <button
-            class="btn-primary"
-            id="btn-connect-drive"
-            onclick="handleAuthClick()"
-          >
-            Kết nối Drive
-          </button>
+          <div class="btn-container-rel">
+            <button
+              class="btn-primary"
+              id="btn-connect-drive"
+              onclick="handleAuthClick()"
+            >
+              Kết nối Drive
+            </button>
+            <div class="btn-tooltip" id="tip-connect"></div>
+          </div>
+
           <div id="driveStatus" class="drive-status">
             <div class="status-label">
               <div class="status-dot"></div>
@@ -748,23 +778,29 @@
             id="namePreview"
             style="color: var(--primary-color); margin-left: 5px"
           ></strong>
-          <button class="btn-reset" onclick="resetNamingConfig()">
-            ↺ Reset
-          </button>
+          <div class="btn-container-rel">
+            <button class="btn-reset" onclick="resetNamingConfig()">
+              ↺ Reset
+            </button>
+            <div class="btn-tooltip" id="tip-reset"></div>
+          </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px">
-          <button
-            class="btn-primary"
-            style="
-              background: var(--danger-color);
-              padding: 5px 10px;
-              font-size: 0.8em;
-            "
-            id="btnClearAll"
-            onclick="confirmClearAll()"
-          >
-            Xóa tất cả
-          </button>
+          <div class="btn-container-rel">
+            <button
+              class="btn-primary"
+              style="
+                background: var(--danger-color);
+                padding: 5px 10px;
+                font-size: 0.8em;
+              "
+              id="btnClearAll"
+              onclick="confirmClearAll()"
+            >
+              Xóa tất cả
+            </button>
+            <div class="btn-tooltip" id="tip-clear"></div>
+          </div>
           <span style="font-size: 0.85em; font-weight: 600"
             ><span id="lbl-count-text">Số file:</span>
             <span id="fileCountDisplay">0</span></span
@@ -786,15 +822,18 @@
 
       <ul class="file-list" id="fileList"></ul>
 
-      <button
-        id="btnUploadDrive"
-        class="btn-primary btn-upload"
-        style="display: none"
-        onclick="uploadAllToDrive()"
-      >
-        <div class="loader" id="uploadLoader"></div>
-        <span id="btnUploadText">🚀 Tải lên Google Drive</span>
-      </button>
+      <div class="btn-container-rel" style="width: 100%">
+        <button
+          id="btnUploadDrive"
+          class="btn-primary btn-upload"
+          style="display: none"
+          onclick="uploadAllToDrive()"
+        >
+          <div class="loader" id="uploadLoader"></div>
+          <span id="btnUploadText">🚀 Tải lên Google Drive</span>
+        </button>
+        <div class="btn-tooltip" id="tip-upload"></div>
+      </div>
     </div>
 
     <div id="customModal" class="modal-overlay">
@@ -1377,6 +1416,8 @@
         localStorage.setItem("app-lang", lang);
         const t = translations[lang] || translations["en"];
         const modKey = isMac ? "option" : "Alt";
+        const ctrlKey = isMac ? "⌘" : "Ctrl";
+
         document.getElementById("txt-title").innerText = t.title;
         document.getElementById("lbl-prefix").innerText = t.prefix;
         document.getElementById("lbl-code").innerText = t.code;
@@ -1404,8 +1445,17 @@
         document.getElementById("opt-dark").innerText = t.themeDark;
         document.getElementById("opt-device").innerText = t.themeDevice;
 
+        // Cập nhật text cho tooltip
         document.getElementById("shortcut-tip").innerText =
           t.shortcutTip.replace("{mod}", modKey);
+
+        const modUpper = modKey.toUpperCase();
+        document.getElementById("tip-connect").innerText = `${modUpper} + C`;
+        document.getElementById("tip-reset").innerText =
+          `${modUpper} + Backspace`;
+        document.getElementById("tip-clear").innerText =
+          `${ctrlKey} + ${modUpper} + Backspace`;
+        document.getElementById("tip-upload").innerText = `${ctrlKey} + Enter`;
 
         renderFileList();
       }
@@ -1617,7 +1667,6 @@
         });
       }
 
-      // Hàm upload file có báo cáo tiến độ
       async function uploadFileWithProgress(file, metadata, index) {
         const progressCont = document.getElementById(`progress-cont-${index}`);
         const progressBar = document.getElementById(`progress-bar-${index}`);
@@ -1683,7 +1732,6 @@
           .getElementById("prefix")
           .value.toUpperCase();
 
-        // Tự động cuộn xuống khu vực tải lên
         btn.scrollIntoView({ behavior: "smooth", block: "center" });
 
         btn.disabled = true;

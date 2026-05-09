@@ -226,6 +226,8 @@ function setLang(lang) {
   localStorage.setItem("app-lang", lang);
   const t = translations[lang] || translations["en"];
   const modKey = isMac ? "option" : "Alt";
+  const ctrlKey = isMac ? "⌘" : "Ctrl";
+
   document.getElementById("txt-title").innerText = t.title;
   document.getElementById("lbl-prefix").innerText = t.prefix;
   document.getElementById("lbl-code").innerText = t.code;
@@ -253,10 +255,18 @@ function setLang(lang) {
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
 
+  // Cập nhật text cho tooltip
   document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
     "{mod}",
     modKey,
   );
+
+  const modUpper = modKey.toUpperCase();
+  document.getElementById("tip-connect").innerText = `${modUpper} + C`;
+  document.getElementById("tip-reset").innerText = `${modUpper} + Backspace`;
+  document.getElementById("tip-clear").innerText =
+    `${ctrlKey} + ${modUpper} + Backspace`;
+  document.getElementById("tip-upload").innerText = `${ctrlKey} + Enter`;
 
   renderFileList();
 }
@@ -460,7 +470,6 @@ function confirmClearAll() {
   });
 }
 
-// Hàm upload file có báo cáo tiến độ
 async function uploadFileWithProgress(file, metadata, index) {
   const progressCont = document.getElementById(`progress-cont-${index}`);
   const progressBar = document.getElementById(`progress-bar-${index}`);
@@ -524,7 +533,6 @@ async function uploadAllToDrive() {
   const t = translations[lang] || translations["en"];
   const currentPrefix = document.getElementById("prefix").value.toUpperCase();
 
-  // Tự động cuộn xuống khu vực tải lên
   btn.scrollIntoView({ behavior: "smooth", block: "center" });
 
   btn.disabled = true;

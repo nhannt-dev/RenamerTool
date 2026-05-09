@@ -448,7 +448,9 @@ input {
   gap: 12px;
 }
 
-.shortcut-tooltip {
+/* Đổi tên hoặc dùng chung class tooltip cho các nút khác */
+.shortcut-tooltip,
+.btn-tooltip {
   background: #333;
   color: #fff;
   padding: 8px 15px;
@@ -457,10 +459,40 @@ input {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translateX(10px);
   transition: all 0.3s ease;
   box-shadow: var(--shadow);
   pointer-events: none;
+  position: absolute;
+  z-index: 1000;
+}
+
+/* Tooltip mặc định của nút shortcut ở góc */
+.shortcut-tooltip {
+  transform: translateX(10px);
+  right: 60px;
+  bottom: 10px;
+}
+.shortcut-icon-container:hover .shortcut-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Tooltip cho các nút chức năng (hiển thị phía trên) */
+.btn-tooltip {
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+}
+.btn-container-rel:hover .btn-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.btn-container-rel {
+  position: relative;
+  display: inline-block;
 }
 
 .shortcut-btn {
@@ -481,12 +513,6 @@ input {
 .shortcut-btn:hover {
   transform: scale(1.1);
   background: #0056b3;
-}
-
-.shortcut-icon-container:hover .shortcut-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(0);
 }
 
 @media (max-width: 1024px) or (pointer: coarse) {

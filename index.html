@@ -119,13 +119,17 @@
             justify-content: space-between;
           "
         >
-          <button
-            class="btn-primary"
-            id="btn-connect-drive"
-            onclick="handleAuthClick()"
-          >
-            Kết nối Drive
-          </button>
+          <div class="btn-container-rel">
+            <button
+              class="btn-primary"
+              id="btn-connect-drive"
+              onclick="handleAuthClick()"
+            >
+              Kết nối Drive
+            </button>
+            <div class="btn-tooltip" id="tip-connect"></div>
+          </div>
+
           <div id="driveStatus" class="drive-status">
             <div class="status-label">
               <div class="status-dot"></div>
@@ -192,23 +196,29 @@
             id="namePreview"
             style="color: var(--primary-color); margin-left: 5px"
           ></strong>
-          <button class="btn-reset" onclick="resetNamingConfig()">
-            ↺ Reset
-          </button>
+          <div class="btn-container-rel">
+            <button class="btn-reset" onclick="resetNamingConfig()">
+              ↺ Reset
+            </button>
+            <div class="btn-tooltip" id="tip-reset"></div>
+          </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px">
-          <button
-            class="btn-primary"
-            style="
-              background: var(--danger-color);
-              padding: 5px 10px;
-              font-size: 0.8em;
-            "
-            id="btnClearAll"
-            onclick="confirmClearAll()"
-          >
-            Xóa tất cả
-          </button>
+          <div class="btn-container-rel">
+            <button
+              class="btn-primary"
+              style="
+                background: var(--danger-color);
+                padding: 5px 10px;
+                font-size: 0.8em;
+              "
+              id="btnClearAll"
+              onclick="confirmClearAll()"
+            >
+              Xóa tất cả
+            </button>
+            <div class="btn-tooltip" id="tip-clear"></div>
+          </div>
           <span style="font-size: 0.85em; font-weight: 600"
             ><span id="lbl-count-text">Số file:</span>
             <span id="fileCountDisplay">0</span></span
@@ -230,15 +240,18 @@
 
       <ul class="file-list" id="fileList"></ul>
 
-      <button
-        id="btnUploadDrive"
-        class="btn-primary btn-upload"
-        style="display: none"
-        onclick="uploadAllToDrive()"
-      >
-        <div class="loader" id="uploadLoader"></div>
-        <span id="btnUploadText">🚀 Tải lên Google Drive</span>
-      </button>
+      <div class="btn-container-rel" style="width: 100%">
+        <button
+          id="btnUploadDrive"
+          class="btn-primary btn-upload"
+          style="display: none"
+          onclick="uploadAllToDrive()"
+        >
+          <div class="loader" id="uploadLoader"></div>
+          <span id="btnUploadText">🚀 Tải lên Google Drive</span>
+        </button>
+        <div class="btn-tooltip" id="tip-upload"></div>
+      </div>
     </div>
 
     <div id="customModal" class="modal-overlay">
