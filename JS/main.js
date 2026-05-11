@@ -184,9 +184,26 @@ window.onload = () => {
     if (e.target.value.length > 6) e.target.value = e.target.value.slice(-6);
     updatePreview();
     renderFileList();
+    updateBase64Code(); // New functionality
   });
   renderFileList();
 };
+
+function updateBase64Code() {
+  const codeValue = document.getElementById("codeInput").value.trim();
+  const display = document.getElementById("base64Display");
+  if (codeValue.length === 6) {
+    try {
+      const encoded = btoa(codeValue);
+      display.innerText = `B64: ${encoded}`;
+      display.onclick = () => copyToClipboard(encoded);
+    } catch (e) {
+      display.innerText = "";
+    }
+  } else {
+    display.innerText = "";
+  }
+}
 
 function initDragAndDrop() {
   const dropzone = document.getElementById("dropzone");
@@ -255,7 +272,6 @@ function setLang(lang) {
   document.getElementById("opt-dark").innerText = t.themeDark;
   document.getElementById("opt-device").innerText = t.themeDevice;
 
-  // Cập nhật text cho tooltip
   document.getElementById("shortcut-tip").innerText = t.shortcutTip.replace(
     "{mod}",
     modKey,
@@ -641,6 +657,7 @@ function resetNamingConfig() {
   document.getElementById("wardInput").value = "";
   updatePreview();
   renderFileList();
+  updateBase64Code(); // New functionality
 }
 
 function showShortcutList() {

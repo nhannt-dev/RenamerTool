@@ -448,7 +448,6 @@ input {
   gap: 12px;
 }
 
-/* Đổi tên hoặc dùng chung class tooltip cho các nút khác */
 .shortcut-tooltip,
 .btn-tooltip {
   background: #333;
@@ -466,7 +465,6 @@ input {
   z-index: 1000;
 }
 
-/* Tooltip mặc định của nút shortcut ở góc */
 .shortcut-tooltip {
   transform: translateX(10px);
   right: 60px;
@@ -478,7 +476,6 @@ input {
   transform: translateX(0);
 }
 
-/* Tooltip cho các nút chức năng (hiển thị phía trên) */
 .btn-tooltip {
   bottom: 120%;
   left: 50%;
@@ -535,7 +532,6 @@ input {
   font-weight: bold;
 }
 
-/* Custom File Explorer Styles */
 .explorer-list {
   list-style: none;
   padding: 0;

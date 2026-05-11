@@ -462,7 +462,6 @@
         gap: 12px;
       }
 
-      /* Đổi tên hoặc dùng chung class tooltip cho các nút khác */
       .shortcut-tooltip,
       .btn-tooltip {
         background: #333;
@@ -480,7 +479,6 @@
         z-index: 1000;
       }
 
-      /* Tooltip mặc định của nút shortcut ở góc */
       .shortcut-tooltip {
         transform: translateX(10px);
         right: 60px;
@@ -492,7 +490,6 @@
         transform: translateX(0);
       }
 
-      /* Tooltip cho các nút chức năng (hiển thị phía trên) */
       .btn-tooltip {
         bottom: 120%;
         left: 50%;
@@ -549,7 +546,6 @@
         font-weight: bold;
       }
 
-      /* Custom File Explorer Styles */
       .explorer-list {
         list-style: none;
         padding: 0;
@@ -785,7 +781,18 @@
             <div class="btn-tooltip" id="tip-reset"></div>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 15px">
+          <span
+            id="base64Display"
+            style="
+              color: var(--accent-color);
+              font-family: monospace;
+              font-size: 0.9em;
+              cursor: pointer;
+              font-weight: bold;
+            "
+            title="Click to copy Base64"
+          ></span>
           <div class="btn-container-rel">
             <button
               class="btn-primary"
@@ -1368,9 +1375,26 @@
             e.target.value = e.target.value.slice(-6);
           updatePreview();
           renderFileList();
+          updateBase64Code(); // New functionality
         });
         renderFileList();
       };
+
+      function updateBase64Code() {
+        const codeValue = document.getElementById("codeInput").value.trim();
+        const display = document.getElementById("base64Display");
+        if (codeValue.length === 6) {
+          try {
+            const encoded = btoa(codeValue);
+            display.innerText = `B64: ${encoded}`;
+            display.onclick = () => copyToClipboard(encoded);
+          } catch (e) {
+            display.innerText = "";
+          }
+        } else {
+          display.innerText = "";
+        }
+      }
 
       function initDragAndDrop() {
         const dropzone = document.getElementById("dropzone");
@@ -1445,7 +1469,6 @@
         document.getElementById("opt-dark").innerText = t.themeDark;
         document.getElementById("opt-device").innerText = t.themeDevice;
 
-        // Cập nhật text cho tooltip
         document.getElementById("shortcut-tip").innerText =
           t.shortcutTip.replace("{mod}", modKey);
 
@@ -1840,6 +1863,7 @@
         document.getElementById("wardInput").value = "";
         updatePreview();
         renderFileList();
+        updateBase64Code(); // New functionality
       }
 
       function showShortcutList() {
