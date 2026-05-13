@@ -1240,7 +1240,7 @@
         const lang = localStorage.getItem("app-lang") || "vi";
         const t = translations[lang] || translations["en"];
         if (!container) return;
-        try {
+        try { 
           let html = `<div class="breadcrumb-nav">`;
           explorerStack.forEach((folder, idx) => {
             html += `<span onclick="navigateToStack(${idx})">${folder.name}</span> ${idx < explorerStack.length - 1 ? ">" : ""} `;
