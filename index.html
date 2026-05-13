@@ -86,6 +86,24 @@
           </div>
         </div>
         <div class="input-box" style="margin-bottom: 15px">
+          <label id="lbl-sheet-id">Google Sheets ID (Mã tham chiếu)</label>
+          <div class="input-with-clear">
+            <input
+              type="text"
+              id="sheetId"
+              placeholder="Nhập ID file Google Sheets..."
+            />
+            <button class="btn-clear-input" onclick="clearInput('sheetId')">
+              &times;
+            </button>
+          </div>
+          <div
+            id="sheetNameDisplay"
+            style="font-size: 0.85em; margin-top: 5px; font-weight: 600"
+          ></div>
+        </div>
+
+        <div class="input-box" style="margin-bottom: 15px">
           <label id="lbl-folder-link">Link Thư mục Google Drive</label>
           <div class="folder-input-group">
             <div class="input-with-clear" style="flex: 1">
@@ -154,12 +172,15 @@
         </div>
         <div class="input-box">
           <label id="lbl-code">Mã (Code)</label>
-          <input
-            type="text"
-            id="codeInput"
-            class="uppercase"
-            placeholder="751621"
-          />
+          <div class="input-with-clear">
+            <input
+              type="text"
+              id="codeInput"
+              class="uppercase"
+              placeholder="751621"
+            />
+            <span id="sheetCodeStatus" class="sheet-status-icon"></span>
+          </div>
         </div>
         <div class="input-box">
           <label id="lbl-order">Thứ tự</label>

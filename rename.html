@@ -291,7 +291,6 @@
         font-size: 0.75em;
       }
 
-      /* Progress styles */
       .item-progress-container {
         width: 100%;
         height: 4px;
@@ -589,6 +588,16 @@
         color: var(--text-color);
         font-weight: bold;
       }
+
+      /* Sheet Sync Styles */
+      .sheet-status-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2em;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -664,6 +673,24 @@
           </div>
         </div>
         <div class="input-box" style="margin-bottom: 15px">
+          <label id="lbl-sheet-id">Google Sheets ID (Mã tham chiếu)</label>
+          <div class="input-with-clear">
+            <input
+              type="text"
+              id="sheetId"
+              placeholder="Nhập ID file Google Sheets..."
+            />
+            <button class="btn-clear-input" onclick="clearInput('sheetId')">
+              &times;
+            </button>
+          </div>
+          <div
+            id="sheetNameDisplay"
+            style="font-size: 0.85em; margin-top: 5px; font-weight: 600"
+          ></div>
+        </div>
+
+        <div class="input-box" style="margin-bottom: 15px">
           <label id="lbl-folder-link">Link Thư mục Google Drive</label>
           <div class="folder-input-group">
             <div class="input-with-clear" style="flex: 1">
@@ -732,12 +759,15 @@
         </div>
         <div class="input-box">
           <label id="lbl-code">Mã (Code)</label>
-          <input
-            type="text"
-            id="codeInput"
-            class="uppercase"
-            placeholder="751621"
-          />
+          <div class="input-with-clear">
+            <input
+              type="text"
+              id="codeInput"
+              class="uppercase"
+              placeholder="751621"
+            />
+            <span id="sheetCodeStatus" class="sheet-status-icon"></span>
+          </div>
         </div>
         <div class="input-box">
           <label id="lbl-order">Thứ tự</label>
@@ -936,6 +966,9 @@
           exEmpty: "(Thư mục trống)",
           exSelecting: "Đang chọn:",
           exBtnConfirm: "Chọn thư mục này",
+          lblSheet: "Google Sheets ID (Mã tham chiếu)",
+          fetchingSheet: "🔍 Đang kiểm tra Google Sheets...",
+          sheetNotFound: "❌ Không tìm thấy file Sheets",
         },
         en: {
           title: "Rename & Upload Drive",
@@ -989,6 +1022,9 @@
           exEmpty: "(Empty Folder)",
           exSelecting: "Selecting:",
           exBtnConfirm: "Select this folder",
+          lblSheet: "Google Sheets ID (Ref Code)",
+          fetchingSheet: "🔍 Checking Google Sheets...",
+          sheetNotFound: "❌ Sheets file not found",
         },
         th: {
           title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
@@ -1042,6 +1078,9 @@
           exEmpty: "(โฟลเดอร์ว่างเปล่า)",
           exSelecting: "กำลังเลือก:",
           exBtnConfirm: "เลือกโฟลเดอร์นี้",
+          lblSheet: "Google Sheets ID (รหัสอ้างอิง)",
+          fetchingSheet: "🔍 กำลังตรวจสอบ Google Sheets...",
+          sheetNotFound: "❌ ไม่พบไฟล์ Sheets",
         },
         ja: {
           title: "名前変更とドライブへのアップロード",
@@ -1095,6 +1134,9 @@
           exEmpty: "(空のフォルダ)",
           exSelecting: "選択中:",
           exBtnConfirm: "このフォルダを選択",
+          lblSheet: "Google Sheets ID (参照コード)",
+          fetchingSheet: "🔍 Google Sheetsをチェック中...",
+          sheetNotFound: "❌ Sheetsファイルが見つかりません",
         },
         zh: {
           title: "重命名并上传至云端硬盘",
@@ -1148,6 +1190,9 @@
           exEmpty: "(空文件夹)",
           exSelecting: "当前选择:",
           exBtnConfirm: "选择此文件夹",
+          lblSheet: "Google Sheets ID (参考代码)",
+          fetchingSheet: "🔍 正在检查 Google Sheets...",
+          sheetNotFound: "❌ 未找到 Sheets 文件",
         },
         fr: {
           title: "Renommer & Télécharger vers Drive",
@@ -1201,6 +1246,9 @@
           exEmpty: "(Dossier vide)",
           exSelecting: "Sélection :",
           exBtnConfirm: "Choisir ce dossier",
+          lblSheet: "Google Sheets ID (Code Réf)",
+          fetchingSheet: "🔍 Vérification Google Sheets...",
+          sheetNotFound: "❌ Fichier Sheets introuvable",
         },
       };
 
@@ -1240,7 +1288,7 @@
         const lang = localStorage.getItem("app-lang") || "vi";
         const t = translations[lang] || translations["en"];
         if (!container) return;
-        try { 
+        try {
           let html = `<div class="breadcrumb-nav">`;
           explorerStack.forEach((folder, idx) => {
             html += `<span onclick="navigateToStack(${idx})">${folder.name}</span> ${idx < explorerStack.length - 1 ? ">" : ""} `;
@@ -1370,12 +1418,20 @@
         document
           .getElementById("folderId")
           .addEventListener("input", fetchFolderName);
+        document
+          .getElementById("sheetId")
+          .addEventListener("input", fetchSheetName);
         document.getElementById("codeInput").addEventListener("input", (e) => {
           if (e.target.value.length > 6)
             e.target.value = e.target.value.slice(-6);
           updatePreview();
           renderFileList();
-          updateBase64Code(); // New functionality
+          updateBase64Code();
+          if (e.target.value.length === 6) {
+            checkCodeInSheet(e.target.value.trim().toUpperCase());
+          } else {
+            document.getElementById("sheetCodeStatus").innerText = "";
+          }
         });
         renderFileList();
       };
@@ -1426,14 +1482,21 @@
           localStorage.getItem("drive-api-key") || "";
         document.getElementById("folderId").value =
           localStorage.getItem("drive-folder-id") || "";
+        document.getElementById("sheetId").value =
+          localStorage.getItem("drive-sheet-id") || "";
       }
 
       function clearInput(id) {
         document.getElementById(id).value = "";
-        let key = "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
-        localStorage.removeItem(key);
+        let storageKey =
+          "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
+        localStorage.removeItem(storageKey);
         if (id === "folderId")
           document.getElementById("folderNameDisplay").innerText = "";
+        if (id === "sheetId")
+          document.getElementById("sheetNameDisplay").innerText = "";
+        if (id === "sheetId")
+          document.getElementById("sheetCodeStatus").innerText = "";
       }
 
       function setLang(lang) {
@@ -1454,6 +1517,7 @@
         document.getElementById("btnClearAll").innerText = t.clearAll;
         document.getElementById("lbl-drive-config").innerText = t.driveConfig;
         document.getElementById("lbl-folder-link").innerText = t.folderLink;
+        document.getElementById("lbl-sheet-id").innerText = t.lblSheet;
         document.getElementById("btn-connect-drive").innerText = t.connect;
         document.getElementById("statusText").innerText = accessToken
           ? t.connected
@@ -1502,6 +1566,12 @@
         return match ? match : input.trim();
       }
 
+      function extractSheetId(input) {
+        if (!input) return null;
+        const match = input.match(/\/d\/([a-zA-Z0-9-_]{25,})/);
+        return match ? match : input.trim();
+      }
+
       async function fetchFolderName() {
         const input = document.getElementById("folderId").value.trim();
         const display = document.getElementById("folderNameDisplay");
@@ -1517,37 +1587,87 @@
           return;
         }
         const fId = extractFolderId(input);
-        if (fId.length < 20) return;
         display.innerText = t.fetching;
         try {
-          let currentId = fId;
-          let pathParts = [];
-          let depthLimit = 10;
-          while (currentId && depthLimit > 0) {
-            const res = await fetch(
-              `https://www.googleapis.com/drive/v3/files/${currentId}?fields=id,name,parents`,
-              { headers: { Authorization: "Bearer " + accessToken } },
-            );
-            if (!res.ok) break;
-            const data = await res.json();
-            let folderName = data.name;
-            if (data.id === "root") folderName = "My Drive";
-            pathParts.unshift(folderName);
-            if (data.parents && data.parents.length > 0)
-              currentId = data.parents;
-            else {
-              if (data.id !== "root" && !pathParts.includes("My Drive"))
-                pathParts.unshift("My Drive");
-              currentId = null;
-            }
-            depthLimit--;
-          }
-          display.innerText = "📁 " + pathParts.join(" > ");
+          const res = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
+            { headers: { Authorization: "Bearer " + accessToken } },
+          );
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          display.innerText = "📁 " + data.name;
           display.style.color = "var(--success-color)";
           localStorage.setItem("drive-folder-id", input);
         } catch (e) {
           display.innerText = t.notFound;
           display.style.color = "var(--danger-color)";
+        }
+      }
+
+      async function fetchSheetName() {
+        const input = document.getElementById("sheetId").value.trim();
+        const display = document.getElementById("sheetNameDisplay");
+        const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+        if (!input) {
+          display.innerText = "";
+          return;
+        }
+        if (!accessToken) {
+          display.innerText = t.needConnect;
+          display.style.color = "orange";
+          return;
+        }
+        const sId = extractSheetId(input);
+        display.innerText = t.fetchingSheet;
+        try {
+          const res = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${sId}?fields=name`,
+            { headers: { Authorization: "Bearer " + accessToken } },
+          );
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          display.innerText = "📊 " + data.name;
+          display.style.color = "var(--success-color)";
+          localStorage.setItem("drive-sheet-id", input);
+        } catch (e) {
+          display.innerText = t.sheetNotFound;
+          display.style.color = "var(--danger-color)";
+        }
+      }
+
+      async function checkCodeInSheet(code) {
+        const sId = extractSheetId(
+          document.getElementById("sheetId").value.trim(),
+        );
+        const statusIcon = document.getElementById("sheetCodeStatus");
+        if (!sId || !accessToken) return;
+
+        statusIcon.innerText = "⏳";
+        try {
+          // Fetch values from the first sheet, column A to Z
+          const res = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sId}/values/A1:Z1000`,
+            { headers: { Authorization: "Bearer " + accessToken } },
+          );
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          const rows = data.values || [];
+
+          // Flatten all cells and check if code exists (case insensitive)
+          const found = rows.some((row) =>
+            row.some((cell) => String(cell).toUpperCase().includes(code)),
+          );
+
+          if (found) {
+            statusIcon.innerText = "✅";
+            statusIcon.title = "Mã hợp lệ";
+          } else {
+            statusIcon.innerText = "❌";
+            statusIcon.title = "Mã không tồn tại";
+          }
+        } catch (e) {
+          statusIcon.innerText = "⚠️";
         }
       }
 
@@ -1584,7 +1704,7 @@
         const client = google.accounts.oauth2.initTokenClient({
           client_id: cid,
           scope:
-            "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets.readonly",
           callback: (res) => {
             if (res.access_token) {
               accessToken = res.access_token;
@@ -1593,6 +1713,7 @@
                 .classList.add("status-connected");
               setLang(lang);
               fetchFolderName();
+              fetchSheetName();
               fetchUserEmail();
               renderFileList();
             }
@@ -1861,9 +1982,10 @@
         document.getElementById("orderSelect").value = "none";
         document.getElementById("streetInput").value = "";
         document.getElementById("wardInput").value = "";
+        document.getElementById("sheetCodeStatus").innerText = "";
         updatePreview();
         renderFileList();
-        updateBase64Code(); // New functionality
+        updateBase64Code();
       }
 
       function showShortcutList() {
@@ -1953,6 +2075,7 @@
           clearInput("clientId");
           clearInput("apiKey");
           clearInput("folderId");
+          clearInput("sheetId");
         }
         if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
           e.preventDefault();

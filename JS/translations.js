@@ -51,6 +51,9 @@ const translations = {
     exEmpty: "(Thư mục trống)",
     exSelecting: "Đang chọn:",
     exBtnConfirm: "Chọn thư mục này",
+    lblSheet: "Google Sheets ID (Mã tham chiếu)",
+    fetchingSheet: "🔍 Đang kiểm tra Google Sheets...",
+    sheetNotFound: "❌ Không tìm thấy file Sheets",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -104,6 +107,9 @@ const translations = {
     exEmpty: "(Empty Folder)",
     exSelecting: "Selecting:",
     exBtnConfirm: "Select this folder",
+    lblSheet: "Google Sheets ID (Ref Code)",
+    fetchingSheet: "🔍 Checking Google Sheets...",
+    sheetNotFound: "❌ Sheets file not found",
   },
   th: {
     title: "เปลี่ยนชื่อและอัปโหลดไดรฟ์",
@@ -157,6 +163,9 @@ const translations = {
     exEmpty: "(โฟลเดอร์ว่างเปล่า)",
     exSelecting: "กำลังเลือก:",
     exBtnConfirm: "เลือกโฟลเดอร์นี้",
+    lblSheet: "Google Sheets ID (รหัสอ้างอิง)",
+    fetchingSheet: "🔍 กำลังตรวจสอบ Google Sheets...",
+    sheetNotFound: "❌ ไม่พบไฟล์ Sheets",
   },
   ja: {
     title: "名前変更とドライブへのアップロード",
@@ -210,6 +219,9 @@ const translations = {
     exEmpty: "(空のフォルダ)",
     exSelecting: "選択中:",
     exBtnConfirm: "このフォルダを選択",
+    lblSheet: "Google Sheets ID (参照コード)",
+    fetchingSheet: "🔍 Google Sheetsをチェック中...",
+    sheetNotFound: "❌ Sheetsファイルが見つかりません",
   },
   zh: {
     title: "重命名并上传至云端硬盘",
@@ -263,6 +275,9 @@ const translations = {
     exEmpty: "(空文件夹)",
     exSelecting: "当前选择:",
     exBtnConfirm: "选择此文件夹",
+    lblSheet: "Google Sheets ID (参考代码)",
+    fetchingSheet: "🔍 正在检查 Google Sheets...",
+    sheetNotFound: "❌ 未找到 Sheets 文件",
   },
   fr: {
     title: "Renommer & Télécharger vers Drive",
@@ -316,5 +331,8 @@ const translations = {
     exEmpty: "(Dossier vide)",
     exSelecting: "Sélection :",
     exBtnConfirm: "Choisir ce dossier",
+    lblSheet: "Google Sheets ID (Code Réf)",
+    fetchingSheet: "🔍 Vérification Google Sheets...",
+    sheetNotFound: "❌ Fichier Sheets introuvable",
   },
 };

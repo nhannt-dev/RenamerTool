@@ -180,11 +180,17 @@ window.onload = () => {
   document
     .getElementById("folderId")
     .addEventListener("input", fetchFolderName);
+  document.getElementById("sheetId").addEventListener("input", fetchSheetName);
   document.getElementById("codeInput").addEventListener("input", (e) => {
     if (e.target.value.length > 6) e.target.value = e.target.value.slice(-6);
     updatePreview();
     renderFileList();
-    updateBase64Code(); // New functionality
+    updateBase64Code();
+    if (e.target.value.length === 6) {
+      checkCodeInSheet(e.target.value.trim().toUpperCase());
+    } else {
+      document.getElementById("sheetCodeStatus").innerText = "";
+    }
   });
   renderFileList();
 };
@@ -229,14 +235,21 @@ function loadSavedConfig() {
     localStorage.getItem("drive-api-key") || "";
   document.getElementById("folderId").value =
     localStorage.getItem("drive-folder-id") || "";
+  document.getElementById("sheetId").value =
+    localStorage.getItem("drive-sheet-id") || "";
 }
 
 function clearInput(id) {
   document.getElementById(id).value = "";
-  let key = "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
-  localStorage.removeItem(key);
+  let storageKey =
+    "drive-" + id.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
+  localStorage.removeItem(storageKey);
   if (id === "folderId")
     document.getElementById("folderNameDisplay").innerText = "";
+  if (id === "sheetId")
+    document.getElementById("sheetNameDisplay").innerText = "";
+  if (id === "sheetId")
+    document.getElementById("sheetCodeStatus").innerText = "";
 }
 
 function setLang(lang) {
@@ -257,6 +270,7 @@ function setLang(lang) {
   document.getElementById("btnClearAll").innerText = t.clearAll;
   document.getElementById("lbl-drive-config").innerText = t.driveConfig;
   document.getElementById("lbl-folder-link").innerText = t.folderLink;
+  document.getElementById("lbl-sheet-id").innerText = t.lblSheet;
   document.getElementById("btn-connect-drive").innerText = t.connect;
   document.getElementById("statusText").innerText = accessToken
     ? t.connected
@@ -304,6 +318,12 @@ function extractFolderId(input) {
   return match ? match : input.trim();
 }
 
+function extractSheetId(input) {
+  if (!input) return null;
+  const match = input.match(/\/d\/([a-zA-Z0-9-_]{25,})/);
+  return match ? match : input.trim();
+}
+
 async function fetchFolderName() {
   const input = document.getElementById("folderId").value.trim();
   const display = document.getElementById("folderNameDisplay");
@@ -319,36 +339,85 @@ async function fetchFolderName() {
     return;
   }
   const fId = extractFolderId(input);
-  if (fId.length < 20) return;
   display.innerText = t.fetching;
   try {
-    let currentId = fId;
-    let pathParts = [];
-    let depthLimit = 10;
-    while (currentId && depthLimit > 0) {
-      const res = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${currentId}?fields=id,name,parents`,
-        { headers: { Authorization: "Bearer " + accessToken } },
-      );
-      if (!res.ok) break;
-      const data = await res.json();
-      let folderName = data.name;
-      if (data.id === "root") folderName = "My Drive";
-      pathParts.unshift(folderName);
-      if (data.parents && data.parents.length > 0) currentId = data.parents;
-      else {
-        if (data.id !== "root" && !pathParts.includes("My Drive"))
-          pathParts.unshift("My Drive");
-        currentId = null;
-      }
-      depthLimit--;
-    }
-    display.innerText = "📁 " + pathParts.join(" > ");
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
+      { headers: { Authorization: "Bearer " + accessToken } },
+    );
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    display.innerText = "📁 " + data.name;
     display.style.color = "var(--success-color)";
     localStorage.setItem("drive-folder-id", input);
   } catch (e) {
     display.innerText = t.notFound;
     display.style.color = "var(--danger-color)";
+  }
+}
+
+async function fetchSheetName() {
+  const input = document.getElementById("sheetId").value.trim();
+  const display = document.getElementById("sheetNameDisplay");
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+  if (!input) {
+    display.innerText = "";
+    return;
+  }
+  if (!accessToken) {
+    display.innerText = t.needConnect;
+    display.style.color = "orange";
+    return;
+  }
+  const sId = extractSheetId(input);
+  display.innerText = t.fetchingSheet;
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${sId}?fields=name`,
+      { headers: { Authorization: "Bearer " + accessToken } },
+    );
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    display.innerText = "📊 " + data.name;
+    display.style.color = "var(--success-color)";
+    localStorage.setItem("drive-sheet-id", input);
+  } catch (e) {
+    display.innerText = t.sheetNotFound;
+    display.style.color = "var(--danger-color)";
+  }
+}
+
+async function checkCodeInSheet(code) {
+  const sId = extractSheetId(document.getElementById("sheetId").value.trim());
+  const statusIcon = document.getElementById("sheetCodeStatus");
+  if (!sId || !accessToken) return;
+
+  statusIcon.innerText = "⏳";
+  try {
+    // Fetch values from the first sheet, column A to Z
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${sId}/values/A1:Z1000`,
+      { headers: { Authorization: "Bearer " + accessToken } },
+    );
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const rows = data.values || [];
+
+    // Flatten all cells and check if code exists (case insensitive)
+    const found = rows.some((row) =>
+      row.some((cell) => String(cell).toUpperCase().includes(code)),
+    );
+
+    if (found) {
+      statusIcon.innerText = "✅";
+      statusIcon.title = "Mã hợp lệ";
+    } else {
+      statusIcon.innerText = "❌";
+      statusIcon.title = "Mã không tồn tại";
+    }
+  } catch (e) {
+    statusIcon.innerText = "⚠️";
   }
 }
 
@@ -384,7 +453,7 @@ function handleAuthClick() {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: cid,
     scope:
-      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets.readonly",
     callback: (res) => {
       if (res.access_token) {
         accessToken = res.access_token;
@@ -393,6 +462,7 @@ function handleAuthClick() {
           .classList.add("status-connected");
         setLang(lang);
         fetchFolderName();
+        fetchSheetName();
         fetchUserEmail();
         renderFileList();
       }
@@ -655,9 +725,10 @@ function resetNamingConfig() {
   document.getElementById("orderSelect").value = "none";
   document.getElementById("streetInput").value = "";
   document.getElementById("wardInput").value = "";
+  document.getElementById("sheetCodeStatus").innerText = "";
   updatePreview();
   renderFileList();
-  updateBase64Code(); // New functionality
+  updateBase64Code();
 }
 
 function showShortcutList() {
@@ -745,6 +816,7 @@ document.addEventListener("keydown", function (e) {
     clearInput("clientId");
     clearInput("apiKey");
     clearInput("folderId");
+    clearInput("sheetId");
   }
   if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === "KeyO") {
     e.preventDefault();
