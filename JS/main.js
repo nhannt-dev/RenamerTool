@@ -515,9 +515,13 @@ function renderFileList() {
     li.className = "file-item";
     li.id = `item-${i}`;
     const newName = generateFileName(i, file.name);
+    const imgUrl = URL.createObjectURL(file);
     li.innerHTML = `
             <div class="file-main-info">
-              <img src="${URL.createObjectURL(file)}" class="file-thumb">
+              <div class="thumbnail-preview-container">
+                <img src="${imgUrl}" class="file-thumb">
+                <img src="${imgUrl}" class="magnifier-zoom">
+              </div>
               <div class="file-info">
                 <span class="new-name">${newName || file.name}</span>
                 <span class="old-name">${file.name}</span>
