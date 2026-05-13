@@ -289,7 +289,10 @@
         position: fixed; /* Thay đổi từ absolute sang fixed để không bị khuất bởi overflow */
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%); /* Đưa ảnh ra giữa màn hình để quan sát rõ nhất */
+        transform: translate(
+          -50%,
+          -50%
+        ); /* Đưa ảnh ra giữa màn hình để quan sát rõ nhất */
         width: 400px; /* Tăng kích thước lên một chút để nhìn rõ hơn */
         height: 400px;
         border-radius: 12px;
@@ -1092,7 +1095,7 @@
           confirmClear: "คุณแน่ใจหรือไม่ว่าต้องการล้างรายการทั้งหมด?",
           fetching: "🔍 กำลังดึงชื่อโฟลเดอร์...",
           notFound: "❌ ไม่พบโฟลเดอร์",
-          needConnect: "⚠️ โปรดคลิกเชื่อมต่อไดrฟ์ก่อน",
+          needConnect: "⚠️ โปรดคลิกเชื่อมต่อไดรฟ์ก่อน",
           modalTitle: "การแจ้งเตือน",
           close: "ปิด",
           confirm: "ยืนยัน",
@@ -1111,7 +1114,7 @@
           scClearConfig: "ล้าง ID/Key config",
           scOpenPicker: "เปิดตัวเลือกโฟลเดอร์",
           scUpload: "เริ่มอัปโหลด",
-          scShowThis: "แสดงรายการปุ่มลัด này",
+          scShowThis: "แสดงรายการปุ่มลัดนี้",
           scCloseEsc: "ปิดการแจ้งเตือนด่วน",
           account: "บัญชี: ",
           exTitle: "Google Drive Explorer",
@@ -1260,7 +1263,7 @@
           placeholderApiKey: "Entrez l'API Key...",
           placeholderFolder: "Collez le lien ou l'ID du dossier",
           placeholderSheet: "Entrez l'ID du fichier Google Sheets...",
-          confirmClear: "Voulez-vous thật sự vider la liste ?",
+          confirmClear: "Voulez-vous vraiment vider la liste ?",
           fetching: "🔍 Récupération du nom du dossier...",
           notFound: "❌ Dossier non trouvé",
           needConnect: "⚠️ Veuillez d'abord cliquer sur Connecter Drive",
@@ -1283,7 +1286,7 @@
           scOpenPicker: "Ouvrir le sélecteur",
           scUpload: "Démarrer l'envoi",
           scShowThis: "Afficher ces raccourcis",
-          scCloseEsc: "Fermer nhanh chóng",
+          scCloseEsc: "Fermer rapidement",
           account: "Compte: ",
           exTitle: "Explorateur Google Drive",
           exEmpty: "(Dossier vide)",
@@ -1294,7 +1297,6 @@
           sheetNotFound: "❌ Fichier Sheets introuvable",
         },
       };
-
       let filesArray = [];
       let accessToken = null;
       let connectedUserEmail = "";
