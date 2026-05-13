@@ -281,6 +281,7 @@ function setLang(lang) {
   document.getElementById("clientId").placeholder = t.placeholderClientId;
   document.getElementById("apiKey").placeholder = t.placeholderApiKey;
   document.getElementById("folderId").placeholder = t.placeholderFolder;
+  document.getElementById("sheetId").placeholder = t.placeholderSheet;
   document.getElementById("btnUploadText").innerText = t.uploadButton;
   document.getElementById("opt-light").innerText = t.themeLight;
   document.getElementById("opt-dark").innerText = t.themeDark;
