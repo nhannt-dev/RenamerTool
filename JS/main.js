@@ -27,6 +27,7 @@ const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
 let currentExplorerFolder = "root";
 let explorerStack = [{ id: "root", name: "My Drive" }];
+let currentSearchQuery = "";
 
 async function showPicker() {
   const lang = localStorage.getItem("app-lang") || "vi";
@@ -37,51 +38,161 @@ async function showPicker() {
   }
   currentExplorerFolder = "root";
   explorerStack = [{ id: "root", name: "My Drive" }];
+  currentSearchQuery = "";
   renderExplorerModal();
 }
 
 async function renderExplorerModal() {
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
+  currentSearchQuery = "";
   showModal(
-    `<div id="explorer-container"><div class="loader" style="display:block"></div></div>`,
+    `<div id="explorer-container">
+             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+               <input type="text" id="explorerSearchInput" placeholder="${t.exSearchPlaceholder}" style="flex: 1; height: 38px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--container-bg); color: var(--text-color); font-size: 14px;">
+               <button class="btn-primary" style="height: 38px; padding: 0 15px;" onclick="executeExplorerSearch()">🔍 ${t.exSearchBtn}</button>
+             </div>
+             <div id="explorer-list-container"><div class="loader" style="display:block"></div></div>
+           </div>`,
     "alert",
   );
   document.getElementById("modalTitle").innerText = t.exTitle;
+
+  setTimeout(() => {
+    const searchInput = document.getElementById("explorerSearchInput");
+    if (searchInput) {
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          executeExplorerSearch();
+        }
+      });
+    }
+  }, 100);
+
+  await refreshExplorerList();
+}
+
+async function executeExplorerSearch() {
+  const input = document.getElementById("explorerSearchInput");
+  if (!input) return;
+  currentSearchQuery = input.value.trim();
+  await refreshExplorerList();
+}
+
+async function clearExplorerSearch() {
+  currentSearchQuery = "";
+  const input = document.getElementById("explorerSearchInput");
+  if (input) input.value = "";
+  await refreshExplorerList();
+}
+
+async function enterFolderFromSearch(id, name) {
+  currentSearchQuery = "";
+  const input = document.getElementById("explorerSearchInput");
+  if (input) input.value = "";
+  explorerStack = [
+    { id: "root", name: "My Drive" },
+    { id: id, name: name },
+  ];
+  currentExplorerFolder = id;
   await refreshExplorerList();
 }
 
 async function refreshExplorerList() {
-  const container = document.getElementById("explorer-container");
+  const container = document.getElementById("explorer-list-container");
   const lang = localStorage.getItem("app-lang") || "vi";
   const t = translations[lang] || translations["en"];
   if (!container) return;
   try {
-    let html = `<div class="breadcrumb-nav">`;
-    explorerStack.forEach((folder, idx) => {
-      html += `<span onclick="navigateToStack(${idx})">${folder.name}</span> ${idx < explorerStack.length - 1 ? ">" : ""} `;
-    });
-    html += `</div><ul class="explorer-list">`;
+    container.innerHTML =
+      '<div class="loader" style="display:block; margin: 20px auto;"></div>';
+    let html = "";
+    let query = "";
 
+    if (currentSearchQuery) {
+      html += `<div class="breadcrumb-nav"><span onclick="clearExplorerSearch()"><b>${t.exBack}</b></span> > <span>${t.exSearchResults} "${currentSearchQuery}"</span></div>`;
+      query = `name contains '${currentSearchQuery.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+    } else {
+      html += `<div class="breadcrumb-nav">`;
+      explorerStack.forEach((folder, idx) => {
+        html += `<span onclick="navigateToStack(${idx})">${folder.name}</span> ${idx < explorerStack.length - 1 ? ">" : ""} `;
+      });
+      html += `</div>`;
+      query = `'${currentExplorerFolder}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+    }
+
+    html += `<ul class="explorer-list">`;
+
+    const fieldsParam = currentSearchQuery
+      ? "files(id,name,parents)"
+      : "files(id,name)";
     const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q='${currentExplorerFolder}'+in+parents+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false&fields=files(id,name)&orderBy=name`,
+      `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=${fieldsParam}&orderBy=name`,
       { headers: { Authorization: "Bearer " + accessToken } },
     );
     const data = await response.json();
 
+    let parentMap = {};
+    if (currentSearchQuery && data.files && data.files.length > 0) {
+      const parentIds = [
+        ...new Set(
+          data.files.map((f) => f.parents && f.parents).filter(Boolean),
+        ),
+      ];
+      if (parentIds.length > 0) {
+        try {
+          const parentQuery = parentIds.map((id) => `id='${id}'`).join(" or ");
+          const pResponse = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(parentQuery)}&fields=files(id,name)`,
+            { headers: { Authorization: "Bearer " + accessToken } },
+          );
+          if (pResponse.ok) {
+            const pData = await pResponse.json();
+            if (pData.files) {
+              pData.files.forEach((p) => {
+                parentMap[p.id] = p.name;
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching parent names:", err);
+        }
+      }
+    }
+
     if (data.files && data.files.length > 0) {
       data.files.forEach((folder) => {
-        html += `<li class="explorer-item" onclick="enterFolder('${folder.id}', '${folder.name}')">📁 ${folder.name}</li>`;
+        if (currentSearchQuery) {
+          const parentId = folder.parents ? folder.parents : null;
+          const parentName = parentId
+            ? parentMap[parentId] || "My Drive"
+            : "My Drive";
+          html += `<li class="explorer-item" onclick="enterFolderFromSearch('${folder.id}', '${folder.name}')" style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;">
+                  <div style="display:flex; align-items:center; gap:10px;">📁 <span>${folder.name}</span></div>
+                  <div style="font-size:0.75em; color:var(--accent-color); margin-left:24px; font-style:italic;">${t.exLocation} ${parentName}</div>
+                </li>`;
+        } else {
+          html += `<li class="explorer-item" onclick="enterFolder('${folder.id}', '${folder.name}')">📁 ${folder.name}</li>`;
+        }
       });
     } else {
-      html += `<li class="explorer-item" style="cursor:default; color:gray;">${t.exEmpty}</li>`;
+      html += `<li class="explorer-item" style="cursor:default; color:gray;">${currentSearchQuery ? t.exNoResults : t.exEmpty}</li>`;
     }
     html += `</ul>`;
+
     const currentFolder = explorerStack[explorerStack.length - 1];
-    html += `<div style="margin-top:15px; border-top:1px solid var(--border-color); padding-top:15px;">
-            <p style="font-size:0.85em; margin-bottom:10px;">${t.exSelecting} <strong>${currentFolder.name}</strong></p>
-            <button class="btn-primary" onclick="confirmPickerSelection('${currentFolder.id}')">${t.exBtnConfirm}</button>
-          </div>`;
+    if (!currentSearchQuery) {
+      html += `<div style="margin-top:15px; border-top:1px solid var(--border-color); padding-top:15px;">
+              <p style="font-size:0.85em; margin-bottom:10px;">${t.exSelecting} <strong>${currentFolder.name}</strong></p>
+              <button class="btn-primary" onclick="confirmPickerSelection('${currentFolder.id}')">${t.exBtnConfirm}</button>
+            </div>`;
+    } else {
+      html += `<div style="margin-top:15px; border-top:1px solid var(--border-color); padding-top:15px;">
+              <p style="font-size:0.85em; color:var(--accent-color);">${t.exClickToSelect}</p>
+            </div>`;
+    }
+
     container.innerHTML = html;
   } catch (e) {
     container.innerHTML = `<p style="color:red">Error loading data: ${e.message}</p>`;
@@ -342,13 +453,40 @@ async function fetchFolderName() {
   const fId = extractFolderId(input);
   display.innerText = t.fetching;
   try {
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fId}?fields=name`,
-      { headers: { Authorization: "Bearer " + accessToken } },
-    );
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    display.innerText = "📁 " + data.name;
+    let currentId = fId;
+    let pathParts = [];
+    let loopCount = 0;
+    let hasMoreParents = false;
+
+    while (currentId && loopCount < 4) {
+      const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${currentId}?fields=name,parents`,
+        { headers: { Authorization: "Bearer " + accessToken } },
+      );
+      if (!res.ok) {
+        if (pathParts.length === 0) throw new Error();
+        break;
+      }
+      const data = await res.json();
+      pathParts.unshift(data.name);
+
+      if (data.parents && data.parents.length > 0) {
+        currentId = data.parents;
+        if (loopCount === 3) {
+          hasMoreParents = true;
+        }
+      } else {
+        currentId = null;
+      }
+      loopCount++;
+    }
+
+    let pathString = pathParts.join(" > ");
+    if (hasMoreParents) {
+      pathString = "... > " + pathString;
+    }
+
+    display.innerText = "📁 " + pathString;
     display.style.color = "var(--success-color)";
     localStorage.setItem("drive-folder-id", input);
   } catch (e) {
@@ -396,7 +534,6 @@ async function checkCodeInSheet(code) {
 
   statusIcon.innerText = "⏳";
   try {
-    // Fetch values from the first sheet, column A to Z
     const res = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${sId}/values/A1:Z1000`,
       { headers: { Authorization: "Bearer " + accessToken } },
@@ -405,7 +542,6 @@ async function checkCodeInSheet(code) {
     const data = await res.json();
     const rows = data.values || [];
 
-    // Flatten all cells and check if code exists (case insensitive)
     const found = rows.some((row) =>
       row.some((cell) => String(cell).toUpperCase().includes(code)),
     );
