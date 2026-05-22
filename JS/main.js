@@ -786,6 +786,13 @@ async function uploadAllToDrive() {
   const t = translations[lang] || translations["en"];
   const currentPrefix = document.getElementById("prefix").value.toUpperCase();
 
+  // --- BẮT ĐẦU CODE SỬA BUG: Chặn khi chưa chỉ định folderId ---
+  if (!fId) {
+    showModal(t.errorFolderMissing); // Hiển thị thông báo bằng ngôn ngữ tương ứng
+    return; // Chặn đứng hành vi upload tiếp theo
+  }
+  // --- KẾT THÚC CODE SỬA BUG ---
+
   btn.scrollIntoView({ behavior: "smooth", block: "center" });
 
   btn.disabled = true;

@@ -983,6 +983,8 @@
           confirm: "Xác nhận",
           cancel: "Hủy bỏ",
           errorMissing: "Thiếu Client ID/API Key",
+          errorFolderMissing:
+            "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!", // <-- THÊM DÒNG NÀY,
           themeLight: "Sáng",
           themeDark: "Tối",
           themeDevice: "Hệ thống",
@@ -1047,6 +1049,8 @@
           confirm: "Confirm",
           cancel: "Cancel",
           errorMissing: "Missing Client ID/API Key",
+          errorFolderMissing:
+            "⚠️ Please specify or select a Google Drive folder before uploading!", // <-- THÊM DÒNG NÀY,
           themeLight: "Light",
           themeDark: "Dark",
           themeDevice: "System",
@@ -1104,13 +1108,15 @@
           placeholderSheet: "ป้อน Google Sheets ID...",
           confirmClear: "คุณแน่ใจหรือไม่ว่าต้องการล้างรายการทั้งหมด?",
           fetching: "🔍 กำลังดึงชื่อโฟลเดอร์...",
-          notFound: "❌ Không tìm thấy thư mục",
+          notFound: "❌ ไม่พบโฟลเดอร์",
           needConnect: "⚠️ โปรดคลิกเชื่อมต่อไดรฟ์ก่อน",
           modalTitle: "การแจ้งเตือน",
           close: "ปิด",
           confirm: "ยืนยัน",
           cancel: "ยกเลิก",
           errorMissing: "ไม่มี Client ID/API Key",
+          errorFolderMissing:
+            "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!", // <-- THÊM DÒNG NÀY,
           themeLight: "สว่าง",
           themeDark: "มืด",
           themeDevice: "ระบบ",
@@ -1175,6 +1181,8 @@
           confirm: "確認",
           cancel: "キャンセル",
           errorMissing: "クライアントIDまたはAPIキーが不足しています",
+          errorFolderMissing:
+            "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！", // <-- THÊM DÒNG NÀY,
           themeLight: "ライト",
           themeDark: "ダーク",
           themeDevice: "システム設定",
@@ -1239,6 +1247,8 @@
           confirm: "确认",
           cancel: "取消",
           errorMissing: "缺少客户端 ID/API 密钥",
+          errorFolderMissing:
+            "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！", // <-- THÊM DÒNG NÀY,
           themeLight: "明亮",
           themeDark: "深色",
           themeDevice: "系统",
@@ -1303,6 +1313,8 @@
           confirm: "Confirmer",
           cancel: "Annuler",
           errorMissing: "Client ID ou API Key manquant",
+          errorFolderMissing:
+            "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !", // <-- THÊM DÒNG NÀY,
           themeLight: "Clair",
           themeDark: "Sombre",
           themeDevice: "Système",
@@ -2127,6 +2139,13 @@
         const currentPrefix = document
           .getElementById("prefix")
           .value.toUpperCase();
+
+        // --- BẮT ĐẦU CODE SỬA BUG: Chặn khi chưa chỉ định folderId ---
+        if (!fId) {
+          showModal(t.errorFolderMissing); // Hiển thị thông báo bằng ngôn ngữ tương ứng
+          return; // Chặn đứng hành vi upload tiếp theo
+        }
+        // --- KẾT THÚC CODE SỬA BUG ---
 
         btn.scrollIntoView({ behavior: "smooth", block: "center" });
 

@@ -32,6 +32,8 @@ const translations = {
     confirm: "Xác nhận",
     cancel: "Hủy bỏ",
     errorMissing: "Thiếu Client ID/API Key",
+    errorFolderMissing:
+      "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!", // <-- THÊM DÒNG NÀY,
     themeLight: "Sáng",
     themeDark: "Tối",
     themeDevice: "Hệ thống",
@@ -96,6 +98,8 @@ const translations = {
     confirm: "Confirm",
     cancel: "Cancel",
     errorMissing: "Missing Client ID/API Key",
+    errorFolderMissing:
+      "⚠️ Please specify or select a Google Drive folder before uploading!", // <-- THÊM DÒNG NÀY,
     themeLight: "Light",
     themeDark: "Dark",
     themeDevice: "System",
@@ -160,6 +164,8 @@ const translations = {
     confirm: "ยืนยัน",
     cancel: "ยกเลิก",
     errorMissing: "ไม่มี Client ID/API Key",
+    errorFolderMissing:
+      "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!", // <-- THÊM DÒNG NÀY,
     themeLight: "สว่าง",
     themeDark: "มืด",
     themeDevice: "ระบบ",
@@ -224,6 +230,8 @@ const translations = {
     confirm: "確認",
     cancel: "キャンセル",
     errorMissing: "クライアントIDまたはAPIキーが不足しています",
+    errorFolderMissing:
+      "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！", // <-- THÊM DÒNG NÀY,
     themeLight: "ライト",
     themeDark: "ダーク",
     themeDevice: "システム設定",
@@ -288,6 +296,7 @@ const translations = {
     confirm: "确认",
     cancel: "取消",
     errorMissing: "缺少客户端 ID/API 密钥",
+    errorFolderMissing: "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！", // <-- THÊM DÒNG NÀY,
     themeLight: "明亮",
     themeDark: "深色",
     themeDevice: "系统",
@@ -352,6 +361,8 @@ const translations = {
     confirm: "Confirmer",
     cancel: "Annuler",
     errorMissing: "Client ID ou API Key manquant",
+    errorFolderMissing:
+      "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !", // <-- THÊM DÒNG NÀY,
     themeLight: "Clair",
     themeDark: "Sombre",
     themeDevice: "Système",
