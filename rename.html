@@ -804,6 +804,16 @@
             />
             <span id="sheetCodeStatus" class="sheet-status-icon"></span>
           </div>
+          <div
+            id="sheetCodeErrorMessage"
+            style="
+              color: var(--danger-color);
+              font-size: 0.8em;
+              font-weight: 600;
+              margin-top: 4px;
+              display: none;
+            "
+          ></div>
         </div>
         <div class="input-box">
           <label id="lbl-order">Thứ tự</label>
@@ -983,8 +993,10 @@
           confirm: "Xác nhận",
           cancel: "Hủy bỏ",
           errorMissing: "Thiếu Client ID/API Key",
+          invalidCode:
+            "⚠️ Mã code không tồn tại trên hệ thống Google Sheets! Vui lòng kiểm tra lại.",
           errorFolderMissing:
-            "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!", // <-- THÊM DÒNG NÀY,
+            "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!",
           themeLight: "Sáng",
           themeDark: "Tối",
           themeDevice: "Hệ thống",
@@ -1049,8 +1061,10 @@
           confirm: "Confirm",
           cancel: "Cancel",
           errorMissing: "Missing Client ID/API Key",
+          invalidCode:
+            "⚠️ The code does not exist in Google Sheets! Please check again.",
           errorFolderMissing:
-            "⚠️ Please specify or select a Google Drive folder before uploading!", // <-- THÊM DÒNG NÀY,
+            "⚠️ Please specify or select a Google Drive folder before uploading!",
           themeLight: "Light",
           themeDark: "Dark",
           themeDevice: "System",
@@ -1115,8 +1129,9 @@
           confirm: "ยืนยัน",
           cancel: "ยกเลิก",
           errorMissing: "ไม่มี Client ID/API Key",
+          invalidCode: "⚠️ รหัสนี้ไม่มีใน Google Sheets! กรุณาตรวจสอบอีกครั้ง",
           errorFolderMissing:
-            "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!", // <-- THÊM DÒNG NÀY,
+            "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!",
           themeLight: "สว่าง",
           themeDark: "มืด",
           themeDevice: "ระบบ",
@@ -1181,8 +1196,10 @@
           confirm: "確認",
           cancel: "キャンセル",
           errorMissing: "クライアントIDまたはAPIキーが不足しています",
+          invalidCode:
+            "⚠️ コードがGoogleスプレッドシートに存在しません。確認してください。",
           errorFolderMissing:
-            "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！", // <-- THÊM DÒNG NÀY,
+            "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！",
           themeLight: "ライト",
           themeDark: "ダーク",
           themeDevice: "システム設定",
@@ -1247,8 +1264,9 @@
           confirm: "确认",
           cancel: "取消",
           errorMissing: "缺少客户端 ID/API 密钥",
+          invalidCode: "⚠️ 该代码在 Google 表格中不存在！请重新检查。",
           errorFolderMissing:
-            "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！", // <-- THÊM DÒNG NÀY,
+            "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！",
           themeLight: "明亮",
           themeDark: "深色",
           themeDevice: "系统",
@@ -1313,8 +1331,10 @@
           confirm: "Confirmer",
           cancel: "Annuler",
           errorMissing: "Client ID ou API Key manquant",
+          invalidCode:
+            "⚠️ Le code n'existe pas dans Google Sheets ! Veuillez vérifier à nouveau.",
           errorFolderMissing:
-            "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !", // <-- THÊM DÒNG NÀY,
+            "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !",
           themeLight: "Clair",
           themeDark: "Sombre",
           themeDevice: "Système",
@@ -1665,6 +1685,8 @@
             checkCodeInSheet(e.target.value.trim().toUpperCase());
           } else {
             document.getElementById("sheetCodeStatus").innerText = "";
+            document.getElementById("sheetCodeErrorMessage").style.display =
+              "none";
           }
         });
         renderFileList();
@@ -1731,6 +1753,7 @@
           document.getElementById("sheetNameDisplay").innerText = "";
         if (id === "sheetId")
           document.getElementById("sheetCodeStatus").innerText = "";
+        document.getElementById("sheetCodeErrorMessage").style.display = "none"; // Ẩn thông báo lỗi khi xóa sheetId
       }
 
       function setLang(lang) {
@@ -1903,6 +1926,10 @@
           document.getElementById("sheetId").value.trim(),
         );
         const statusIcon = document.getElementById("sheetCodeStatus");
+        const errorMsgEl = document.getElementById("sheetCodeErrorMessage");
+        const lang = localStorage.getItem("app-lang") || "vi";
+        const t = translations[lang] || translations["en"];
+
         if (!sId || !accessToken) return;
 
         statusIcon.innerText = "⏳";
@@ -1922,12 +1949,17 @@
           if (found) {
             statusIcon.innerText = "✅";
             statusIcon.title = "Mã hợp lệ";
+            errorMsgEl.innerText = "";
+            errorMsgEl.style.display = "none";
           } else {
             statusIcon.innerText = "❌";
             statusIcon.title = "Mã không tồn tại";
+            // errorMsgEl.innerText = t.invalidCode;
+            errorMsgEl.style.display = "block";
           }
         } catch (e) {
-          statusIcon.innerText = "⚠️";
+          statusIcon.innerText = "❌";
+          errorMsgEl.style.display = "none";
         }
       }
 
@@ -2140,12 +2172,17 @@
           .getElementById("prefix")
           .value.toUpperCase();
 
-        // --- BẮT ĐẦU CODE SỬA BUG: Chặn khi chưa chỉ định folderId ---
         if (!fId) {
-          showModal(t.errorFolderMissing); // Hiển thị thông báo bằng ngôn ngữ tương ứng
-          return; // Chặn đứng hành vi upload tiếp theo
+          showModal(t.errorFolderMissing);
+          return;
         }
-        // --- KẾT THÚC CODE SỬA BUG ---
+        // --- BẮT ĐẦU ĐOẠN CODE FIX BUG: Chặn upload khi mã không tồn tại ---
+        const statusIcon = document.getElementById("sheetCodeStatus").innerText;
+        if (statusIcon === "❌") {
+          showModal(t.invalidCode); // Hiển thị modal thông báo lỗi chặn upload
+          return;
+        }
+        // --- KẾT THÚC ĐOẠN CODE FIX BUG ---
 
         btn.scrollIntoView({ behavior: "smooth", block: "center" });
 
@@ -2274,6 +2311,7 @@
         document.getElementById("streetInput").value = "";
         document.getElementById("wardInput").value = "";
         document.getElementById("sheetCodeStatus").innerText = "";
+        document.getElementById("sheetCodeErrorMessage").style.display = "none"; // Thêm dòng này để ẩn lỗi đỏ khi reset
         updatePreview();
         renderFileList();
         updateBase64Code();

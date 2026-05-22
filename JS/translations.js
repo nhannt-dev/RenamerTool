@@ -32,8 +32,10 @@ const translations = {
     confirm: "Xác nhận",
     cancel: "Hủy bỏ",
     errorMissing: "Thiếu Client ID/API Key",
+    invalidCode:
+      "⚠️ Mã code không tồn tại trên hệ thống Google Sheets! Vui lòng kiểm tra lại.",
     errorFolderMissing:
-      "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!", // <-- THÊM DÒNG NÀY,
+      "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!",
     themeLight: "Sáng",
     themeDark: "Tối",
     themeDevice: "Hệ thống",
@@ -98,8 +100,10 @@ const translations = {
     confirm: "Confirm",
     cancel: "Cancel",
     errorMissing: "Missing Client ID/API Key",
+    invalidCode:
+      "⚠️ The code does not exist in Google Sheets! Please check again.",
     errorFolderMissing:
-      "⚠️ Please specify or select a Google Drive folder before uploading!", // <-- THÊM DÒNG NÀY,
+      "⚠️ Please specify or select a Google Drive folder before uploading!",
     themeLight: "Light",
     themeDark: "Dark",
     themeDevice: "System",
@@ -164,8 +168,9 @@ const translations = {
     confirm: "ยืนยัน",
     cancel: "ยกเลิก",
     errorMissing: "ไม่มี Client ID/API Key",
+    invalidCode: "⚠️ รหัสนี้ไม่มีใน Google Sheets! กรุณาตรวจสอบอีกครั้ง",
     errorFolderMissing:
-      "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!", // <-- THÊM DÒNG NÀY,
+      "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!",
     themeLight: "สว่าง",
     themeDark: "มืด",
     themeDevice: "ระบบ",
@@ -230,8 +235,10 @@ const translations = {
     confirm: "確認",
     cancel: "キャンセル",
     errorMissing: "クライアントIDまたはAPIキーが不足しています",
+    invalidCode:
+      "⚠️ コードがGoogleスプレッドシートに存在しません。確認してください。",
     errorFolderMissing:
-      "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！", // <-- THÊM DÒNG NÀY,
+      "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！",
     themeLight: "ライト",
     themeDark: "ダーク",
     themeDevice: "システム設定",
@@ -296,7 +303,8 @@ const translations = {
     confirm: "确认",
     cancel: "取消",
     errorMissing: "缺少客户端 ID/API 密钥",
-    errorFolderMissing: "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！", // <-- THÊM DÒNG NÀY,
+    invalidCode: "⚠️ 该代码在 Google 表格中不存在！请重新检查。",
+    errorFolderMissing: "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！",
     themeLight: "明亮",
     themeDark: "深色",
     themeDevice: "系统",
@@ -361,8 +369,10 @@ const translations = {
     confirm: "Confirmer",
     cancel: "Annuler",
     errorMissing: "Client ID ou API Key manquant",
+    invalidCode:
+      "⚠️ Le code n'existe pas dans Google Sheets ! Veuillez vérifier à nouveau.",
     errorFolderMissing:
-      "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !", // <-- THÊM DÒNG NÀY,
+      "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !",
     themeLight: "Clair",
     themeDark: "Sombre",
     themeDevice: "Système",

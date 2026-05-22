@@ -327,6 +327,7 @@ window.onload = () => {
       checkCodeInSheet(e.target.value.trim().toUpperCase());
     } else {
       document.getElementById("sheetCodeStatus").innerText = "";
+      document.getElementById("sheetCodeErrorMessage").style.display = "none";
     }
   });
   renderFileList();
@@ -387,6 +388,7 @@ function clearInput(id) {
     document.getElementById("sheetNameDisplay").innerText = "";
   if (id === "sheetId")
     document.getElementById("sheetCodeStatus").innerText = "";
+  document.getElementById("sheetCodeErrorMessage").style.display = "none"; // Ẩn thông báo lỗi khi xóa sheetId
 }
 
 function setLang(lang) {
@@ -556,6 +558,10 @@ async function fetchSheetName() {
 async function checkCodeInSheet(code) {
   const sId = extractSheetId(document.getElementById("sheetId").value.trim());
   const statusIcon = document.getElementById("sheetCodeStatus");
+  const errorMsgEl = document.getElementById("sheetCodeErrorMessage");
+  const lang = localStorage.getItem("app-lang") || "vi";
+  const t = translations[lang] || translations["en"];
+
   if (!sId || !accessToken) return;
 
   statusIcon.innerText = "⏳";
@@ -575,12 +581,17 @@ async function checkCodeInSheet(code) {
     if (found) {
       statusIcon.innerText = "✅";
       statusIcon.title = "Mã hợp lệ";
+      errorMsgEl.innerText = "";
+      errorMsgEl.style.display = "none";
     } else {
       statusIcon.innerText = "❌";
       statusIcon.title = "Mã không tồn tại";
+      // errorMsgEl.innerText = t.invalidCode;
+      errorMsgEl.style.display = "block";
     }
   } catch (e) {
-    statusIcon.innerText = "⚠️";
+    statusIcon.innerText = "❌";
+    errorMsgEl.style.display = "none";
   }
 }
 
@@ -786,12 +797,17 @@ async function uploadAllToDrive() {
   const t = translations[lang] || translations["en"];
   const currentPrefix = document.getElementById("prefix").value.toUpperCase();
 
-  // --- BẮT ĐẦU CODE SỬA BUG: Chặn khi chưa chỉ định folderId ---
   if (!fId) {
-    showModal(t.errorFolderMissing); // Hiển thị thông báo bằng ngôn ngữ tương ứng
-    return; // Chặn đứng hành vi upload tiếp theo
+    showModal(t.errorFolderMissing);
+    return;
   }
-  // --- KẾT THÚC CODE SỬA BUG ---
+  // --- BẮT ĐẦU ĐOẠN CODE FIX BUG: Chặn upload khi mã không tồn tại ---
+  const statusIcon = document.getElementById("sheetCodeStatus").innerText;
+  if (statusIcon === "❌") {
+    showModal(t.invalidCode); // Hiển thị modal thông báo lỗi chặn upload
+    return;
+  }
+  // --- KẾT THÚC ĐOẠN CODE FIX BUG ---
 
   btn.scrollIntoView({ behavior: "smooth", block: "center" });
 
@@ -920,6 +936,7 @@ function resetNamingConfig() {
   document.getElementById("streetInput").value = "";
   document.getElementById("wardInput").value = "";
   document.getElementById("sheetCodeStatus").innerText = "";
+  document.getElementById("sheetCodeErrorMessage").style.display = "none"; // Thêm dòng này để ẩn lỗi đỏ khi reset
   updatePreview();
   renderFileList();
   updateBase64Code();
