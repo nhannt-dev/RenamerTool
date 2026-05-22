@@ -801,13 +801,30 @@ async function uploadAllToDrive() {
     showModal(t.errorFolderMissing);
     return;
   }
-  // --- BẮT ĐẦU ĐOẠN CODE FIX BUG: Chặn upload khi mã không tồn tại ---
+
+  // --- BẮT ĐẦU ĐOẠN CODE FIX BUG: KIỂM TRA THIẾU THÔNG SỐ (ĐÃ TRÁNH TRÙNG BIẾN) ---
+  const checkPrefix = document.getElementById("prefix").value;
+  const checkCode = document.getElementById("codeInput").value.trim();
+  const checkStreet = document.getElementById("streetInput").value.trim();
+  const checkWard = document.getElementById("wardInput").value.trim();
+
+  if (
+    !checkPrefix ||
+    checkPrefix === "None" ||
+    !checkCode ||
+    !checkStreet ||
+    !checkWard
+  ) {
+    showModal(t.errorMissingParams); // Hiển thị modal thông báo lỗi chặn upload đa ngôn ngữ
+    return;
+  }
+  // --- KẾT THÚC ĐOẠN CODE FIX BUG ---
+
   const statusIcon = document.getElementById("sheetCodeStatus").innerText;
   if (statusIcon === "❌") {
     showModal(t.invalidCode); // Hiển thị modal thông báo lỗi chặn upload
     return;
   }
-  // --- KẾT THÚC ĐOẠN CODE FIX BUG ---
 
   btn.scrollIntoView({ behavior: "smooth", block: "center" });
 

@@ -34,6 +34,8 @@ const translations = {
     errorMissing: "Thiếu Client ID/API Key",
     invalidCode:
       "⚠️ Mã code không tồn tại trên hệ thống Google Sheets! Vui lòng kiểm tra lại.",
+    errorMissingParams:
+      "⚠️ Vui lòng điền đầy đủ các thông số: Tiền tố, Mã (Code), Đường và Phường trước khi tải lên!",
     errorFolderMissing:
       "⚠️ Vui lòng chỉ định hoặc chọn thư mục Google Drive trước khi tải lên!",
     themeLight: "Sáng",
@@ -102,6 +104,8 @@ const translations = {
     errorMissing: "Missing Client ID/API Key",
     invalidCode:
       "⚠️ The code does not exist in Google Sheets! Please check again.",
+    errorMissingParams:
+      "⚠️ Please fill in all parameters: Prefix, Code, Street, and Ward before uploading!",
     errorFolderMissing:
       "⚠️ Please specify or select a Google Drive folder before uploading!",
     themeLight: "Light",
@@ -169,6 +173,8 @@ const translations = {
     cancel: "ยกเลิก",
     errorMissing: "ไม่มี Client ID/API Key",
     invalidCode: "⚠️ รหัสนี้ไม่มีใน Google Sheets! กรุณาตรวจสอบอีกครั้ง",
+    errorMissingParams:
+      "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง ก่อนอัปโหลด!",
     errorFolderMissing:
       "⚠️ โปรดระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!",
     themeLight: "สว่าง",
@@ -237,6 +243,8 @@ const translations = {
     errorMissing: "クライアントIDまたはAPIキーが不足しています",
     invalidCode:
       "⚠️ コードがGoogleスプレッドシートに存在しません。確認してください。",
+    errorMissingParams:
+      "⚠️ アップロードする前に、プレフィックス、コード、通り、区のすべてのパラメータを入力してください！",
     errorFolderMissing:
       "⚠️ アップロードする前に、Google ドライブのフォルダを指定または選択してください！",
     themeLight: "ライト",
@@ -304,6 +312,7 @@ const translations = {
     cancel: "取消",
     errorMissing: "缺少客户端 ID/API 密钥",
     invalidCode: "⚠️ 该代码在 Google 表格中不存在！请重新检查。",
+    errorMissingParams: "⚠️ 请在上传前填写所有参数：前缀、代码、街道和区域！",
     errorFolderMissing: "⚠️ 请在上传前指定 or 选择 Google 云端硬盘文件夹！",
     themeLight: "明亮",
     themeDark: "深色",
@@ -371,6 +380,8 @@ const translations = {
     errorMissing: "Client ID ou API Key manquant",
     invalidCode:
       "⚠️ Le code n'existe pas dans Google Sheets ! Veuillez vérifier à nouveau.",
+    errorMissingParams:
+      "⚠️ Veuillez remplir tous les paramètres : Préfixe, Code, Rue et Quartier avant le téléchargement !",
     errorFolderMissing:
       "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !",
     themeLight: "Clair",
