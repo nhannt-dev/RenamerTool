@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rename & Upload Drive Pro</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -1339,6 +1340,32 @@
       let connectedUserEmail = "";
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
+      // --- BẮT ĐẦU CODE THÊM MỚI: Xử lý âm thanh thông báo ---
+      const notificationAudio = new Audio("./Sounds/ding_dong_notify.wav");
+      notificationAudio.loop = true;
+      let isWaitingForUser = false;
+
+      function stopNotification() {
+        // Bỏ điều kiện if (isWaitingForUser) để đảm bảo âm thanh luôn được ngắt
+        if (!notificationAudio.paused) {
+          notificationAudio.pause();
+          notificationAudio.currentTime = 0;
+        }
+        isWaitingForUser = false;
+      }
+
+      // Xử lý khi người dùng thu nhỏ trình duyệt, nhảy qua lại các tab hoặc nhấp qua phần mềm khác
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden || document.visibilityState === "visible") {
+          stopNotification();
+        }
+      });
+      window.addEventListener("focus", stopNotification);
+      window.addEventListener("click", stopNotification);
+      window.addEventListener("keydown", stopNotification);
+      window.addEventListener("pointerdown", stopNotification);
+      // --- KẾT THÚC CODE THÊM MỚI ---
+
       let currentExplorerFolder = "root";
       let explorerStack = [{ id: "root", name: "My Drive" }];
       let currentSearchQuery = "";
@@ -2107,6 +2134,17 @@
         btnText.innerText = t.uploading;
         document.getElementById("uploadLoader").style.display = "block";
 
+        // --- BẮT ĐẦU CODE THÊM MỚI: Mồi âm thanh để vượt rào cấm Autoplay của trình duyệt ---
+        notificationAudio.muted = true;
+        notificationAudio
+          .play()
+          .then(() => {
+            notificationAudio.pause();
+            notificationAudio.muted = false;
+          })
+          .catch((e) => console.log("Init audio failed:", e));
+        // --- KẾT THÚC CODE THÊM MỚI ---
+
         let links = [];
         try {
           for (let i = 0; i < filesArray.length; i++) {
@@ -2126,6 +2164,15 @@
             }
           }
           showResultModal(links);
+
+          // --- BẮT ĐẦU CODE THÊM MỚI: Phát âm thanh nếu đang ở tab/cửa sổ khác ---
+          if (!document.hasFocus() || document.hidden) {
+            isWaitingForUser = true;
+            notificationAudio
+              .play()
+              .catch((e) => console.log("Lỗi phát âm thanh:", e));
+          }
+          // --- KẾT THÚC CODE THÊM MỚI ---
         } catch (e) {
           showModal("Error: " + e.message);
         } finally {

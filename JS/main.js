@@ -25,6 +25,32 @@ let accessToken = null;
 let connectedUserEmail = "";
 const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
+// --- BẮT ĐẦU CODE THÊM MỚI: Xử lý âm thanh thông báo ---
+const notificationAudio = new Audio("./Sounds/ding_dong_notify.wav");
+notificationAudio.loop = true;
+let isWaitingForUser = false;
+
+function stopNotification() {
+  // Bỏ điều kiện if (isWaitingForUser) để đảm bảo âm thanh luôn được ngắt
+  if (!notificationAudio.paused) {
+    notificationAudio.pause();
+    notificationAudio.currentTime = 0;
+  }
+  isWaitingForUser = false;
+}
+
+// Xử lý khi người dùng thu nhỏ trình duyệt, nhảy qua lại các tab hoặc nhấp qua phần mềm khác
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden || document.visibilityState === "visible") {
+    stopNotification();
+  }
+});
+window.addEventListener("focus", stopNotification);
+window.addEventListener("click", stopNotification);
+window.addEventListener("keydown", stopNotification);
+window.addEventListener("pointerdown", stopNotification);
+// --- KẾT THÚC CODE THÊM MỚI ---
+
 let currentExplorerFolder = "root";
 let explorerStack = [{ id: "root", name: "My Drive" }];
 let currentSearchQuery = "";
@@ -766,6 +792,17 @@ async function uploadAllToDrive() {
   btnText.innerText = t.uploading;
   document.getElementById("uploadLoader").style.display = "block";
 
+  // --- BẮT ĐẦU CODE THÊM MỚI: Mồi âm thanh để vượt rào cấm Autoplay của trình duyệt ---
+  notificationAudio.muted = true;
+  notificationAudio
+    .play()
+    .then(() => {
+      notificationAudio.pause();
+      notificationAudio.muted = false;
+    })
+    .catch((e) => console.log("Init audio failed:", e));
+  // --- KẾT THÚC CODE THÊM MỚI ---
+
   let links = [];
   try {
     for (let i = 0; i < filesArray.length; i++) {
@@ -785,6 +822,15 @@ async function uploadAllToDrive() {
       }
     }
     showResultModal(links);
+
+    // --- BẮT ĐẦU CODE THÊM MỚI: Phát âm thanh nếu đang ở tab/cửa sổ khác ---
+    if (!document.hasFocus() || document.hidden) {
+      isWaitingForUser = true;
+      notificationAudio
+        .play()
+        .catch((e) => console.log("Lỗi phát âm thanh:", e));
+    }
+    // --- KẾT THÚC CODE THÊM MỚI ---
   } catch (e) {
     showModal("Error: " + e.message);
   } finally {
