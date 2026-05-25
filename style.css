@@ -1,3 +1,36 @@
+/* ======================================================= */
+/* CODE ẨN ICON TỰ ĐỘNG ĐIỀN CỦA TRÌNH DUYỆT / EXTENSION  */
+/* ======================================================= */
+
+/* 1. Ẩn icon chìa khóa, xem mật khẩu và icon tự điền của Microsoft Edge */
+input::-ms-clear,
+input::-ms-reveal {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 2. Ẩn icon danh bạ, tự điền tài khoản/mật khẩu của Google Chrome */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0 !important;
+}
+
+/* 3. Đánh lừa và chặn các Extension bên thứ 3 (như 1Password, Bitwarden, Dashlane) */
+input[autocomplete="new-password"] {
+  background-image: none !important;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px var(--container-bg) inset !important;
+  -webkit-text-fill-color: var(--text-color) !important;
+}
+
 :root {
   --bg-color: #f0f2f5;
   --container-bg: #ffffff;

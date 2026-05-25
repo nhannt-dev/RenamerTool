@@ -13,6 +13,39 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <style>
+      /* ======================================================= */
+      /* CODE ẨN ICON TỰ ĐỘNG ĐIỀN CỦA TRÌNH DUYỆT / EXTENSION  */
+      /* ======================================================= */
+
+      /* 1. Ẩn icon chìa khóa, xem mật khẩu và icon tự điền của Microsoft Edge */
+      input::-ms-clear,
+      input::-ms-reveal {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+
+      /* 2. Ẩn icon danh bạ, tự điền tài khoản/mật khẩu của Google Chrome */
+      input::-webkit-contacts-auto-fill-button,
+      input::-webkit-credentials-auto-fill-button {
+        visibility: hidden !important;
+        display: none !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        right: 0 !important;
+      }
+
+      /* 3. Đánh lừa và chặn các Extension bên thứ 3 (như 1Password, Bitwarden, Dashlane) */
+      input[autocomplete="new-password"] {
+        background-image: none !important;
+      }
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0px 1000px var(--container-bg) inset !important;
+        -webkit-text-fill-color: var(--text-color) !important;
+      }
+
       :root {
         --bg-color: #f0f2f5;
         --container-bg: #ffffff;
@@ -937,6 +970,46 @@
 
     <div id="copyToast" class="toast-copy">✅ Đã copy vào bộ nhớ tạm!</div>
     <script>
+      // Hàm bật/tắt (khóa/mở khóa) các ô nhập liệu khi đang upload
+      function toggleFormInputs(shouldDisable) {
+        // Danh sách các ID phần tử thực tế trong file rename.html của bạn
+        const inputIds = [
+          "clientId",
+          "apiKey",
+          "sheetId",
+          "folderId", // Cấu hình Google
+          "prefix",
+          "codeInput",
+          "orderSelect",
+          "streetInput",
+          "wardInput", // Cấu hình đặt tên
+          "btn-open-picker",
+          "btn-connect-drive",
+          "btnClearAll", // Các nút bấm khác cần chặn
+        ];
+
+        inputIds.forEach((id) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.disabled = shouldDisable;
+            // Tạo hiệu ứng mờ đi một chút khi bị khóa để người dùng dễ nhận biết bằng mắt
+            element.style.opacity = shouldDisable ? "0.6" : "1";
+          }
+        });
+
+        // Chặn cả việc kéo thả hoặc bấm chọn thêm file mới vào dropzone
+        const dropzone = document.getElementById("dropzone");
+        if (dropzone) {
+          if (shouldDisable) {
+            dropzone.style.pointerEvents = "none";
+            dropzone.style.opacity = "0.6";
+          } else {
+            dropzone.style.pointerEvents = "auto";
+            dropzone.style.opacity = "1";
+          }
+        }
+      }
+
       function startSplashScreen() {
         const splash = document.getElementById("splash-screen");
         const bar = document.getElementById("splash-bar");
@@ -2175,21 +2248,25 @@
       }
 
       async function uploadAllToDrive() {
-        const fId = extractFolderId(document.getElementById("folderId").value);
-        const btn = document.getElementById("btnUploadDrive");
-        const btnText = document.getElementById("btnUploadText");
+        // 1. Khai báo ngôn ngữ và các phần tử UI lên đầu hàm để dùng chung
         const lang = localStorage.getItem("app-lang") || "vi";
         const t = translations[lang] || translations["en"];
+
+        const btnUpload = document.getElementById("btnUploadDrive");
+        const btnText = document.getElementById("btnUploadText");
+        const loader = document.getElementById("uploadLoader");
+
+        const fId = extractFolderId(document.getElementById("folderId").value);
         const currentPrefix = document
           .getElementById("prefix")
           .value.toUpperCase();
 
+        // 2. Các bước kiểm tra điều kiện đầu vào (Chưa khóa UI nên return thoải mái)
         if (!fId) {
           showModal(t.errorFolderMissing);
           return;
         }
 
-        // --- BẮT ĐẦU ĐOẠN CODE FIX BUG: KIỂM TRA THIẾU THÔNG SỐ (ĐÃ TRÁNH TRÙNG BIẾN) ---
         const checkPrefix = document.getElementById("prefix").value;
         const checkCode = document.getElementById("codeInput").value.trim();
         const checkStreet = document.getElementById("streetInput").value.trim();
@@ -2202,36 +2279,42 @@
           !checkStreet ||
           !checkWard
         ) {
-          showModal(t.errorMissingParams); // Hiển thị modal thông báo lỗi chặn upload đa ngôn ngữ
+          showModal(t.errorMissingParams);
           return;
         }
-        // --- KẾT THÚC ĐOẠN CODE FIX BUG ---
 
         const statusIcon = document.getElementById("sheetCodeStatus").innerText;
         if (statusIcon === "❌") {
-          showModal(t.invalidCode); // Hiển thị modal thông báo lỗi chặn upload
+          showModal(t.invalidCode);
           return;
         }
 
-        btn.scrollIntoView({ behavior: "smooth", block: "center" });
-
-        btn.disabled = true;
-        btnText.innerText = t.uploading;
-        document.getElementById("uploadLoader").style.display = "block";
-
-        // --- BẮT ĐẦU CODE THÊM MỚI: Mồi âm thanh để vượt rào cấm Autoplay của trình duyệt ---
-        notificationAudio.muted = true;
-        notificationAudio
-          .play()
-          .then(() => {
-            notificationAudio.pause();
-            notificationAudio.muted = false;
-          })
-          .catch((e) => console.log("Init audio failed:", e));
-        // --- KẾT THÚC CODE THÊM MỚI ---
-
-        let links = [];
+        // 3. ĐƯA TOÀN BỘ TIẾN TRÌNH CÒN LẠI VÀO KHỐI TRY...FINALLY ĐỂ ĐƯỢC BẢO VỆ TUYỆT ĐỐI
         try {
+          // Cuộn màn hình đến nút bấm
+          if (btnUpload)
+            btnUpload.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          // Khóa các ô input nhập liệu và vùng Dropzone trước
+          toggleFormInputs(true);
+
+          // Thay đổi trạng thái nút bấm thành Đang tải lên
+          if (btnUpload) btnUpload.disabled = true;
+          if (loader) loader.style.display = "block";
+          if (btnText) btnText.innerText = t.uploading;
+
+          // Mồi âm thanh thông báo
+          notificationAudio.muted = true;
+          notificationAudio
+            .play()
+            .then(() => {
+              notificationAudio.pause();
+              notificationAudio.muted = false;
+            })
+            .catch((e) => console.log("Init audio failed:", e));
+
+          // Tiến hành vòng lặp upload ảnh lên Drive
+          let links = [];
           for (let i = 0; i < filesArray.length; i++) {
             const file = filesArray[i];
             const meta = {
@@ -2248,22 +2331,28 @@
               links.push(data.webViewLink);
             }
           }
+
+          // Hiển thị kết quả thành công
           showResultModal(links);
 
-          // --- BẮT ĐẦU CODE THÊM MỚI: Phát âm thanh nếu đang ở tab/cửa sổ khác ---
+          // Phát âm thanh báo hiệu nếu người dùng đang ở tab khác
           if (!document.hasFocus() || document.hidden) {
             isWaitingForUser = true;
             notificationAudio
               .play()
               .catch((e) => console.log("Lỗi phát âm thanh:", e));
           }
-          // --- KẾT THÚC CODE THÊM MỚI ---
         } catch (e) {
+          console.error(e);
           showModal("Error: " + e.message);
         } finally {
-          btn.disabled = false;
-          btnText.innerText = t.uploadButton;
-          document.getElementById("uploadLoader").style.display = "none";
+          // 4. KHỐI FINALLY LUÔN LUÔN CHẠY: Giải phóng nút bấm và mở khóa lại UI thành công
+          if (btnUpload) btnUpload.disabled = false;
+          if (loader) loader.style.display = "none";
+          if (btnText) btnText.innerText = t.uploadButton;
+
+          // Trả lại quyền tương tác các ô input cho người dùng
+          toggleFormInputs(false);
         }
       }
 
