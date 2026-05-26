@@ -29,8 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
-
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body
     class="bg-gray-100 text-gray-800 dark:bg-darkBg dark:text-gray-200 font-sans min-h-screen transition-colors duration-300"
@@ -258,7 +257,7 @@
         >
           <div class="relative w-full sm:w-auto">
             <button
-              class="w-full sm:w-auto bg-primaryBlue hover:bg-blue-700 text-white font-medium text-sm px-6 py-2.5 rounded-lg transition shadow-md"
+              class="w-full sm:w-auto bg-primaryBlue hover:bg-sky-700 text-white font-medium text-sm px-6 py-2.5 rounded-lg transition shadow-md"
               id="btn-connect-drive"
               onclick="handleAuthClick()"
             >
@@ -304,12 +303,15 @@
               id="prefix"
               class="w-full bg-white dark:bg-panelBg border border-gray-300 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-primaryBlue cursor-pointer appearance-none shadow-sm"
             >
-              <option value="None">None</option>
+              <option value="None">NONE</option>
               <option value="ZL">ZL</option>
               <option value="LURC">LURC</option>
               <option value="FT">FT</option>
               <option value="P">P</option>
               <option value="S">S</option>
+              <option value="S">SH</option>
+              <option value="S">C</option>
+              <option value="S">D</option>
             </select>
             <div class="absolute right-3 pointer-events-none text-gray-500">
               <svg
@@ -361,7 +363,7 @@
               id="orderSelect"
               class="w-full bg-white dark:bg-panelBg border border-gray-300 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-primaryBlue cursor-pointer appearance-none shadow-sm"
             >
-              <option value="none">No Order</option>
+              <option value="none">NONE</option>
               <option value="asc">ASC</option>
               <option value="desc">DESC</option>
             </select>
