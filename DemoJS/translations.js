@@ -69,6 +69,10 @@ const translations = {
     buildingTree: "🔄 Đang dựng cấu trúc cây thư mục...",
     sheetErrorAccess: "❌ Không tìm thấy file hoặc không có quyền truy cập",
     folderErrorAccess: "❌ Không tìm thấy thư mục hoặc không có quyền truy cập",
+    modalTitle: "Thông báo",
+    close: "Đóng",
+    confirm: "Xác nhận",
+    cancel: "Hủy bỏ",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -140,6 +144,10 @@ const translations = {
     buildingTree: "🔄 Building folder structure...",
     sheetErrorAccess: "❌ File not found or no access permission",
     folderErrorAccess: "❌ Folder not found or no access permission",
+    modalTitle: "Notification",
+    close: "Close",
+    confirm: "Confirm",
+    cancel: "Cancel",
   },
   th: {
     title: "Rename & Upload Drive",
@@ -210,6 +218,10 @@ const translations = {
     buildingTree: "🔄 กำลังสร้างโครงสร้างโฟลเดอร์...",
     sheetErrorAccess: "❌ ไม่พบไฟล์หรือไม่มีสิทธิ์เข้าถึง",
     folderErrorAccess: "❌ ไม่พบโฟลเดอร์หรือไม่มีสิทธิ์เข้าถึง",
+    modalTitle: "การแจ้งเตือน",
+    close: "ปิด",
+    confirm: "ยืนยัน",
+    cancel: "ยกเลิก"
   },
   ja: {
     title: "Rename & Upload Drive",
@@ -281,6 +293,10 @@ const translations = {
     buildingTree: "🔄 フォルダ構造を構築中...",
     sheetErrorAccess: "❌ ファイルが見つからないか、アクセス権限がありません",
     folderErrorAccess: "❌ フォルダが見つからないか、アクセス権限がありません",
+    modalTitle: "通知",
+    close: "閉じる",
+    confirm: "確認",
+    cancel: "キャンセル"
   },
   zh: {
     title: "Rename & Upload Drive",
@@ -349,6 +365,10 @@ const translations = {
     buildingTree: "🔄 正在构建文件夹结构...",
     sheetErrorAccess: "❌ 未找到文件或无访问权限",
     folderErrorAccess: "❌ 未找到文件夹或无访问权限",
+    modalTitle: "提示",
+    close: "关闭",
+    confirm: "确认",
+    cancel: "取消"
   },
   fr: {
     title: "Rename & Upload Drive",
@@ -420,5 +440,9 @@ const translations = {
     buildingTree: "🔄 Construction de la structure des dossiers...",
     sheetErrorAccess: "❌ Fichier introuvable ou pas de permission d'accès",
     folderErrorAccess: "❌ Dossier introuvable ou pas de permission d'accès",
+    modalTitle: "Notification",
+    close: "Fermer",
+    confirm: "Confirmer",
+    cancel: "Annuler",
   },
 };
