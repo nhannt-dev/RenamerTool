@@ -66,6 +66,9 @@ const translations = {
     exBack: "⬅ Quay lại",
     exLoading: "Đang tải dữ liệu...",
     shortcutActive: "Chế độ phím tắt đang bật",
+    buildingTree: "🔄 Đang dựng cấu trúc cây thư mục...",
+    sheetErrorAccess: "❌ Không tìm thấy file hoặc không có quyền truy cập",
+    folderErrorAccess: "❌ Không tìm thấy thư mục hoặc không có quyền truy cập",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -134,6 +137,9 @@ const translations = {
     exBack: "⬅ Back",
     exLoading: "Loading data...",
     shortcutActive: "Shortcuts mode is active",
+    buildingTree: "🔄 Building folder structure...",
+    sheetErrorAccess: "❌ File not found or no access permission",
+    folderErrorAccess: "❌ Folder not found or no access permission",
   },
   th: {
     title: "Rename & Upload Drive",
@@ -201,6 +207,9 @@ const translations = {
     exBack: "⬅ ย้อนกลับ",
     exLoading: "กำลังโหลดข้อมูล...",
     shortcutActive: "เปิดใช้งานโหมดปุ่มลัดแล้ว",
+    buildingTree: "🔄 กำลังสร้างโครงสร้างโฟลเดอร์...",
+    sheetErrorAccess: "❌ ไม่พบไฟล์หรือไม่มีสิทธิ์เข้าถึง",
+    folderErrorAccess: "❌ ไม่พบโฟลเดอร์หรือไม่มีสิทธิ์เข้าถึง",
   },
   ja: {
     title: "Rename & Upload Drive",
@@ -269,6 +278,9 @@ const translations = {
     exBack: "⬅ 戻る",
     exLoading: "データを読み込み中...",
     shortcutActive: "ショートカットモードが有効です",
+    buildingTree: "🔄 フォルダ構造を構築中...",
+    sheetErrorAccess: "❌ ファイルが見つからないか、アクセス権限がありません",
+    folderErrorAccess: "❌ フォルダが見つからないか、アクセス権限がありません",
   },
   zh: {
     title: "Rename & Upload Drive",
@@ -334,6 +346,9 @@ const translations = {
     exBack: "⬅ 返回",
     exLoading: "正在加载数据...",
     shortcutActive: "快捷键模式已启用",
+    buildingTree: "🔄 正在构建文件夹结构...",
+    sheetErrorAccess: "❌ 未找到文件或无访问权限",
+    folderErrorAccess: "❌ 未找到文件夹或无访问权限",
   },
   fr: {
     title: "Rename & Upload Drive",
@@ -402,5 +417,8 @@ const translations = {
     exBack: "⬅ Retour",
     exLoading: "Chargement des données...",
     shortcutActive: "Mode raccourcis activé",
+    buildingTree: "🔄 Construction de la structure des dossiers...",
+    sheetErrorAccess: "❌ Fichier introuvable ou pas de permission d'accès",
+    folderErrorAccess: "❌ Dossier introuvable ou pas de permission d'accès",
   },
 };
