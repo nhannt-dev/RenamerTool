@@ -29,7 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body
     class="bg-gray-100 text-gray-800 dark:bg-darkBg dark:text-gray-200 font-sans min-h-screen transition-colors duration-300"
@@ -269,7 +269,10 @@
             ></div>
           </div>
 
-          <div id="driveStatus" class="flex flex-col items-start gap-1 text-sm sm:items-end">
+          <div
+            id="driveStatus"
+            class="flex flex-col items-start gap-1 text-sm sm:items-end"
+          >
             <div class="flex items-center gap-2">
               <span
                 class="w-2.5 h-2.5 rounded-full bg-gray-400 dark:bg-gray-500"
@@ -283,7 +286,7 @@
             </div>
             <div
               id="connectedEmail"
-              class="text-xs text-gray-600 dark:text-gray-500 bg-gray-100 dark:bg-black/20 px-2 py-0.5 rounded min-h-[20px]"
+              class="hidden text-xs text-gray-600 dark:text-gray-500 bg-gray-100 dark:bg-black/20 px-2 py-0.5 rounded min-h-[20px]"
             ></div>
           </div>
         </div>
@@ -551,6 +554,111 @@
       class="fixed bottom-5 right-5 bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-xl translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2"
     >
       ✅ Đã copy vào bộ nhớ tạm!
+    </div>
+
+    <div
+      id="folderExplorerModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="bg-white dark:bg-panelBg border border-gray-200 dark:border-gray-800 rounded-xl max-w-lg w-full p-6 shadow-2xl flex flex-col max-h-[85vh]"
+      >
+        <div
+          class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700"
+        >
+          <h3
+            id="exTitle"
+            class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
+          >
+            📁 Duyệt thư mục Google Drive
+          </h3>
+          <button
+            onclick="closeFolderExplorer()"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-semibold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="mt-3 relative flex items-center">
+          <span class="absolute left-3 text-gray-400 text-sm">🔍</span>
+          <input
+            type="text"
+            id="modalSearchInput"
+            placeholder="Tìm kiếm thư mục toàn cục trên Drive..."
+            class="w-full bg-gray-50 dark:bg-inputBg border border-gray-300 dark:border-gray-700 rounded-lg pl-9 pr-8 py-2 text-xs focus:outline-none focus:border-primaryBlue text-gray-900 dark:text-white transition shadow-sm"
+            oninput="handleSearchInput(this.value)"
+          />
+          <button
+            id="btnResetSearch"
+            class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm hidden"
+            onclick="clearModalSearch()"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div
+          id="modalBreadcrumb"
+          class="text-xs text-gray-500 dark:text-gray-400 my-3 flex items-center gap-1 overflow-x-auto whitespace-nowrap bg-gray-50 dark:bg-black/10 p-2 rounded-lg"
+        >
+          <span
+            class="cursor-pointer text-primaryBlue hover:underline"
+            onclick="navigateToFolder('root', 'My Drive')"
+            >My Drive</span
+          >
+        </div>
+
+        <div class="flex-1 overflow-y-auto my-2 min-h-[250px] max-h-[400px]">
+          <div id="modalLoader" class="hidden text-center py-10">
+            <div
+              class="inline-block w-8 h-8 border-4 border-gray-300 border-t-primaryBlue rounded-full animate-spin"
+            ></div>
+            <p id="exLoading" class="text-xs text-gray-400 mt-2">
+              Đang tải dữ liệu...
+            </p>
+          </div>
+          <ul
+            id="folderListContainer"
+            class="space-y-1 divide-y divide-gray-100 dark:divide-gray-800"
+          ></ul>
+          <div
+            id="emptyFolderMsg"
+            class="hidden text-center py-10 text-sm text-gray-400"
+          >
+            Không tìm thấy thư mục con nào phù hợp.
+          </div>
+        </div>
+
+        <div
+          class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center"
+        >
+          <div class="text-xs text-gray-500 max-w-[60%] truncate">
+            <span id="exSelecting">Đang chọn:</span>
+            <span
+              id="currentSelectedFolderName"
+              class="font-bold text-emerald-600 dark:text-emerald-400"
+              >My Drive</span
+            >
+          </div>
+          <div class="flex gap-2">
+            <button
+              id="exBtnCancel"
+              onclick="closeFolderExplorer()"
+              class="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition"
+            >
+              Hủy bỏ
+            </button>
+            <button
+              id="exBtnConfirm"
+              onclick="confirmSelectFolder()"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition shadow"
+            >
+              Xác nhận chọn
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="DemoJS/connectivity-monitor.js"></script>
