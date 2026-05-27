@@ -9,7 +9,7 @@ const translations = {
     preview: "Xem trước:",
     drop: "Kéo thả ảnh vào đây hoặc Click để chọn file",
     countText: "Số file:",
-    remove: "Xóa",
+    remove: "Xóa", // <-- Đã đồng bộ Tiếng Việt
     clearAll: "Xóa tất cả",
     connect: "Kết nối Drive",
     connected: "Đã kết nối",
@@ -82,7 +82,7 @@ const translations = {
     preview: "Preview:",
     drop: "Drag & drop images here or Click to select files",
     countText: "Files:",
-    remove: "Remove",
+    remove: "Remove", // <-- Đã đồng bộ Tiếng Anh
     clearAll: "Clear All",
     connect: "Connect Drive",
     connected: "Connected",
@@ -153,9 +153,9 @@ const translations = {
     street: "ถนน",
     ward: "แขวง/ตำบล",
     preview: "ตัวอย่างชื่อ:",
-    drop: "ลากไฟล์รูปภาพมาที่นี่ hoặc คลิกเพื่อเลือกไฟล์",
+    drop: "ลากไฟล์รูปภาพมาที่นี่ หรือ คลิกเพื่อเลือกไฟล์",
     countText: "ไฟล์ทั้งหมด:",
-    remove: "ลบ",
+    remove: "ลบ", // <-- Đã đồng bộ Tiếng Thái
     clearAll: "ลบทั้งหมด",
     connect: "เชื่อมต่อ Drive",
     connected: "เชื่อมต่อแล้ว",
@@ -180,9 +180,9 @@ const translations = {
     errorMissing: "ไม่มี Client ID/API Key",
     invalidCode: "⚠️ ไม่มีรหัสนี้ในระบบ Google Sheets! กรุณาตรวจสอบอีกครั้ง",
     errorMissingParams:
-      "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง ก่อนอัปโหลด!",
+      "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง Trước khi tải lên!",
     errorFolderMissing:
-      "⚠️ กรุณาระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!",
+      "⚠️ กรุณาระบุหรือเลือกโฟลเดอร์ Google Drive Trước khi tải lên!",
     errorSheetIdMissing: "⚠️ กรุณากรอก Google Sheets ID ก่อนกรอกรหัส (Code)!",
     themeLight: "สว่าง",
     themeDark: "มืด",
@@ -226,7 +226,7 @@ const translations = {
     preview: "プレビュー:",
     drop: "ここに画像をドラッグ＆ドロップするか、クリックしてファイルを選択してください",
     countText: "ファイル数:",
-    remove: "削除",
+    remove: "削除", // <-- Đã đồng bộ Tiếng Nhật
     clearAll: "すべてクリア",
     connect: "Driveに接続",
     connected: "接続済み",
@@ -299,7 +299,7 @@ const translations = {
     preview: "名称预览:",
     drop: "将图片拖拽到此处或点击选择文件",
     countText: "文件总数:",
-    remove: "删除",
+    remove: "删除", // <-- Đã đồng bộ Tiếng Trung (Phổ thông)
     clearAll: "清空全部",
     connect: "连接 Drive",
     connected: "已连接",
@@ -369,7 +369,7 @@ const translations = {
     preview: "Aperçu:",
     drop: "Faites glisser des images ici ou cliquez pour sélectionner",
     countText: "Fichiers:",
-    remove: "Supprimer",
+    remove: "Supprimer", // <-- Đã đồng bộ Tiếng Pháp
     clearAll: "Tout effacer",
     connect: "Connecter Drive",
     connected: "Connecté",
