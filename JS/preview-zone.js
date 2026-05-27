@@ -44,7 +44,7 @@ function updateNamingPreview() {
 
   // 2. Mã (Code)
   if (code) {
-    parts.push(code.toUpperCase());
+    parts.push(code.toUpperCase().slice(-6));
   }
 
   // 3. Thứ tự (Order)
@@ -69,6 +69,16 @@ function updateNamingPreview() {
     namePreviewEl.innerText = previewResult;
   }
 
+  // --- ĐOẠN CODE THÊM MỚI: TỰ ĐỘNG HIỆN/ẨN NÚT RESET ---
+  const btnResetNaming = document.getElementById("btnResetNaming");
+  if (btnResetNaming) {
+    if (previewResult.length > 0) {
+      btnResetNaming.classList.remove("hidden");
+    } else {
+      btnResetNaming.classList.add("hidden");
+    }
+  }
+
   // =========================================================================
   // LOGIC 2: XỬ LÝ MÃ HÓA BASE64 (Chỉ chạy và mã hóa khi CODE có đủ 6 ký tự)
   // =========================================================================
@@ -81,8 +91,14 @@ function updateNamingPreview() {
 
       base64DisplayEl.innerText = `${base64Str}`;
       base64DisplayEl.setAttribute("title", `Click to copy: ${base64Str}`);
+    } else if (code.length > 6) {
+      const codeUpper = code.toUpperCase().slice(-6);
+      const base64Str = btoa(unescape(encodeURIComponent(codeUpper)));
+
+      base64DisplayEl.innerText = `${base64Str}`;
+      base64DisplayEl.setAttribute("title", `Click to copy: ${base64Str}`);
     } else {
-      // Nếu chưa đủ hoặc vượt quá 6 ký tự thì ẩn/xóa trắng chuỗi Base64
+      // Nếu chưa đủ 6 ký tự thì ẩn/xóa trắng chuỗi Base64
       base64DisplayEl.innerText = "";
       base64DisplayEl.removeAttribute("title");
     }
@@ -136,3 +152,41 @@ document
       });
     }
   });
+
+function resetNamingConfig() {
+  // 1. Reset các ô input text về rỗng
+  const codeInput = document.getElementById("codeInput");
+  const streetInput = document.getElementById("streetInput");
+  const wardInput = document.getElementById("wardInput");
+
+  if (codeInput) codeInput.value = "";
+  if (streetInput) streetInput.value = "";
+  if (wardInput) wardInput.value = "";
+
+  // 2. Reset các ô select về giá trị mặc định (None / none)
+  const prefixSelect = document.getElementById("prefix");
+  const orderSelect = document.getElementById("orderSelect");
+
+  if (prefixSelect) prefixSelect.value = "None"; 
+  if (orderSelect) orderSelect.value = "none";   
+
+  // =========================================================================
+  // BỔ SUNG: Xóa icon tích xanh và thông báo lỗi của ô CODE khi reset
+  // =========================================================================
+  const sheetCodeStatus = document.getElementById("sheetCodeStatus");
+  if (sheetCodeStatus) {
+    sheetCodeStatus.innerHTML = ""; // Xóa sạch icon tích xanh bên trong span
+  }
+
+  const sheetCodeErrorMessage = document.getElementById("sheetCodeErrorMessage");
+  if (sheetCodeErrorMessage) {
+    sheetCodeErrorMessage.innerText = ""; // Xóa tin nhắn lỗi
+    sheetCodeErrorMessage.classList.add("hidden"); // Ẩn vùng chứa lỗi đi
+  }
+  // =========================================================================
+
+  // 3. Cập nhật lại giao diện hiển thị Preview và chuỗi Base64
+  if (typeof updateNamingPreview === "function") {
+    updateNamingPreview();
+  }
+}
