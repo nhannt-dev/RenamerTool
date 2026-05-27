@@ -1,6 +1,6 @@
 const translations = {
   vi: {
-    title: "Rename & Upload Drive",
+    title: "Đổi tên & Tải lên Drive",
     prefix: "Tiền tố",
     code: "Mã (Code)",
     order: "Thứ tự",
@@ -38,6 +38,8 @@ const translations = {
       "⚠️ Vui lòng điền đầy đủ thông tin: Tiền tố, Mã, Đường và Phường trước khi tải lên!",
     errorFolderMissing:
       "⚠️ Vui lòng chỉ định hoặc chọn một thư mục Google Drive trước khi tải lên!",
+    errorSheetIdMissing:
+      "⚠️ Vui lòng nhập Google Sheets ID trước khi điền Mã (Code)!",
     themeLight: "Sáng",
     themeDark: "Tối",
     themeDevice: "Hệ thống",
@@ -69,10 +71,6 @@ const translations = {
     buildingTree: "🔄 Đang dựng cấu trúc cây thư mục...",
     sheetErrorAccess: "❌ Không tìm thấy file hoặc không có quyền truy cập",
     folderErrorAccess: "❌ Không tìm thấy thư mục hoặc không có quyền truy cập",
-    modalTitle: "Thông báo",
-    close: "Đóng",
-    confirm: "Xác nhận",
-    cancel: "Hủy bỏ",
   },
   en: {
     title: "Rename & Upload Drive",
@@ -113,6 +111,8 @@ const translations = {
       "⚠️ Please fill in all parameters: Prefix, Code, Street, and Ward before uploading!",
     errorFolderMissing:
       "⚠️ Please specify or select a Google Drive folder before uploading!",
+    errorSheetIdMissing:
+      "⚠️ Please enter the Google Sheets ID before filling in the Code!",
     themeLight: "Light",
     themeDark: "Dark",
     themeDevice: "System",
@@ -144,13 +144,9 @@ const translations = {
     buildingTree: "🔄 Building folder structure...",
     sheetErrorAccess: "❌ File not found or no access permission",
     folderErrorAccess: "❌ Folder not found or no access permission",
-    modalTitle: "Notification",
-    close: "Close",
-    confirm: "Confirm",
-    cancel: "Cancel",
   },
   th: {
-    title: "Rename & Upload Drive",
+    title: "เปลี่ยนชื่อ & อัปโหลดไปยัง Drive",
     prefix: "คำนำหน้า",
     code: "รหัส",
     order: "ลำดับ",
@@ -187,6 +183,7 @@ const translations = {
       "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง ก่อนอัปโหลด!",
     errorFolderMissing:
       "⚠️ กรุณาระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!",
+    errorSheetIdMissing: "⚠️ กรุณากรอก Google Sheets ID ก่อนกรอกรหัส (Code)!",
     themeLight: "สว่าง",
     themeDark: "มืด",
     themeDevice: "ระบบ",
@@ -218,13 +215,9 @@ const translations = {
     buildingTree: "🔄 กำลังสร้างโครงสร้างโฟลเดอร์...",
     sheetErrorAccess: "❌ ไม่พบไฟล์หรือไม่มีสิทธิ์เข้าถึง",
     folderErrorAccess: "❌ ไม่พบโฟลเดอร์หรือไม่มีสิทธิ์เข้าถึง",
-    modalTitle: "การแจ้งเตือน",
-    close: "ปิด",
-    confirm: "ยืนยัน",
-    cancel: "ยกเลิก"
   },
   ja: {
-    title: "Rename & Upload Drive",
+    title: "名前変更＆Driveへアップロード",
     prefix: "接頭辞",
     code: "コード",
     order: "順序",
@@ -262,6 +255,8 @@ const translations = {
       "⚠️ アップロードする前に、接頭辞、コード、通り、区のすべてのパラメータを入力してください！",
     errorFolderMissing:
       "⚠️ アップロードする前に、Google Driveのフォルダーを指定または選択してください！",
+    errorSheetIdMissing:
+      "⚠️ コード（Code）を入力する前に、Google Sheets IDを入力してください！",
     themeLight: "ライト",
     themeDark: "ダーク",
     themeDevice: "システム設定",
@@ -293,13 +288,9 @@ const translations = {
     buildingTree: "🔄 フォルダ構造を構築中...",
     sheetErrorAccess: "❌ ファイルが見つからないか、アクセス権限がありません",
     folderErrorAccess: "❌ フォルダが見つからないか、アクセス権限がありません",
-    modalTitle: "通知",
-    close: "閉じる",
-    confirm: "確認",
-    cancel: "キャンセル"
   },
   zh: {
-    title: "Rename & Upload Drive",
+    title: "重命名并上传至网盘",
     prefix: "前缀",
     code: "代码 (Code)",
     order: "顺序",
@@ -334,6 +325,8 @@ const translations = {
     invalidCode: "⚠️ 谷歌表格 (Sheets) 系统中不存在该代码！请重新检查。",
     errorMissingParams: "⚠️ 上传前请填写完整参数：前缀、代码、街道和区域！",
     errorFolderMissing: "⚠️ 上传前请指定或选择一个 Google Drive 文件夹！",
+    errorSheetIdMissing:
+      "⚠️ 在填写代码 (Code) 之前，请先输入 Google Sheets ID！",
     themeLight: "浅色",
     themeDark: "深色",
     themeDevice: "跟随系统",
@@ -365,13 +358,9 @@ const translations = {
     buildingTree: "🔄 正在构建文件夹结构...",
     sheetErrorAccess: "❌ 未找到文件或无访问权限",
     folderErrorAccess: "❌ 未找到文件夹或无访问权限",
-    modalTitle: "提示",
-    close: "关闭",
-    confirm: "确认",
-    cancel: "取消"
   },
   fr: {
-    title: "Rename & Upload Drive",
+    title: "Renommer & Importer sur Drive",
     prefix: "Préfixe",
     code: "Code",
     order: "Ordre",
@@ -409,6 +398,8 @@ const translations = {
       "⚠️ Veuillez remplir tous les paramètres : Préfixe, Code, Rue et Quartier avant le téléchargement !",
     errorFolderMissing:
       "⚠️ Veuillez spécifier ou sélectionner un dossier Google Drive avant de télécharger !",
+    errorSheetIdMissing:
+      "⚠️ Veuillez saisir l'ID Google Sheets avant de remplir le Code !",
     themeLight: "Clair",
     themeDark: "Sombre",
     themeDevice: "Système",
@@ -440,9 +431,5 @@ const translations = {
     buildingTree: "🔄 Construction de la structure des dossiers...",
     sheetErrorAccess: "❌ Fichier introuvable ou pas de permission d'accès",
     folderErrorAccess: "❌ Dossier introuvable ou pas de permission d'accès",
-    modalTitle: "Notification",
-    close: "Fermer",
-    confirm: "Confirmer",
-    cancel: "Annuler",
   },
 };

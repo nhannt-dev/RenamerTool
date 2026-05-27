@@ -53,7 +53,7 @@ function changeLanguage(lang) {
     "lbl-drive-config": t.driveConfig,
     "lbl-sheet-id": t.lblSheet,
     "lbl-folder-link": t.folderLink,
-    "btn-connect-drive": t.connect, 
+    "btn-connect-drive": t.connect,
     "lbl-prefix": t.prefix,
     "lbl-code": t.code,
     "lbl-order": t.order,
@@ -62,19 +62,19 @@ function changeLanguage(lang) {
     "lbl-preview": t.preview,
     "lbl-count-text": t.countText,
     "txt-drop": t.drop,
-    "btnClearAll": t.clearAll,
-    "btnUploadText": t.uploadButton,
-    "modalTitle": t.modalTitle,
+    btnClearAll: t.clearAll,
+    btnUploadText: t.uploadButton,
+    modalTitle: t.modalTitle,
     "opt-light": t.themeLight,
     "opt-dark": t.themeDark,
     "opt-device": t.themeDevice,
-    
+
     // --- ĐỒNG BỘ THÊM CÁC ID CỦA MODAL EXPLORER TỪ FILE TRANSLATIONS ---
-    "exTitle": "📁 " + (t.exTitle || "Duyệt thư mục Google Drive"),
-    "exLoading": t.exLoading || "Đang tải dữ liệu...",
-    "exSelecting": t.exSelecting || "Đang chọn:",
-    "exBtnCancel": t.cancel || "Hủy bỏ",
-    "exBtnConfirm": t.exBtnConfirm || "Xác nhận chọn"
+    exTitle: "📁 " + (t.exTitle || "Duyệt thư mục Google Drive"),
+    exLoading: t.exLoading || "Đang tải dữ liệu...",
+    exSelecting: t.exSelecting || "Đang chọn:",
+    exBtnCancel: t.cancel || "Hủy bỏ",
+    exBtnConfirm: t.exBtnConfirm || "Xác nhận chọn",
   };
 
   const statusDot = document.getElementById("status-dot");
@@ -82,14 +82,18 @@ function changeLanguage(lang) {
   const btnConnect = document.getElementById("btn-connect-drive");
 
   if (statusDot && statusText && btnConnect) {
-    const isNotConnected = statusDot.classList.contains("bg-gray-400") || statusDot.classList.contains("bg-gray-500") || statusDot.classList.contains("bg-rose-500");
-    
+    const isNotConnected =
+      statusDot.classList.contains("bg-gray-400") ||
+      statusDot.classList.contains("bg-gray-500") ||
+      statusDot.classList.contains("bg-rose-500");
+
     if (isNotConnected) {
-      statusText.textContent = t.notConnected; 
-      btnConnect.textContent = t.connect;      
+      statusText.textContent = t.notConnected;
+      btnConnect.textContent = t.connect;
     } else {
-      statusText.textContent = t.connected;    
-      btnConnect.textContent = lang === 'vi' ? "Đổi tài khoản" : "Change Account";    
+      statusText.textContent = t.connected;
+      btnConnect.textContent =
+        lang === "vi" ? "Đổi tài khoản" : "Change Account";
     }
   }
 
@@ -106,12 +110,12 @@ function changeLanguage(lang) {
 
   // Cập nhật các Placeholder cho các thẻ Input bên ngoài
   const placeholders = {
-    "clientId": t.placeholderClientId,
-    "apiKey": t.placeholderApiKey,
-    "sheetId": t.placeholderSheet,
-    "folderId": t.placeholderFolder,
+    clientId: t.placeholderClientId,
+    apiKey: t.placeholderApiKey,
+    sheetId: t.placeholderSheet,
+    folderId: t.placeholderFolder,
     // --- CẬP NHẬT PLACEHOLDER ĐA NGÔN NGỮ CHO Ô TÌM KIẾM TRONG MODAL ---
-    "modalSearchInput": t.exSearchPlaceholder || "Tìm kiếm thư mục..."
+    modalSearchInput: t.exSearchPlaceholder || "Tìm kiếm thư mục...",
   };
 
   for (const [id, value] of Object.entries(placeholders)) {
@@ -122,17 +126,29 @@ function changeLanguage(lang) {
   }
 
   // CẬP NHẬT CHUYỂN NGỮ LỖI TỨC THÌ QUA ATTRIBUTE
-  const sheetNameDisplay = document.getElementById('sheetNameDisplay');
-  if (sheetNameDisplay && sheetNameDisplay.getAttribute('data-error-type') === 'access-error') {
+  const sheetNameDisplay = document.getElementById("sheetNameDisplay");
+  if (
+    sheetNameDisplay &&
+    sheetNameDisplay.getAttribute("data-error-type") === "access-error"
+  ) {
     sheetNameDisplay.innerHTML = `<span class="text-rose-500 font-medium">${t.sheetErrorAccess}</span>`;
-  } else if (sheetNameDisplay && sheetNameDisplay.getAttribute('data-status') === 'fetching') {
+  } else if (
+    sheetNameDisplay &&
+    sheetNameDisplay.getAttribute("data-status") === "fetching"
+  ) {
     sheetNameDisplay.innerHTML = `<span class="text-gray-400 animate-pulse">${t.fetchingSheet || "🔍 Checking..."}</span>`;
   }
 
-  const folderNameDisplay = document.getElementById('folderNameDisplay');
-  if (folderNameDisplay && folderNameDisplay.getAttribute('data-error-type') === 'access-error') {
+  const folderNameDisplay = document.getElementById("folderNameDisplay");
+  if (
+    folderNameDisplay &&
+    folderNameDisplay.getAttribute("data-error-type") === "access-error"
+  ) {
     folderNameDisplay.innerHTML = `<span class="text-rose-500 font-medium">${t.folderErrorAccess}</span>`;
-  } else if (folderNameDisplay && folderNameDisplay.getAttribute('data-status') === 'fetching') {
+  } else if (
+    folderNameDisplay &&
+    folderNameDisplay.getAttribute("data-status") === "fetching"
+  ) {
     folderNameDisplay.innerHTML = `<span class="text-gray-400 animate-pulse">${t.buildingTree || "🔍 Checking..."}</span>`;
   }
 
@@ -308,7 +324,7 @@ async function handleAuthClick() {
   const apiKey = document.getElementById("apiKey").value;
 
   if (!clientId || !apiKey) {
-    showCustomAlert('errorMissing', 'error')
+    showCustomAlert("errorMissing", "error");
     return false;
   }
 
@@ -595,6 +611,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (folderIdInput) {
     folderIdInput.addEventListener("input", fetchAndDisplayFolderName);
   }
+
+  // 4. TỰ ĐỘNG CẮT LẤY 6 KÝ TỰ CUỐI KHI NHẬP MÃ CODE (Ví dụ: TKWVRD4L -> WVRD4L)
+  const codeInput = document.getElementById("codeInput");
+  if (codeInput) {
+    codeInput.addEventListener("input", (e) => {
+      let value = e.target.value.trim();
+      if (value.length > 6) {
+        e.target.value = value.slice(-6);
+      }
+    });
+  }
 });
 
 // =========================================================================
@@ -612,7 +639,7 @@ let isSearchingMode = false; // Biến kiểm soát trạng thái đang tìm ki�
 async function showPicker() {
   const token = gapi.client.getToken();
   if (!token) {
-    showCustomAlert('needConnect', 'error')
+    showCustomAlert("needConnect", "error");
     return;
   }
 
@@ -881,11 +908,12 @@ function confirmSelectFolder() {
  * @param {string} type - 'info' | 'warning' | 'error' | 'success' (để đổi màu sắc icon/tiêu đề)
  * @returns {Promise<boolean>} Trả về true khi người dùng bấm Đóng/Xác nhận
  */
-function showCustomAlert(messageKey, type = 'info') {
+function showCustomAlert(messageKey, type = "info") {
   return new Promise((resolve) => {
     // Tự động nhận diện ngôn ngữ hiện tại của hệ thống (Ví dụ: 'vi', 'ja', 'en'...)
     // Thay 'currentLang' bằng tên biến lưu ngôn ngữ thực tế trong code của bạn nếu có tên khác
-    const lang = localStorage.getItem('language') || localStorage.getItem('lang') || 'vi';
+    const lang =
+      localStorage.getItem("language") || localStorage.getItem("lang") || "vi";
     // Kiểm tra xem translations[lang] và key tin nhắn có tồn tại không
     let message = messageKey;
     if (translations[lang] && translations[lang][messageKey]) {
@@ -898,9 +926,10 @@ function showCustomAlert(messageKey, type = 'info') {
 
     // Phối màu icon theo type ('error', 'warning', 'success', 'info')
     let colorClass = "text-blue-600 dark:text-blue-400";
-    if (type === 'error') colorClass = "text-red-500 dark:text-red-400";
-    if (type === 'success') colorClass = "text-emerald-500 dark:text-emerald-400";
-    if (type === 'warning') colorClass = "text-amber-500 dark:text-amber-400";
+    if (type === "error") colorClass = "text-red-500 dark:text-red-400";
+    if (type === "success")
+      colorClass = "text-emerald-500 dark:text-emerald-400";
+    if (type === "warning") colorClass = "text-amber-500 dark:text-amber-400";
 
     const modalId = `custom-alert-${Date.now()}`;
     const modalHTML = `
@@ -922,22 +951,22 @@ function showCustomAlert(messageKey, type = 'info') {
       </div>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
 
     const modalElement = document.getElementById(modalId);
     const closeBtn = document.getElementById(`${modalId}-btn`);
 
     const closeModal = () => {
-      modalElement.classList.remove('animate__fadeIn');
-      modalElement.classList.add('animate__fadeOut');
+      modalElement.classList.remove("animate__fadeIn");
+      modalElement.classList.add("animate__fadeOut");
       setTimeout(() => {
         modalElement.remove();
         resolve(true);
       }, 200);
     };
 
-    closeBtn.addEventListener('click', closeModal);
-    modalElement.addEventListener('click', (e) => {
+    closeBtn.addEventListener("click", closeModal);
+    modalElement.addEventListener("click", (e) => {
       if (e.target === modalElement) closeModal();
     });
   });
