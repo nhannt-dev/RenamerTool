@@ -4,7 +4,7 @@ const SCOPES =
 // Dùng URL dạng này để Google API Client tự load chính xác v4 mà không lo lỗi 404
 const DISCOVERY_DOCS = [
   "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-  "https://www.googleapis.com/discovery/v1/apis/sheets/v4/rest"
+  "https://www.googleapis.com/discovery/v1/apis/sheets/v4/rest",
 ];
 
 let tokenClient;
@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           checkCodeInGoogleSheets(value);
         }
-      }else{
+      } else {
         if (statusSpan) statusSpan.innerHTML = "";
         if (errorMsgDiv) errorMsgDiv.classList.add("hidden");
       }
@@ -460,7 +460,7 @@ function toggleNamingSection(isConnected) {
       targetSection.classList.remove("animate__fadeInUp");
       // Thêm hiệu ứng trượt xuống ẩn đi
       targetSection.classList.add("animate__fadeOutDown");
-      
+
       // Chờ hiệu ứng trượt xuống chạy hết 300ms rồi mới ẩn hẳn phần tử khỏi màn hình
       setTimeout(() => {
         if (targetSection.classList.contains("animate__fadeOutDown")) {
@@ -479,7 +479,7 @@ async function checkCodeInGoogleSheets(code) {
   const sheetId = document.getElementById("sheetId").value.trim();
   const statusSpan = document.getElementById("sheetCodeStatus");
   const errorMsgDiv = document.getElementById("sheetCodeErrorMessage");
-  
+
   if (!sheetId || !code || code.length !== 6) return;
 
   // Lấy ngôn ngữ hiện tại để thông báo lỗi nếu cần
@@ -495,11 +495,11 @@ async function checkCodeInGoogleSheets(code) {
     // Bạn có thể thay đổi "Trang_Tính_1" thành tên cụ thể nếu muốn, dùng "A1:Z" để quét toàn bộ sheet
     const response = await gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: "A1:Z10000", 
+      range: "A1:Z10000",
     });
 
     const rows = response.result.values;
-    
+
     if (!rows || rows.length === 0) {
       updateCodeStatusUI(false);
       return;
@@ -512,7 +512,7 @@ async function checkCodeInGoogleSheets(code) {
     for (let i = 0; i < rows.length; i++) {
       for (let j = 0; j < rows[i].length; j++) {
         const cellValue = String(rows[i][j]).trim().toUpperCase();
-        
+
         // Kiểm tra xem giá trị trong ô có kết thúc bằng 6 ký tự nhập vào không
         // Thỏa mãn cả "TK-1985CB" hay "TK1985CB" khi tìm kiếm bằng "1985CB"
         if (cellValue === targetCode || cellValue.endsWith(targetCode)) {
@@ -525,12 +525,12 @@ async function checkCodeInGoogleSheets(code) {
 
     // 4. Cập nhật giao diện kết quả
     updateCodeStatusUI(isFound);
-
   } catch (err) {
     console.error("Lỗi khi truy vấn Google Sheets:", err);
     statusSpan.innerHTML = "❌";
     if (errorMsgDiv) {
-      errorMsgDiv.innerText = t.sheetErrorAccess || "Lỗi truy cập dữ liệu Sheet!";
+      errorMsgDiv.innerText =
+        t.sheetErrorAccess || "Lỗi truy cập dữ liệu Sheet!";
       errorMsgDiv.classList.remove("hidden");
     }
   }
@@ -538,12 +538,12 @@ async function checkCodeInGoogleSheets(code) {
 
 /**
  * Cập nhật giao diện Tích xanh / X đỏ kế bên ô Code
- * @param {boolean} isSuccess 
+ * @param {boolean} isSuccess
  */
 function updateCodeStatusUI(isSuccess) {
   const statusSpan = document.getElementById("sheetCodeStatus");
   const errorMsgDiv = document.getElementById("sheetCodeErrorMessage");
-  
+
   const currentLang = localStorage.getItem("preferredLanguage") || "vi";
   const t = translations[currentLang] || translations["vi"];
 
