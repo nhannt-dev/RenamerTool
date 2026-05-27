@@ -1,3 +1,13 @@
+const themeSelector = document.getElementById("themeSelector");
+const htmlEl = document.documentElement;
+
+if (themeSelector) {
+  themeSelector.addEventListener("change", (e) => {
+    localStorage.setItem("app-theme", e.target.value);
+    initTheme();
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const splashScreen = document.getElementById("splash-screen");
   const splashBar = document.getElementById("splash-bar");
