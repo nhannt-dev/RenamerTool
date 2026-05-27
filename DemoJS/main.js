@@ -612,13 +612,26 @@ document.addEventListener("DOMContentLoaded", () => {
     folderIdInput.addEventListener("input", fetchAndDisplayFolderName);
   }
 
-  // 4. TỰ ĐỘNG CẮT LẤY 6 KÝ TỰ CUỐI KHI NHẬP MÃ CODE (Ví dụ: TKWVRD4L -> WVRD4L)
+  // 4. TỰ ĐỘNG CẮT LẤY 6 KÝ TỰ CUỐI KHI NHẬP MÃ CODE VÀ KIỂM TRA GOOGLE SHEETS ID
   const codeInput = document.getElementById("codeInput");
   if (codeInput) {
     codeInput.addEventListener("input", (e) => {
       let value = e.target.value.trim();
+
+      // Giữ nguyên logic cắt lấy 6 ký tự cuối của bạn
       if (value.length > 6) {
-        e.target.value = value.slice(-6);
+        value = value.slice(-6);
+        e.target.value = value;
+      }
+
+      // Kiểm tra khi chuỗi nhập vào đạt vừa đủ 6 ký tự
+      if (value.length === 6) {
+        const sheetIdValue = sheetIdInput ? sheetIdInput.value.trim() : "";
+
+        // Nếu ô Google Sheets ID đang trống thì hiện modal thông báo lỗi đa ngôn ngữ
+        if (!sheetIdValue) {
+          showCustomAlert("errorSheetIdMissing", "error");
+        }
       }
     });
   }
@@ -654,6 +667,23 @@ async function showPicker() {
     folderHistory = [{ id: "root", name: "My Drive" }];
 
     await loadSubFolders(currentFolderId);
+
+    setTimeout(() => {
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          closeFolderExplorer();
+        }
+      };
+    }, 0);
+
+    // BỔ SUNG: Lắng nghe sự kiện click vào vùng nền tối để tự đóng modal
+    // Xóa sự kiện cũ nếu có để tránh trùng lặp
+    modal.onclick = null;
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeFolderExplorer();
+      }
+    };
   }
 }
 
@@ -911,7 +941,6 @@ function confirmSelectFolder() {
 function showCustomAlert(messageKey, type = "info") {
   return new Promise((resolve) => {
     // Tự động nhận diện ngôn ngữ hiện tại của hệ thống (Ví dụ: 'vi', 'ja', 'en'...)
-    // Thay 'currentLang' bằng tên biến lưu ngôn ngữ thực tế trong code của bạn nếu có tên khác
     const lang =
       localStorage.getItem("language") || localStorage.getItem("lang") || "vi";
     // Kiểm tra xem translations[lang] và key tin nhắn có tồn tại không
@@ -933,7 +962,7 @@ function showCustomAlert(messageKey, type = "info") {
 
     const modalId = `custom-alert-${Date.now()}`;
     const modalHTML = `
-      <div id="${modalId}" class="fixed inset-0 z- flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate__animated animate__fadeIn animate__faster">
+      <div id="${modalId}" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate__animated animate__fadeIn animate__faster">
         <div class="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-100 dark:border-gray-800 transform transition-all scale-100 animate__animated animate__zoomIn animate__faster">
           <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 pb-3 mb-4">
             <span class="text-xl ${colorClass}">➔</span>
