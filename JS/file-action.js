@@ -69,43 +69,57 @@ dropzone.addEventListener("drop", (e) => {
 
 // --- 3. XỬ LÝ FILE & TẠO HIỆU ỨNG ANIMATION LOADER ---
 function handleFiles(files) {
-  if (files.length === 0) return;
+  if (files.length === 0) return; //
 
-  loader.classList.remove("hidden");
-  txtDrop.classList.add("opacity-40");
+  const btnClearAll = document.getElementById("btnClearAll");
+  const btnUploadDrive = document.getElementById("btnUploadDrive");
 
-  const imageFiles = Array.from(files).filter((file) =>
-    file.type.startsWith("image/"),
+  // TẠM THỜI KHÓA/ẨN KHI ĐANG ĐỌC DỮ LIỆU FILE
+  if (btnClearAll) {
+    btnClearAll.disabled = true;
+    btnClearAll.classList.add("opacity-50", "cursor-not-allowed");
+  }
+  btnUploadDrive?.classList.add("hidden");
+
+  loader.classList.remove("hidden"); //
+  txtDrop.classList.add("opacity-40"); //
+
+  const imageFiles = Array.from(files).filter(
+    (file) => file.type.startsWith("image/"), //
   );
 
-  // Tạo một mảng các Promise để đợi đọc toàn bộ ảnh xong xuôi
   const readers = imageFiles.map((file) => {
+    //
     return new Promise((resolve) => {
+      //
       const isDuplicate = selectedFiles.some(
-        (f) => f.name === file.name && f.size === file.size,
+        //
+        (f) => f.name === file.name && f.size === file.size, //
       );
-      
+
       if (!isDuplicate) {
-        const reader = new FileReader();
+        //
+        const reader = new FileReader(); //
         reader.onload = function (e) {
-          // Lưu chuỗi Base64 của ảnh vào thuộc tính thumbnailData
-          file.thumbnailData = e.target.result;
-          selectedFiles.push(file);
-          resolve();
+          //
+          file.thumbnailData = e.target.result; //
+          selectedFiles.push(file); //
+          resolve(); //
         };
-        reader.readAsDataURL(file); // Đọc file dạng DataURL chống mất ảnh khi chuyển tab
+        reader.readAsDataURL(file); //
       } else {
-        resolve();
+        resolve(); //
       }
     });
   });
 
-  // Sau khi đọc xong tất cả các file thì mới render giao diện
   Promise.all(readers).then(() => {
-    renderFileList();
-    loader.classList.add("hidden");
-    txtDrop.classList.remove("opacity-40");
-    fileInput.value = "";
+    //
+    renderFileList(); // Gọi hàm này xong, logic tự động ẩn/hiện ở Bước 1 sẽ quyết định trạng thái nút
+
+    loader.classList.add("hidden"); //
+    txtDrop.classList.remove("opacity-40"); //
+    fileInput.value = ""; //
   });
 }
 
@@ -168,9 +182,10 @@ function renderFileList() {
 
     // Lấy phần đuôi mở rộng gốc của file (ví dụ: .jpg, .jpeg, .png)
     const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-    
+
     // Ghép tên mới (Nếu cấu hình trống hết thì giữ tên gốc)
-    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : file.name;
+    const newFileName =
+      parts.length > 0 ? parts.join(".") + fileExtension : file.name;
 
     // Lưu trữ tên mới trực tiếp vào một thuộc tính custom của đối tượng file để sử dụng khi upload lên Drive
     file.newName = newFileName;
@@ -214,6 +229,32 @@ function renderFileList() {
   if (fileCountDisplay) {
     fileCountDisplay.textContent = totalFiles;
   }
+
+  const btnUploadDrive = document.getElementById("btnUploadDrive");
+  const btnClearAll = document.getElementById("btnClearAll");
+
+  if (totalFiles > 0) {
+    if (btnUploadDrive)
+      btnUploadDrive.style.setProperty("display", "flex", "important");
+    if (btnClearAll) {
+      btnClearAll.disabled = false;
+      btnClearAll.classList.remove(
+        "opacity-50",
+        "cursor-not-allowed",
+        "pointer-events-none",
+      );
+      btnClearAll.classList.add("bg-dangerRed", "hover:bg-red-700");
+    }
+  } else {
+    if (btnUploadDrive)
+      btnUploadDrive.style.setProperty("display", "none", "important");
+    if (btnClearAll) {
+      btnClearAll.disabled = true;
+      btnClearAll.classList.remove("hover:bg-red-700");
+      // Thêm làm mờ (opacity-50) và dấu chéo (cursor-not-allowed)
+      btnClearAll.classList.add("opacity-50", "cursor-not-allowed");
+    }
+  }
 }
 
 // --- 5. HÀM XÓA FILE KHI CLICK NÚT REMOVE ---
@@ -247,3 +288,8 @@ window.confirmClearAll = function () {
   selectedFiles = [];
   renderFileList();
 };
+
+// Gọi lần đầu tiên khi tải trang để đưa giao diện về trạng thái chuẩn (ẩn upload, khóa clear all)
+document.addEventListener("DOMContentLoaded", () => {
+  renderFileList();
+});
