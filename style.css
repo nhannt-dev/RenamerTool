@@ -30,3 +30,21 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px var(--container-bg) inset !important;
   -webkit-text-fill-color: var(--text-color) !important;
 }
+
+/* Trạng thái bình thường khi di chuột vào dòng file */
+#fileList li {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+
+/* Trạng thái khi đang giữ chuột và kéo file đi */
+#fileList li:active {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}
+
+/* Thêm hiệu ứng làm mờ nhẹ phần tử gốc khi đang được kéo đi */
+.sortable-ghost {
+  opacity: 0.4;
+  background-color: rgba(14, 165, 233, 0.1) !important; /* màu xanh sky nhạt */
+}

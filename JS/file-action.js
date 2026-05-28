@@ -130,7 +130,6 @@ function renderFileList() {
   // Xóa trắng danh sách cũ trước khi render lại
   fileList.innerHTML = "";
 
-  // 1. Lấy thông tin cấu hình đặt tên hiện tại từ giao diện
   const prefix = document.getElementById("prefix")?.value || "None";
   const code = document.getElementById("codeInput")?.value.trim() || "";
   const order = document.getElementById("orderSelect")?.value || "none";
@@ -143,76 +142,51 @@ function renderFileList() {
       ? translations[currentLang].remove
       : "Xóa";
 
-  // Tổng số lượng file đang có
   const totalFiles = selectedFiles.length;
 
   selectedFiles.forEach((file, index) => {
-    // 2. LOGIC TÍNH TOÁN ĐỔI TÊN FILE THEO PREVIEW-ZONE
     const parts = [];
 
-    // Tiền tố
-    if (prefix && prefix !== "None" && prefix !== "none") {
-      parts.push(prefix.toUpperCase());
-    }
-
-    // Mã Code (Lấy 6 ký tự cuối)
-    if (code) {
-      parts.push(code.toUpperCase().slice(-6));
-    }
-
-    // XỬ LÝ RIÊNG CHO SỐ THỨ TỰ (ORDER)
+    if (prefix && prefix !== "None" && prefix !== "none") parts.push(prefix.toUpperCase());
+    if (code) parts.push(code.toUpperCase().slice(-6));
+    
     if (order === "asc") {
-      // Tăng dần: File đầu tiên là 1, file tiếp theo là 2...
       parts.push(index + 1);
     } else if (order === "desc") {
-      // Giảm dần: File đầu tiên lấy tổng số lượng file, giảm dần về 1
       parts.push(totalFiles - index);
     }
-    // Nếu order === "none" -> Bỏ qua không push gì vào mảng parts
 
-    // Đường
-    if (street) {
-      parts.push(street.toUpperCase());
-    }
+    if (street) parts.push(street.toUpperCase());
+    if (ward) parts.push(ward.toUpperCase());
 
-    // Phường
-    if (ward) {
-      parts.push(ward.toUpperCase());
-    }
-
-    // Lấy phần đuôi mở rộng gốc của file (ví dụ: .jpg, .jpeg, .png)
     const fileExtension = file.name.substring(file.name.lastIndexOf("."));
+    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : file.name;
 
-    // Ghép tên mới (Nếu cấu hình trống hết thì giữ tên gốc)
-    const newFileName =
-      parts.length > 0 ? parts.join(".") + fileExtension : file.name;
-
-    // Lưu trữ tên mới trực tiếp vào một thuộc tính custom của đối tượng file để sử dụng khi upload lên Drive
     file.newName = newFileName;
 
-    // 3. RENDER GIAO DIỆN MỚI
     const li = document.createElement("li");
     li.className =
       "flex items-center justify-between p-3 bg-white dark:bg-panelBg/40 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm animate__animated animate__fadeInUp";
     li.style.animationDuration = "0.3s";
+    
+    // LƯU THÊM THÔNG TIN GỐC VÀO ĐÂY ĐỂ ĐỠ BỊ LỖI LỆCH INDEX KHI KÉO THẢ
+    li.setAttribute("data-original-name", file.name);
+    li.setAttribute("data-size", file.size);
 
-    // const thumbnailUrl = URL.createObjectURL(file);
     const thumbnailUrl = file.thumbnailData || "";
 
     li.innerHTML = `
       <div class="flex items-center gap-3 min-w-0 flex-1">
         <img src="${thumbnailUrl}" class="w-10 h-10 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" alt="preview" />
-        
         <div class="truncate flex flex-col">
           <span class="text-sm font-semibold text-sky-500 dark:text-primaryBlue hover:underline cursor-pointer truncate" title="${newFileName}">
             ${newFileName}
           </span>
-          <span class="text-xs text-gray-400 dark:text-gray-500 truncate">
+          <span class="text-xs text-gray-400 dark:text-gray-500 truncate sub-text">
             ${file.name} (${(file.size / 1024).toFixed(1)} KB)
           </span>
         </div>
       </div>
-      
       <button 
         onclick="removeFile(${index})" 
         data-i18n="remove"
@@ -225,7 +199,6 @@ function renderFileList() {
     fileList.appendChild(li);
   });
 
-  // Cập nhật số lượng file hiển thị
   if (fileCountDisplay) {
     fileCountDisplay.textContent = totalFiles;
   }
@@ -234,24 +207,19 @@ function renderFileList() {
   const btnClearAll = document.getElementById("btnClearAll");
 
   if (totalFiles > 0) {
-    if (btnUploadDrive)
-      btnUploadDrive.style.setProperty("display", "flex", "important");
+    if (btnUploadDrive) btnUploadDrive.style.setProperty("display", "flex", "important");
     if (btnClearAll) {
       btnClearAll.disabled = false;
-      btnClearAll.classList.remove(
-        "opacity-50",
-        "cursor-not-allowed",
-        "pointer-events-none",
-      );
+      btnClearAll.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
       btnClearAll.classList.add("bg-dangerRed", "hover:bg-red-700");
     }
+    // Kích hoạt kéo thả Sortable
+    initSortableFileList();
   } else {
-    if (btnUploadDrive)
-      btnUploadDrive.style.setProperty("display", "none", "important");
+    if (btnUploadDrive) btnUploadDrive.style.setProperty("display", "none", "important");
     if (btnClearAll) {
       btnClearAll.disabled = true;
       btnClearAll.classList.remove("hover:bg-red-700");
-      // Thêm làm mờ (opacity-50) và dấu chéo (cursor-not-allowed)
       btnClearAll.classList.add("opacity-50", "cursor-not-allowed");
     }
   }
@@ -292,7 +260,99 @@ window.confirmClearAll = async function () {
   }
 };
 
+// --- 8. KHỞI TẠO SORTABLEJS ĐỂ KÉO THẢ SẮP XẾP FILE ---
+// --- 8. KHỞI TẠO SORTABLEJS ĐỂ KÉO THẢ SẮP XẾP FILE ---
+function initSortableFileList() {
+  const fileListEl = document.getElementById("fileList");
+  if (!fileListEl || fileListEl.classList.contains("sortable-initialized")) return;
+
+  Sortable.create(fileListEl, {
+    animation: 250,
+    ghostClass: "sortable-ghost",
+    onEnd: function () {
+      // Sau khi kéo thả xong, tiến hành cập nhật lại toàn bộ tên và mảng dữ liệu
+      updateNamesAfterSort();
+    },
+  });
+  
+  // Đánh dấu để tránh khởi tạo trùng lặp nhiều lần
+  fileListEl.classList.add("sortable-initialized");
+}
+
+function updateNamesAfterSort() {
+  const fileList = document.getElementById("fileList");
+  if (!fileList) return;
+
+  const prefix = document.getElementById("prefix")?.value || "None";
+  const code = document.getElementById("codeInput")?.value.trim() || "";
+  const order = document.getElementById("orderSelect")?.value || "none";
+  const street = document.getElementById("streetInput")?.value.trim() || "";
+  const ward = document.getElementById("wardInput")?.value.trim() || "";
+  
+  const totalFiles = fileList.children.length;
+  const newSortedFiles = [];
+
+  // Duyệt qua thứ tự thực tế của các thẻ LI đang hiển thị trên màn hình
+  Array.from(fileList.children).forEach((li, index) => {
+    const originalName = li.getAttribute("data-original-name");
+    const size = parseInt(li.getAttribute("data-size") || "0", 10);
+    if (!originalName) return;
+
+    // 1. Tính toán lại tên mới dựa trên vị trí hiển thị hiện tại
+    const parts = [];
+    if (prefix && prefix !== "None" && prefix !== "none") parts.push(prefix.toUpperCase());
+    if (code) parts.push(code.toUpperCase().slice(-6));
+    
+    if (order === "asc") {
+      parts.push(index + 1);
+    } else if (order === "desc") {
+      parts.push(totalFiles - index);
+    }
+
+    if (street) parts.push(street.toUpperCase());
+    if (ward) parts.push(ward.toUpperCase());
+
+    const fileExtension = originalName.substring(originalName.lastIndexOf("."));
+    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : originalName;
+
+    // 2. Cập nhật Text hiển thị tên mới trên giao diện UI
+    const nameSpan = li.querySelector("span.text-sky-500");
+    if (nameSpan) {
+      nameSpan.textContent = newFileName;
+      nameSpan.setAttribute("title", newFileName);
+    }
+
+    // 3. Cập nhật lại nút xóa ứng với index mới
+    const removeBtn = li.querySelector("button[onclick^='removeFile']");
+    if (removeBtn) {
+      removeBtn.setAttribute("onclick", `removeFile(${index})`);
+    }
+
+    // 4. Tìm và đồng bộ lại Object File trong mảng dữ liệu selectedFiles cũ sang mảng tạm mới
+    const matchedFile = selectedFiles.find(f => f.name === originalName && f.size === size);
+    if (matchedFile) {
+      matchedFile.newName = newFileName;
+      newSortedFiles.push(matchedFile);
+    }
+  });
+
+  // 5. Gán lại mảng selectedFiles chính bằng mảng đã được đồng bộ thứ tự kéo thả mới thành công
+  selectedFiles = newSortedFiles;
+}
+
+// Lắng nghe sự kiện thay đổi cấu hình đặt tên để cập nhật Realtime
+["prefix", "codeInput", "orderSelect", "streetInput", "wardInput"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    const eventType = el.tagName === "SELECT" ? "change" : "input";
+    el.addEventListener(eventType, () => {
+      if (selectedFiles.length > 0) updateNamesAfterSort();
+    });
+  }
+});
+
 // Gọi lần đầu tiên khi tải trang để đưa giao diện về trạng thái chuẩn (ẩn upload, khóa clear all)
 document.addEventListener("DOMContentLoaded", () => {
   renderFileList();
+  initSortableFileList();
 });
