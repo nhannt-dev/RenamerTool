@@ -49,7 +49,8 @@ function updateNamingPreview() {
 
   // 3. Thứ tự (Order)
   if (order && order !== "none") {
-    parts.push("1"); // Hiển thị số thứ tự theo giao diện mẫu
+    // parts.push("1"); // Hiển thị số thứ tự theo giao diện mẫu
+    parts.push(order === "asc" ? "1" : "N");
   }
 
   // 4. Đường (Street)
@@ -102,6 +103,10 @@ function updateNamingPreview() {
       base64DisplayEl.innerText = "";
       base64DisplayEl.removeAttribute("title");
     }
+  }
+
+  if (typeof renderFileList == "function") {
+    renderFileList();
   }
 }
 

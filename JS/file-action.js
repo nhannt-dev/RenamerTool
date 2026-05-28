@@ -71,37 +71,42 @@ dropzone.addEventListener("drop", (e) => {
 function handleFiles(files) {
   if (files.length === 0) return;
 
-  // Kích hoạt hiệu ứng Loader (Hiện loader xoay, ẩn bớt text chỉ dẫn)
   loader.classList.remove("hidden");
   txtDrop.classList.add("opacity-40");
 
-  // Giả lập hiệu ứng tải/xử lý file mượt mà (300ms) để người dùng thấy animation chuyển động
-  setTimeout(() => {
-    // Chỉ lọc lấy các file là hình ảnh theo đúng thuộc tính accept="image/*"
-    const imageFiles = Array.from(files).filter((file) =>
-      file.type.startsWith("image/"),
-    );
+  const imageFiles = Array.from(files).filter((file) =>
+    file.type.startsWith("image/"),
+  );
 
-    imageFiles.forEach((file) => {
-      // Tránh trùng lặp file có cùng tên và cùng dung lượng
+  // Tạo một mảng các Promise để đợi đọc toàn bộ ảnh xong xuôi
+  const readers = imageFiles.map((file) => {
+    return new Promise((resolve) => {
       const isDuplicate = selectedFiles.some(
         (f) => f.name === file.name && f.size === file.size,
       );
+      
       if (!isDuplicate) {
-        selectedFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          // Lưu chuỗi Base64 của ảnh vào thuộc tính thumbnailData
+          file.thumbnailData = e.target.result;
+          selectedFiles.push(file);
+          resolve();
+        };
+        reader.readAsDataURL(file); // Đọc file dạng DataURL chống mất ảnh khi chuyển tab
+      } else {
+        resolve();
       }
     });
+  });
 
-    // Cập nhật lại giao diện hiển thị danh sách
+  // Sau khi đọc xong tất cả các file thì mới render giao diện
+  Promise.all(readers).then(() => {
     renderFileList();
-
-    // Tắt hiệu ứng loader sau khi xử lý xong
     loader.classList.add("hidden");
     txtDrop.classList.remove("opacity-40");
-
-    // Reset lại value của input để có thể chọn lại chính file vừa xóa nếu muốn
     fileInput.value = "";
-  }, 400);
+  });
 }
 
 // --- 4. RENDER GIAO DIỆN DANH SÁCH FILE + NÚT REMOVE ĐA NGÔN NGỮ ---
@@ -111,36 +116,84 @@ function renderFileList() {
   // Xóa trắng danh sách cũ trước khi render lại
   fileList.innerHTML = "";
 
-  // 1. Tìm ngôn ngữ hiện tại đang được chọn ở LangSelector
-  const currentLang = document.getElementById("langSelector")?.value || "vi";
+  // 1. Lấy thông tin cấu hình đặt tên hiện tại từ giao diện
+  const prefix = document.getElementById("prefix")?.value || "None";
+  const code = document.getElementById("codeInput")?.value.trim() || "";
+  const order = document.getElementById("orderSelect")?.value || "none";
+  const street = document.getElementById("streetInput")?.value.trim() || "";
+  const ward = document.getElementById("wardInput")?.value.trim() || "";
 
-  // 2. Lấy từ khóa dịch "remove" tương ứng từ file translations.js
-  // Nếu hệ thống dịch chưa sẵn sàng, từ khóa mặc định sẽ trả về là "Xóa"
+  const currentLang = document.getElementById("langSelector")?.value || "vi";
   const textRemove =
     typeof translations !== "undefined" && translations[currentLang]?.remove
       ? translations[currentLang].remove
       : "Xóa";
 
+  // Tổng số lượng file đang có
+  const totalFiles = selectedFiles.length;
+
   selectedFiles.forEach((file, index) => {
-    // Tạo phần tử <li> với class Tailwind và animation mượt mà từ animate.css
+    // 2. LOGIC TÍNH TOÁN ĐỔI TÊN FILE THEO PREVIEW-ZONE
+    const parts = [];
+
+    // Tiền tố
+    if (prefix && prefix !== "None" && prefix !== "none") {
+      parts.push(prefix.toUpperCase());
+    }
+
+    // Mã Code (Lấy 6 ký tự cuối)
+    if (code) {
+      parts.push(code.toUpperCase().slice(-6));
+    }
+
+    // XỬ LÝ RIÊNG CHO SỐ THỨ TỰ (ORDER)
+    if (order === "asc") {
+      // Tăng dần: File đầu tiên là 1, file tiếp theo là 2...
+      parts.push(index + 1);
+    } else if (order === "desc") {
+      // Giảm dần: File đầu tiên lấy tổng số lượng file, giảm dần về 1
+      parts.push(totalFiles - index);
+    }
+    // Nếu order === "none" -> Bỏ qua không push gì vào mảng parts
+
+    // Đường
+    if (street) {
+      parts.push(street.toUpperCase());
+    }
+
+    // Phường
+    if (ward) {
+      parts.push(ward.toUpperCase());
+    }
+
+    // Lấy phần đuôi mở rộng gốc của file (ví dụ: .jpg, .jpeg, .png)
+    const fileExtension = file.name.substring(file.name.lastIndexOf("."));
+    
+    // Ghép tên mới (Nếu cấu hình trống hết thì giữ tên gốc)
+    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : file.name;
+
+    // Lưu trữ tên mới trực tiếp vào một thuộc tính custom của đối tượng file để sử dụng khi upload lên Drive
+    file.newName = newFileName;
+
+    // 3. RENDER GIAO DIỆN MỚI
     const li = document.createElement("li");
     li.className =
       "flex items-center justify-between p-3 bg-white dark:bg-panelBg/40 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm animate__animated animate__fadeInUp";
     li.style.animationDuration = "0.3s";
 
-    // Tạo Object URL để làm ảnh Preview thu nhỏ (Thumbnail)
-    const thumbnailUrl = URL.createObjectURL(file);
+    // const thumbnailUrl = URL.createObjectURL(file);
+    const thumbnailUrl = file.thumbnailData || "";
 
     li.innerHTML = `
       <div class="flex items-center gap-3 min-w-0 flex-1">
         <img src="${thumbnailUrl}" class="w-10 h-10 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" alt="preview" />
         
         <div class="truncate flex flex-col">
-          <span class="text-sm font-semibold text-sky-500 dark:text-primaryBlue hover:underline cursor-pointer truncate">
-            ${file.name}
+          <span class="text-sm font-semibold text-sky-500 dark:text-primaryBlue hover:underline cursor-pointer truncate" title="${newFileName}">
+            ${newFileName}
           </span>
           <span class="text-xs text-gray-400 dark:text-gray-500 truncate">
-            ${(file.size / 1024).toFixed(1)} KB
+            ${file.name} (${(file.size / 1024).toFixed(1)} KB)
           </span>
         </div>
       </div>
@@ -157,9 +210,9 @@ function renderFileList() {
     fileList.appendChild(li);
   });
 
-  // Cập nhật số lượng file hiển thị lên giao diện (id="fileCountDisplay")
+  // Cập nhật số lượng file hiển thị
   if (fileCountDisplay) {
-    fileCountDisplay.textContent = selectedFiles.length;
+    fileCountDisplay.textContent = totalFiles;
   }
 }
 
