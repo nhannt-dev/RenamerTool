@@ -281,12 +281,15 @@ document.getElementById("langSelector")?.addEventListener("change", () => {
 });
 
 // --- 7. HÀM CHO NÚT "TOUT EFFACER" (CLEAR ALL) TẠI GIAO DIỆN CỦA BẠN ---
-window.confirmClearAll = function () {
+window.confirmClearAll = async function () {
   if (selectedFiles.length === 0) return;
 
-  // Hiển thị hộp thoại xác nhận xóa danh sách tùy thuộc vào file alert.js / modal của bạn
-  selectedFiles = [];
-  renderFileList();
+  const isConfirmed = await showCustomConfirm("confirmClear", "warning");
+  if (isConfirmed) {
+    // Hiển thị hộp thoại xác nhận xóa danh sách tùy thuộc vào file alert.js / modal của bạn
+    selectedFiles = [];
+    renderFileList();
+  }
 };
 
 // Gọi lần đầu tiên khi tải trang để đưa giao diện về trạng thái chuẩn (ẩn upload, khóa clear all)
