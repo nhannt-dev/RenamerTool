@@ -147,9 +147,10 @@ function renderFileList() {
   selectedFiles.forEach((file, index) => {
     const parts = [];
 
-    if (prefix && prefix !== "None" && prefix !== "none") parts.push(prefix.toUpperCase());
+    if (prefix && prefix !== "None" && prefix !== "none")
+      parts.push(prefix.toUpperCase());
     if (code) parts.push(code.toUpperCase().slice(-6));
-    
+
     if (order === "asc") {
       parts.push(index + 1);
     } else if (order === "desc") {
@@ -160,7 +161,8 @@ function renderFileList() {
     if (ward) parts.push(ward.toUpperCase());
 
     const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : file.name;
+    const newFileName =
+      parts.length > 0 ? parts.join(".") + fileExtension : file.name;
 
     file.newName = newFileName;
 
@@ -168,7 +170,7 @@ function renderFileList() {
     li.className =
       "flex items-center justify-between p-3 bg-white dark:bg-panelBg/40 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm animate__animated animate__fadeInUp";
     li.style.animationDuration = "0.3s";
-    
+
     // LƯU THÊM THÔNG TIN GỐC VÀO ĐÂY ĐỂ ĐỠ BỊ LỖI LỆCH INDEX KHI KÉO THẢ
     li.setAttribute("data-original-name", file.name);
     li.setAttribute("data-size", file.size);
@@ -177,9 +179,14 @@ function renderFileList() {
 
     li.innerHTML = `
       <div class="flex items-center gap-3 min-w-0 flex-1">
-        <img src="${thumbnailUrl}" class="w-10 h-10 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" alt="preview" />
+        <img 
+          src="${thumbnailUrl}" 
+          onclick="openImagePreview('${thumbnailUrl}')"
+          class="w-10 h-10 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0 cursor-pointer hover:scale-105 transition-transform" 
+          alt="preview" 
+        />
         <div class="truncate flex flex-col">
-          <span class="text-sm font-semibold text-sky-500 dark:text-primaryBlue hover:underline cursor-pointer truncate" title="${newFileName}">
+          <span class="text-sm font-semibold text-sky-500 dark:text-primaryBlue hover:underline cursor-pointer truncate" onclick="openImagePreview('${thumbnailUrl}')" title="${newFileName}">
             ${newFileName}
           </span>
           <span class="text-xs text-gray-400 dark:text-gray-500 truncate sub-text">
@@ -207,16 +214,22 @@ function renderFileList() {
   const btnClearAll = document.getElementById("btnClearAll");
 
   if (totalFiles > 0) {
-    if (btnUploadDrive) btnUploadDrive.style.setProperty("display", "flex", "important");
+    if (btnUploadDrive)
+      btnUploadDrive.style.setProperty("display", "flex", "important");
     if (btnClearAll) {
       btnClearAll.disabled = false;
-      btnClearAll.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+      btnClearAll.classList.remove(
+        "opacity-50",
+        "cursor-not-allowed",
+        "pointer-events-none",
+      );
       btnClearAll.classList.add("bg-dangerRed", "hover:bg-red-700");
     }
     // Kích hoạt kéo thả Sortable
     initSortableFileList();
   } else {
-    if (btnUploadDrive) btnUploadDrive.style.setProperty("display", "none", "important");
+    if (btnUploadDrive)
+      btnUploadDrive.style.setProperty("display", "none", "important");
     if (btnClearAll) {
       btnClearAll.disabled = true;
       btnClearAll.classList.remove("hover:bg-red-700");
@@ -264,7 +277,8 @@ window.confirmClearAll = async function () {
 // --- 8. KHỞI TẠO SORTABLEJS ĐỂ KÉO THẢ SẮP XẾP FILE ---
 function initSortableFileList() {
   const fileListEl = document.getElementById("fileList");
-  if (!fileListEl || fileListEl.classList.contains("sortable-initialized")) return;
+  if (!fileListEl || fileListEl.classList.contains("sortable-initialized"))
+    return;
 
   Sortable.create(fileListEl, {
     animation: 250,
@@ -274,7 +288,7 @@ function initSortableFileList() {
       updateNamesAfterSort();
     },
   });
-  
+
   // Đánh dấu để tránh khởi tạo trùng lặp nhiều lần
   fileListEl.classList.add("sortable-initialized");
 }
@@ -288,7 +302,7 @@ function updateNamesAfterSort() {
   const order = document.getElementById("orderSelect")?.value || "none";
   const street = document.getElementById("streetInput")?.value.trim() || "";
   const ward = document.getElementById("wardInput")?.value.trim() || "";
-  
+
   const totalFiles = fileList.children.length;
   const newSortedFiles = [];
 
@@ -300,9 +314,10 @@ function updateNamesAfterSort() {
 
     // 1. Tính toán lại tên mới dựa trên vị trí hiển thị hiện tại
     const parts = [];
-    if (prefix && prefix !== "None" && prefix !== "none") parts.push(prefix.toUpperCase());
+    if (prefix && prefix !== "None" && prefix !== "none")
+      parts.push(prefix.toUpperCase());
     if (code) parts.push(code.toUpperCase().slice(-6));
-    
+
     if (order === "asc") {
       parts.push(index + 1);
     } else if (order === "desc") {
@@ -313,7 +328,8 @@ function updateNamesAfterSort() {
     if (ward) parts.push(ward.toUpperCase());
 
     const fileExtension = originalName.substring(originalName.lastIndexOf("."));
-    const newFileName = parts.length > 0 ? parts.join(".") + fileExtension : originalName;
+    const newFileName =
+      parts.length > 0 ? parts.join(".") + fileExtension : originalName;
 
     // 2. Cập nhật Text hiển thị tên mới trên giao diện UI
     const nameSpan = li.querySelector("span.text-sky-500");
@@ -329,7 +345,9 @@ function updateNamesAfterSort() {
     }
 
     // 4. Tìm và đồng bộ lại Object File trong mảng dữ liệu selectedFiles cũ sang mảng tạm mới
-    const matchedFile = selectedFiles.find(f => f.name === originalName && f.size === size);
+    const matchedFile = selectedFiles.find(
+      (f) => f.name === originalName && f.size === size,
+    );
     if (matchedFile) {
       matchedFile.newName = newFileName;
       newSortedFiles.push(matchedFile);
@@ -341,18 +359,87 @@ function updateNamesAfterSort() {
 }
 
 // Lắng nghe sự kiện thay đổi cấu hình đặt tên để cập nhật Realtime
-["prefix", "codeInput", "orderSelect", "streetInput", "wardInput"].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    const eventType = el.tagName === "SELECT" ? "change" : "input";
-    el.addEventListener(eventType, () => {
-      if (selectedFiles.length > 0) updateNamesAfterSort();
-    });
-  }
-});
+["prefix", "codeInput", "orderSelect", "streetInput", "wardInput"].forEach(
+  (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const eventType = el.tagName === "SELECT" ? "change" : "input";
+      el.addEventListener(eventType, () => {
+        if (selectedFiles.length > 0) updateNamesAfterSort();
+      });
+    }
+  },
+);
 
 // Gọi lần đầu tiên khi tải trang để đưa giao diện về trạng thái chuẩn (ẩn upload, khóa clear all)
 document.addEventListener("DOMContentLoaded", () => {
   renderFileList();
   initSortableFileList();
+});
+
+// --- 9. TÍNH NĂNG PHÓNG TO ẢNH (IMAGE LIGHTBOX PREVIEW) ---
+
+/**
+ * Mở modal phóng to ảnh
+ * @param {string} src - Đường dẫn dữ liệu dạng Base64 hoặc URL của ảnh
+ */
+window.openImagePreview = function (src) {
+  const modal = document.getElementById("imagePreviewModal");
+  const modalImg = document.getElementById("modalPreviewImage");
+  const innerContainer = modalImg?.parentElement;
+
+  if (!modal || !modalImg) return;
+
+  // Gán nguồn ảnh
+  modalImg.src = src;
+
+  // Hiển thị Modal với hiệu ứng mượt mà giống customModal của bạn
+  modal.classList.remove("hidden");
+
+  // Thực hiện ép trình duyệt render lại (reflow) để nhận biết thuộc tính ẩn/hiện trước khi thêm class animation transition
+  void modal.offsetWidth;
+
+  modal.classList.add("opacity-100");
+
+  if (innerContainer) {
+    innerContainer.classList.remove("animate__zoomOut");
+    innerContainer.classList.add("animate__zoomIn");
+  }
+
+  // Khóa cuộn trang của body khi đang xem ảnh phóng to
+  document.body.classList.add("overflow-hidden");
+};
+
+/**
+ * Đóng modal phóng to ảnh
+ */
+window.closeImagePreview = function () {
+  const modal = document.getElementById("imagePreviewModal");
+  const modalImg = document.getElementById("modalPreviewImage");
+  const innerContainer = modalImg?.parentElement;
+
+  if (!modal) return;
+
+  modal.classList.remove("opacity-100");
+  if (innerContainer) {
+    innerContainer.classList.remove("animate__zoomIn");
+    innerContainer.classList.add("animate__zoomOut");
+  }
+
+  // Đợi hiệu ứng tắt mượt mà chạy xong (300ms) rồi mới ẩn hẳn phần tử DOM
+  setTimeout(() => {
+    modal.classList.add("hidden");
+    if (modalImg) modalImg.src = ""; // Xóa dữ liệu nguồn ảnh để giải phóng bộ nhớ
+    document.body.classList.remove("overflow-hidden");
+  }, 300);
+};
+
+// Lắng nghe sự kiện phím Esc trên bàn phím để tắt nhanh ảnh đang phóng to
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const modal = document.getElementById("imagePreviewModal");
+    if (modal && !modal.classList.contains("hidden")) {
+      closeImagePreview();
+    }
+  }
 });
