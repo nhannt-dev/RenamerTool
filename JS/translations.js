@@ -180,9 +180,9 @@ const translations = {
     errorMissing: "ไม่มี Client ID/API Key",
     invalidCode: "⚠️ ไม่มีรหัสนี้ในระบบ Google Sheets! กรุณาตรวจสอบอีกครั้ง",
     errorMissingParams:
-      "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง Trước khi tải lên!",
+      "⚠️ กรุณากรอกข้อมูลให้ครบถ้วน: คำนำหน้า, รหัส, ถนน และแขวง ก่อนอัปโหลด!", // <-- Đã sửa lỗi dịch thuật
     errorFolderMissing:
-      "⚠️ กรุณาระบุหรือเลือกโฟลเดอร์ Google Drive Trước khi tải lên!",
+      "⚠️ กรุณาระบุหรือเลือกโฟลเดอร์ Google Drive ก่อนอัปโหลด!", // <-- Đã sửa lỗi dịch thuật
     errorSheetIdMissing: "⚠️ กรุณากรอก Google Sheets ID ก่อนกรอกรหัส (Code)!",
     themeLight: "สว่าง",
     themeDark: "มืด",
