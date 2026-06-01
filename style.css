@@ -73,3 +73,53 @@ input:-webkit-autofill:focus {
 @keyframes button-spin {
   to { transform: rotate(360deg); }
 }
+
+/* =========================================================================
+   ÉP THANH TIẾN TRÌNH LUÔN DÀI BẰNG 100% CHIỀU DÀI THẺ LI (CHẠM MÉP 2 BÊN)
+   ========================================================================= */
+
+/* 1. Chuẩn hóa layout của danh sách file */
+#fileList {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+}
+
+#fileList > li {
+  display: flex !important;
+  flex-wrap: wrap !important; /* Cho phép các phần tử rớt dòng */
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  /* Nếu thẻ li của bạn có overflow-hidden thì giữ nguyên để bo tròn góc thanh tiến trình dưới đáy */
+  overflow: hidden !important; 
+}
+
+/* 2. Ép khung chứa tiến trình chiếm trọn 100% và tràn lề sát mép */
+.upload-progress-container {
+  display: block !important;
+  position: absolute !important; /* Dùng vị trí tuyệt đối để ghim chặt dưới đáy */
+  bottom: 0 !important;          /* Dính chặt vào mép dưới cùng của thẻ li */
+  left: 0 !important;            /* Chạm sát mép trái */
+  right: 0 !important;           /* Chạm sát mép phải */
+  width: 100% !important;        /* Rộng tuyệt đối 100% */
+  margin: 0 !important;          /* Xóa bỏ mọi khoảng cách margin */
+  
+  /* Cấu hình kích thước thanh */
+  height: 4px !important;        /* Thanh chạy mảnh tinh tế ở đáy thẻ li */
+  background-color: #f3f4f6 !important; /* Nền xám nhạt (Light Mode) */
+  border-radius: 0 !important;   /* Xóa bo góc container để nó phẳng đều theo đáy li */
+}
+
+/* Hỗ trợ hiển thị nền thanh chạy khi ứng dụng ở chế độ Dark Mode */
+.dark .upload-progress-container {
+  background-color: #27272a !important; /* Nền xám tối zinc-800 dưới đáy */
+}
+
+/* 3. Thanh phần trăm màu xanh chạy bên trong */
+.upload-progress-bar {
+  display: block !important;
+  height: 100% !important;
+  background-color: #0ea5e9 !important; /* Màu xanh sky-500 chủ đạo */
+  transition: width 200ms ease-out !important; /* Hiệu ứng mượt mà */
+}
