@@ -1,3 +1,7 @@
+// Khai báo đối tượng Audio toàn cục và biến cờ kiểm soát âm thanh khi kết nối lần đầu
+let globalAudio = new Audio();
+window.isFirstConnectSoundPlayed = false;
+
 const SCOPES =
   "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/userinfo.email";
 
@@ -160,6 +164,23 @@ function updateDriveStatus(isConnected, message) {
     }
 
     toggleNamingSection(true);
+
+    // Hiển thị dropdown và xử lý tự động phát khi tải lại trang thành công
+    const soundSelector = document.getElementById("soundSelector");
+    if (soundSelector) {
+      soundSelector.classList.remove("hidden");
+      
+      const savedSound = localStorage.getItem("preferredSound") || "none";
+      soundSelector.value = savedSound; // Đồng bộ lại giao diện dropdown từ localStorage
+
+      if (!window.isFirstConnectSoundPlayed) {
+        window.isFirstConnectSoundPlayed = true; // Đánh dấu đã phát xong âm thanh chào mừng
+
+        if (savedSound != "none") {
+          playWelcomeSound(savedSound);
+        }
+      }
+    }
   } else {
     statusDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
     statusText.innerText =
@@ -173,6 +194,13 @@ function updateDriveStatus(isConnected, message) {
     }
 
     toggleNamingSection(false);
+
+    // BỔ SUNG: Ẩn dropdown âm thanh và reset cờ khi ngắt kết nối
+    const soundSelector = document.getElementById("soundSelector");
+    if (soundSelector) {
+      soundSelector.classList.add("hidden");
+    }
+    window.isFirstConnectSoundPlayed = false;
   }
 }
 
@@ -426,6 +454,28 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         if (statusSpan) statusSpan.innerHTML = "";
         if (errorMsgDiv) errorMsgDiv.classList.add("hidden");
+      }
+    });
+  }
+
+  // BỔ SUNG: Khởi tạo giá trị ban đầu và sự kiện Change cho dropdown âm thanh
+  const soundSelector = document.getElementById("soundSelector");
+  if (soundSelector) {
+    const savedSound = localStorage.getItem("preferredSound") || "none";
+    soundSelector.value = savedSound;
+    
+    soundSelector.addEventListener("change", (e) => {
+      const selectedSound = e.target.value;
+      localStorage.setItem("preferredSound", selectedSound);
+
+      if (selectedSound === "none") {
+        globalAudio.pause();
+        globalAudio.currentTime = 0;
+      } else {
+        globalAudio.pause();
+        globalAudio.src = `Sounds/${selectedSound}.mp3`;
+        globalAudio.loop = false;
+        globalAudio.play().catch(err => console.error("Lỗi khi phát thử âm thanh:", err));
       }
     });
   }

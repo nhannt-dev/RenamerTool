@@ -86,6 +86,20 @@
         <div class="flex items-center gap-3 w-full sm:w-auto">
           <div class="relative w-full sm:w-auto flex items-center">
             <select
+              id="soundSelector"
+              class="hidden mr-4 w-full sm:w-auto bg-white dark:bg-panelBg border border-gray-300 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2.5 text-sm focus:outline-none focus:border-primaryBlue text-gray-700 dark:text-gray-300 cursor-pointer appearance-none shadow-sm"
+            >
+              <option value="none" data-translate="soundNone">Tắt tiếng</option>
+              <option value="Airport">Airport</option>
+              <option value="Car Unlock">Car Unlock</option>
+              <option value="Ding Dong">Ding Dong</option>
+              <option value="Mario">Mario</option>
+              <option value="Mixkit Bike">Mixkit Bike</option>
+              <option value="Samsung">Samsung</option>
+              <option value="Whistle">Whistle</option>
+            </select>
+
+            <select
               id="langSelector"
               class="w-full sm:w-auto bg-white dark:bg-panelBg border border-gray-300 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2.5 text-sm focus:outline-none focus:border-primaryBlue text-gray-700 dark:text-gray-300 cursor-pointer appearance-none shadow-sm"
             >
@@ -701,5 +715,6 @@
     <script src="JS/file-action.js"></script>
     <script src="JS/main.js"></script>
     <script src="JS/upload.js"></script>
+    <script src="JS/sound.js"></script>
   </body>
 </html>

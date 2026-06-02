@@ -120,6 +120,12 @@ function changeLanguage(lang) {
   localStorage.setItem("preferredLanguage", lang);
   localStorage.setItem("lang", lang);
   document.documentElement.lang = lang;
+
+  // Bổ sung: Cập nhật ngôn ngữ cho option "Tắt tiếng" mà không làm mất giá trị đang chọn
+  const soundNoneOption = document.querySelector('#soundSelector option[value="none"]');
+  if (soundNoneOption && translations[lang] && translations[lang].soundNone) {
+    soundNoneOption.innerText = translations[lang].soundNone;
+  }
 }
 
 /**

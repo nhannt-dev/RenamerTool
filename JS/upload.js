@@ -255,6 +255,16 @@ document
               if (uploadResults.length > 0) {
                 showUploadResultsModal(uploadResults);
               }
+
+              if (document.hidden) {
+                const preferredSound = localStorage.getItem("preferredSound") || "none";
+                if (preferredSound !== "none" && typeof globalAudio !== "undefined") {
+                  globalAudio.pause();
+                  globalAudio.src = `Sounds/${preferredSound}.mp3`;
+                  globalAudio.loop = true; // Kích hoạt chế độ lặp lại liên tục (loop)
+                  globalAudio.play().catch(err => console.error("Không thể phát âm thanh nhắc nhở:", err));
+                }
+              }
             }, 350);
           }
         }
@@ -387,3 +397,13 @@ function showToastNotification() {
     toast.classList.add("translate-y-10", "opacity-0");
   }, 2500);
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    if (typeof globalAudio !== "undefined" && !globalAudio.paused && globalAudio.loop) {
+      globalAudio.pause();       // Dừng phát âm thanh ngay lập tức
+      globalAudio.currentTime = 0; // Đưa thời gian phát về vạch xuất phát
+      globalAudio.loop = false;    // Tắt chế độ lặp lại
+    }
+  }
+});
