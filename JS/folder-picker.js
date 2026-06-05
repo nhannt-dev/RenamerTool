@@ -314,3 +314,20 @@ function handleEscKey(e) {
     closeFolderExplorer();
   }
 }
+
+// Lắng nghe sự kiện phím tắt toàn cục để mở Folder Explorer Modal
+document.addEventListener("keydown", (e) => {
+  // Kiểm tra tổ hợp phím:
+  // (Mac: altKey + metaKey + O) HOẶC (Windows/Linux: ctrlKey + altKey + O)
+  const isMacShortcut = e.altKey && e.metaKey && e.code === "KeyO";
+  const isWinShortcut = e.ctrlKey && e.altKey && e.code === "KeyO";
+
+  if (isMacShortcut || isWinShortcut) {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của trình duyệt nếu có
+
+    // Gọi hàm hiển thị Picker đã được định nghĩa trong folder-picker.js
+    if (typeof showPicker === "function") {
+      showPicker();
+    }
+  }
+});
