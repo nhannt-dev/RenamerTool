@@ -1,25 +1,21 @@
 /**
  * Hàm hiển thị Modal thay thế cho alert() truyền thống
- * @param {string} messageKey - Key dịch thuật (ví dụ: 'invalidCode') HOẶC một chuỗi text thuần nếu không có key
- * @param {string} type - 'info' | 'warning' | 'error' | 'success' (để đổi màu sắc icon/tiêu đề)
+ * @param {string} messageKey - Key dịch thuật HOẶC một chuỗi text thuần nếu không có key
+ * @param {string} type - 'info' | 'warning' | 'error' | 'success'
  * @returns {Promise<boolean>} Trả về true khi người dùng bấm Đóng/Xác nhận
  */
 function showCustomAlert(messageKey, type = "info") {
   return new Promise((resolve) => {
-    // Tự động nhận diện ngôn ngữ hiện tại của hệ thống (Ví dụ: 'vi', 'ja', 'en'...)
     const lang =
       localStorage.getItem("language") || localStorage.getItem("lang") || "vi";
-    // Kiểm tra xem translations[lang] và key tin nhắn có tồn tại không
     let message = messageKey;
     if (translations[lang] && translations[lang][messageKey]) {
       message = translations[lang][messageKey];
     }
 
-    // Lấy tiêu đề và nhãn nút đóng tương ứng theo ngôn ngữ được chọn
     const titleText = translations[lang]?.modalTitle || "Thông báo";
     const btnText = translations[lang]?.close || "Đóng";
 
-    // Phối màu icon theo type ('error', 'warning', 'success', 'info')
     let colorClass = "text-blue-600 dark:text-blue-400";
     if (type === "error") colorClass = "text-red-500 dark:text-red-400";
     if (type === "success")
@@ -34,9 +30,7 @@ function showCustomAlert(messageKey, type = "info") {
             <span class="text-xl ${colorClass}">➔</span>
             <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">${titleText}</h3>
           </div>
-          <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line">
-            ${message}
-          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line">${message}</div>
           <div class="flex justify-end">
             <button id="${modalId}-btn" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-xl transition-all shadow-sm">
               ${btnText}
@@ -45,13 +39,14 @@ function showCustomAlert(messageKey, type = "info") {
         </div>
       </div>
     `;
-
     document.body.insertAdjacentHTML("beforeend", modalHTML);
 
     const modalElement = document.getElementById(modalId);
     const closeBtn = document.getElementById(`${modalId}-btn`);
 
+    // Hàm đóng modal gốc
     const closeModal = () => {
+      window.removeEventListener("keydown", handleEsc); // Gỡ bỏ sự kiện Esc khi đóng
       modalElement.classList.remove("animate__fadeIn");
       modalElement.classList.add("animate__fadeOut");
       setTimeout(() => {
@@ -60,6 +55,12 @@ function showCustomAlert(messageKey, type = "info") {
       }, 200);
     };
 
+    // Hàm lắng nghe phím Esc
+    const handleEsc = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+
+    window.addEventListener("keydown", handleEsc);
     closeBtn.addEventListener("click", closeModal);
     modalElement.addEventListener("click", (e) => {
       if (e.target === modalElement) closeModal();
@@ -75,35 +76,44 @@ function showCustomAlert(messageKey, type = "info") {
  */
 function showCustomConfirm(messageKey, type = "warning") {
   return new Promise((resolve) => {
-    const lang = localStorage.getItem("language") || localStorage.getItem("lang") || "vi";
-    
+    const lang =
+      localStorage.getItem("language") || localStorage.getItem("lang") || "vi";
+
     let message = messageKey;
-    if (typeof translations !== 'undefined' && translations[lang] && translations[lang][messageKey]) {
+    if (
+      typeof translations !== "undefined" &&
+      translations[lang] &&
+      translations[lang][messageKey]
+    ) {
       message = translations[lang][messageKey];
     }
 
-    const titleText = (typeof translations !== 'undefined' && translations[lang]?.modalTitle) || "Thông báo";
-    const confirmBtnText = (typeof translations !== 'undefined' && translations[lang]?.confirm) || "Xác nhận";
-    const cancelBtnText = (typeof translations !== 'undefined' && translations[lang]?.cancel) || "Hủy bỏ";
+    const titleText =
+      (typeof translations !== "undefined" && translations[lang]?.modalTitle) ||
+      "Thông báo";
+    const confirmBtnText =
+      (typeof translations !== "undefined" && translations[lang]?.confirm) ||
+      "Xác nhận";
+    const cancelBtnText =
+      (typeof translations !== "undefined" && translations[lang]?.cancel) ||
+      "Hủy bỏ";
 
     let colorClass = "text-yellow-500 dark:text-yellow-400";
     if (type === "error") colorClass = "text-red-500 dark:text-red-400";
-    if (type === "success") colorClass = "text-emerald-500 dark:text-emerald-400";
+    if (type === "success")
+      colorClass = "text-emerald-500 dark:text-emerald-400";
     if (type === "info") colorClass = "text-blue-500 dark:text-blue-400";
 
     const modalId = `custom-confirm-${Date.now()}`;
 
-    // Sử dụng nháy đơn nội bộ để không bao giờ bị lỗi vỡ chuỗi template
     const modalHTML = `
-      <div id='${modalId}' class='fixed inset-0 z- flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate__animated animate__fadeIn animate__faster'>
+      <div id='${modalId}' class='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate__animated animate__fadeIn animate__faster'>
         <div class='bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-100 dark:border-zinc-800 transform transition-all scale-100 animate__animated animate__zoomIn animate__faster'>
           <div class='flex items-center gap-3 border-b border-gray-100 dark:border-zinc-800 pb-3 mb-4'>
             <span class='text-xl ${colorClass}'>⚠️</span>
             <h3 class='font-bold text-base text-gray-800 dark:text-gray-100'>${titleText}</h3>
           </div>
-          <div class='text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line'>
-            ${message}
-          </div>
+          <div class='text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line'>${message}</div>
           <div class='flex justify-end gap-2'>
             <button id='${modalId}-btn-cancel' class='px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-xl transition-all shadow-sm'>
               ${cancelBtnText}
@@ -122,8 +132,10 @@ function showCustomConfirm(messageKey, type = "warning") {
     const cancelBtn = document.getElementById(`${modalId}-btn-cancel`);
     const confirmBtn = document.getElementById(`${modalId}-btn-confirm`);
 
+    // Hàm đóng modal gốc
     const closeModal = (result) => {
       if (!modalElement) return;
+      window.removeEventListener("keydown", handleEsc); // Gỡ bỏ sự kiện Esc khi đóng
       modalElement.classList.remove("animate__fadeIn");
       modalElement.classList.add("animate__fadeOut");
       setTimeout(() => {
@@ -132,9 +144,14 @@ function showCustomConfirm(messageKey, type = "warning") {
       }, 200);
     };
 
+    // Nhấn Esc tương đương hành động Cancel (false)
+    const handleEsc = (e) => {
+      if (e.key === "Escape") closeModal(false);
+    };
+
+    window.addEventListener("keydown", handleEsc);
     cancelBtn?.addEventListener("click", () => closeModal(false));
     confirmBtn?.addEventListener("click", () => closeModal(true));
-    
     modalElement?.addEventListener("click", (e) => {
       if (e.target === modalElement) closeModal(false);
     });
@@ -151,7 +168,7 @@ function showUploadResultsModal(results) {
     modal = document.createElement("div");
     modal.id = "uploadResultsModal";
     modal.className =
-      "fixed inset-0 z- flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300";
+      "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300";
     document.body.appendChild(modal);
   }
 
@@ -179,9 +196,7 @@ function showUploadResultsModal(results) {
         <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 truncate" title="${res.fileName}">${res.fileName}</span>
         <a href="${res.link}" target="_blank" class="text-sm font-medium text-sky-500 hover:underline truncate">${res.link}</a>
       </div>
-      <button onclick="copyToClipboard('${res.link}')" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex-shrink-0 self-end sm:self-center">
-        Copy
-      </button>
+      <button onclick="copyToClipboard('${res.link}')" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition flex-shrink-0 self-end sm:self-center">Copy</button>
     </div>
   `,
     )
@@ -198,24 +213,17 @@ function showUploadResultsModal(results) {
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
-      <div class="p-5 overflow-y-auto space-y-3 flex-1 min-h-0">
-        ${listItemsHtml}
-      </div>
+      <div class="p-5 overflow-y-auto space-y-3 flex-1 min-h-0">${listItemsHtml}</div>
       <div class="p-4 border-t border-gray-100 dark:border-zinc-800 flex justify-end gap-3 bg-gray-50/50 dark:bg-zinc-800/20 rounded-b-2xl">
-        <button onclick="copyAllLinks()" class="bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 text-sm font-semibold px-4 py-2 rounded-xl transition">
-          ${copyAllText}
-        </button>
-        <button onclick="closeUploadResultsModal()" class="bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-xl shadow transition">
-          ${closeText}
-        </button>
+        <button onclick="copyAllLinks()" class="bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 text-sm font-semibold px-4 py-2 rounded-xl transition">${copyAllText}</button>
+        <button onclick="closeUploadResultsModal()" class="bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-xl shadow transition">${closeText}</button>
       </div>
     </div>
   `;
-
   window.currentLinksToCopy = results.map((r) => r.link).join("\n");
 
   modal.classList.remove("hidden");
-  void modal.offsetWidth; // Force Reflow hành vi CSS
+  void modal.offsetWidth;
   modal.classList.add("opacity-100");
   document.body.classList.add("overflow-hidden");
 }
@@ -234,3 +242,13 @@ window.closeUploadResultsModal = function () {
     document.body.classList.remove("overflow-hidden");
   }, 300);
 };
+
+// Lắng nghe phím Esc riêng cho Upload Results Modal
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const uploadModal = document.getElementById("uploadResultsModal");
+    if (uploadModal && !uploadModal.classList.contains("hidden")) {
+      window.closeUploadResultsModal();
+    }
+  }
+});

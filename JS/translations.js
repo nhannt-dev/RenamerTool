@@ -1,6 +1,6 @@
 const translations = {
   vi: {
-    soundNone: "Tắt tiếng",
+    soundNone: "🔕 Tắt tiếng",
     title: "Đổi tên & Tải lên Drive",
     prefix: "Tiền tố",
     code: "Mã (Code)",
@@ -68,7 +68,7 @@ const translations = {
     buildingTree: "🔍 Đang kiểm tra cây thư mục..."
   },
   en: {
-    soundNone: "Mute",
+    soundNone: "🔕 Mute",
     title: "Rename & Upload to Drive",
     prefix: "Prefix",
     code: "Code",
@@ -136,7 +136,7 @@ const translations = {
     buildingTree: "🔍 Checking folder tree..."
   },
   th: {
-    soundNone: "ปิดเสียง",
+    soundNone: "🔕 ปิดเสียง",
     title: "เปลี่ยนชื่อ & อัปโหลดไปยัง Drive",
     prefix: "คำนำหน้า",
     code: "รหัส (Code)",
@@ -204,7 +204,7 @@ const translations = {
     buildingTree: "🔍 กำลังตรวจสอบแผนผังโฟลเดอร์..."
   },
   ja: {
-    soundNone: "消音",
+    soundNone: "🔕 消音",
     title: "名前変更＆Driveアップロード",
     prefix: "接頭辞",
     code: "コード (Code)",
@@ -272,7 +272,7 @@ const translations = {
     buildingTree: "🔍 フォルダツリーを検証中..."
   },
   zh: {
-    soundNone: "静音",
+    soundNone: "🔕 静音",
     title: "重命名并上传至云端硬盘",
     prefix: "前缀",
     code: "代码 (Code)",
@@ -340,7 +340,7 @@ const translations = {
     buildingTree: "🔍 正在检查文件夹树..."
   },
   fr: {
-    soundNone: "Muet",
+    soundNone: "🔕 Muet",
     title: "Renommer & Importer sur Drive",
     prefix: "Préfixe",
     code: "Code",

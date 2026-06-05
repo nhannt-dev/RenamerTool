@@ -10,7 +10,15 @@ async function showPicker() {
 
   const modal = document.getElementById("folderExplorerModal");
   if (modal) {
+    // 1. Gỡ bỏ class ẩn và xóa sạch các class animation cũ (nếu có)
     modal.classList.remove("hidden");
+    modal.classList.remove("animate__fadeOut", "animate__animated", "animate__faster");
+    
+    // 2. Thêm hiệu ứng xuất hiện (Fade In)
+    modal.classList.add("animate__animated", "animate__fadeIn", "animate__faster");
+
+    // BỔ SUNG: Lắng nghe sự kiện nhấn phím Esc khi modal mở ra
+    document.addEventListener("keydown", handleEscKey);
 
     // Reset trạng thái ban đầu khi mở lên
     clearModalSearch();
@@ -44,7 +52,21 @@ async function showPicker() {
  */
 function closeFolderExplorer() {
   const modal = document.getElementById("folderExplorerModal");
-  if (modal) modal.classList.add("hidden");
+  if (modal) {
+    // BỔ SUNG: Lắng nghe sự kiện nhấn phím Esc khi modal mở ra
+    document.addEventListener("keydown", handleEscKey);
+    
+    // 1. Gỡ hiệu ứng xuất hiện, thêm hiệu ứng biến mất
+    modal.classList.remove("animate__fadeIn");
+    modal.classList.add("animate__fadeOut");
+
+    // 2. Chờ hiệu ứng Fade Out chạy xong (animate__faster thường tốn ~150ms-200ms) rồi mới ẩn hẳn
+    // Cách 1: Dùng setTimeout (Đơn giản, dễ dùng)
+    setTimeout(() => {
+      modal.classList.add("hidden");
+    }, 200);
+  };
+
 }
 
 /**
@@ -280,6 +302,15 @@ function confirmSelectFolder() {
     folderIdInput.value = currentFolderId;
     saveConfigToStorage();
     fetchAndDisplayFolderName();
+    closeFolderExplorer();
+  }
+}
+
+/**
+ * Xử lý sự kiện nhấn phím Esc để đóng modal
+ */
+function handleEscKey(e) {
+  if (e.key === "Escape" || e.keyCode === 27) {
     closeFolderExplorer();
   }
 }
