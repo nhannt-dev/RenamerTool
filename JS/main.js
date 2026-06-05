@@ -19,7 +19,31 @@ window.addEventListener("load", () => {
   loadConfigFromStorage();
   gapiLoad();
   gisLoad();
+
+  window.addEventListener("keydown", handleShortcutConnect);
 });
+
+/**
+ * Hàm xử lý phím tắt Alt + C hoặc Option + C
+ */
+function handleShortcutConnect(event) {
+  // 1. Nếu đang gõ trong ô Input hoặc Textarea thì bỏ qua để không bị lỗi khi nhập liệu
+  if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+    return;
+  }
+
+  // 2. Sử dụng event.code === 'KeyC' để nhận diện chuẩn xác phím C vật lý
+  if (event.altKey && event.code === 'KeyC') {
+    // Ngăn chặn ngay lập tức hành vi mở Menu mặc định của phím Alt trên trình duyệt
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log("-> Đã kích hoạt phím tắt Alt+C / Option+C thành công!");
+
+    // 3. Gọi trực tiếp hàm xử lý click có sẵn trong file main.txt của bạn
+    handleAuthClick();
+  }
+}
 
 function saveConfigToStorage() {
   localStorage.setItem(
