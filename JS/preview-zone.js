@@ -195,3 +195,16 @@ function resetNamingConfig() {
     updateNamingPreview();
   }
 }
+
+// Tính năng phím tắt: Nhấn Alt/Option + Backspace để Reset cấu hình tên file
+document.addEventListener("keydown", (event) => {
+  if ((event.altKey || event.metaKey) && event.key === "Backspace") {
+    // Ngăn chặn hành vi mặc định (ví dụ: xóa từ trong ô nhập liệu) nếu cần
+    event.preventDefault(); 
+    
+    // Gọi hàm reset cấu hình
+    if (typeof resetNamingConfig === "function") {
+      resetNamingConfig();
+    }
+  }
+});

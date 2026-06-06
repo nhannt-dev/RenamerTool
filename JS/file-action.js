@@ -443,3 +443,39 @@ document.addEventListener("keydown", (e) => {
     }
   }
 });
+
+// =========================================================================
+// PHÍM TẮT TOÀN CỤC: Cmd + Backspace (Mac) hoặc Ctrl + Backspace (Win/Linux)
+// =========================================================================
+document.addEventListener("keydown", async (event) => {
+  // Kiểm tra Ctrl (Windows/Linux) hoặc Meta/Cmd (Mac) đi kèm phím Backspace
+  if ((event.ctrlKey || event.metaKey) && event.key === "Backspace") {
+    // Ngăn chặn hành vi mặc định của trình duyệt
+    event.preventDefault();
+
+    // Chỉ thực hiện khi danh sách file hiện tại có phần tử để xóa
+    if (typeof selectedFiles !== "undefined" && selectedFiles.length > 0) {
+      
+      // Gọi modal xác nhận tùy chỉnh từ modal.js
+      const confirmed = await showCustomConfirm("confirmClearAll");
+      
+      if (confirmed) {
+        // Thực hiện xóa sạch danh sách file (Đồng bộ với logic nút Clear All của bạn)
+        selectedFiles = [];
+        
+        if (typeof renderFileList === "function") {
+          renderFileList();
+        }
+        if (typeof updateFileCountDisplay === "function") {
+          updateFileCountDisplay();
+        }
+        
+        // Trả lại trạng thái trống cho dropzone nếu có
+        const dropzone = document.getElementById("dropzone");
+        if (dropzone) {
+          // Bạn có thể tùy biến thêm class/giao diện ẩn hiện tại đây nếu cần
+        }
+      }
+    }
+  }
+});

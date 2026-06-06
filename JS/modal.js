@@ -115,10 +115,10 @@ function showCustomConfirm(messageKey, type = "warning") {
           </div>
           <div class='text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line'>${message}</div>
           <div class='flex justify-end gap-2'>
-            <button id='${modalId}-btn-cancel' class='px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-xl transition-all shadow-sm'>
+            <button id='${modalId}-btn-cancel' class='px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-xl transition-all shadow-sm focus:outline-none ring-2 ring-transparent'>
               ${cancelBtnText}
             </button>
-            <button id='${modalId}-btn-confirm' class='px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm'>
+            <button id='${modalId}-btn-confirm' class='px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm focus:outline-none ring-2 ring-transparent'>
               ${confirmBtnText}
             </button>
           </div>
@@ -131,11 +131,35 @@ function showCustomConfirm(messageKey, type = "warning") {
     const modalElement = document.getElementById(modalId);
     const cancelBtn = document.getElementById(`${modalId}-btn-cancel`);
     const confirmBtn = document.getElementById(`${modalId}-btn-confirm`);
+    const buttons = [cancelBtn, confirmBtn];
+
+    // Mặc định chọn nút Hủy bỏ (index 0) để an toàn cho người dùng
+    let currentFocusIndex = 0;
+
+    // Hàm cập nhật hiệu ứng viền nổi bật (focus) khi dùng phím điều hướng
+    function updateButtonFocus() {
+      buttons.forEach((btn, idx) => {
+        if (!btn) return;
+        if (idx === currentFocusIndex) {
+          btn.focus();
+          if (idx === 0) {
+            btn.classList.add("ring-red-500", "dark:ring-red-400");
+          } else {
+            btn.classList.add("ring-sky-500", "dark:ring-sky-400");
+          }
+        } else {
+          btn.classList.remove("ring-sky-500", "dark:ring-sky-400", "ring-red-500", "dark:ring-red-400");
+        }
+      });
+    }
+
+    // Tự động gán trạng thái focus ban đầu sau một khoảng delay nhỏ để khớp hiệu ứng UI
+    setTimeout(updateButtonFocus, 50);
 
     // Hàm đóng modal gốc
     const closeModal = (result) => {
       if (!modalElement) return;
-      window.removeEventListener("keydown", handleEsc); // Gỡ bỏ sự kiện Esc khi đóng
+      window.removeEventListener("keydown", handleModalKeydown); // Gỡ bỏ sự kiện khi đóng
       modalElement.classList.remove("animate__fadeIn");
       modalElement.classList.add("animate__fadeOut");
       setTimeout(() => {
@@ -144,12 +168,24 @@ function showCustomConfirm(messageKey, type = "warning") {
       }, 200);
     };
 
-    // Nhấn Esc tương đương hành động Cancel (false)
-    const handleEsc = (e) => {
-      if (e.key === "Escape") closeModal(false);
+    // Hàm tổng hợp lắng nghe các phím bấm điều hướng (Mũi tên, Enter, Esc)
+    const handleModalKeydown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeModal(false);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        // Luân chuyển trạng thái qua lại giữa nút Hủy (0) và nút Xác nhận (1)
+        currentFocusIndex = currentFocusIndex === 0 ? 1 : 0;
+        updateButtonFocus();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        // Đóng modal và trả về true nếu chọn Xác nhận (index 1), ngược lại trả về false
+        closeModal(currentFocusIndex === 1);
+      }
     };
 
-    window.addEventListener("keydown", handleEsc);
+    window.addEventListener("keydown", handleModalKeydown);
     cancelBtn?.addEventListener("click", () => closeModal(false));
     confirmBtn?.addEventListener("click", () => closeModal(true));
     modalElement?.addEventListener("click", (e) => {
