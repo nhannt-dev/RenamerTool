@@ -21,19 +21,85 @@ window.addEventListener("load", () => {
   gisLoad();
 
   window.addEventListener("keydown", handleShortcutConnect);
+  // Bổ sung lắng nghe phím tắt xóa cấu hình
+  window.addEventListener("keydown", handleShortcutClearConfig);
 });
+
+/**
+ * Hàm xử lý phím tắt xóa toàn bộ cấu hình (ClientID, API Key, Sheet ID, Folder ID)
+ * macOS: Option + Command + Backspace
+ * Windows/Linux: Ctrl + Alt + Backspace
+ */
+async function handleShortcutClearConfig(event) {
+  // 1. Kiểm tra phím bấm chính phải là Backspace
+  if (event.code !== 'Backspace') return;
+
+  // 2. Xác định tổ hợp phím theo hệ điều hành độc lập
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const isTriggered = isMac 
+    ? (event.altKey && event.metaKey) // Option + Command trên Mac
+    : (event.ctrlKey && event.altKey); // Ctrl + Alt trên Windows/Linux
+
+  if (!isTriggered) return;
+
+  // Ngăn chặn hành vi mặc định để tránh trình duyệt quay lại trang trước
+  event.preventDefault();
+
+  // 3. Sử dụng hàm showCustomConfirm như yêu cầu để hiển thị Modal xác nhận
+  // Key 'confirmClearConfig' đã có sẵn trong translations.js của bạn
+  const isConfirmed = await showCustomConfirm("confirmClearConfig", "warning");
+  
+  if (isConfirmed) {
+    // 4. Xóa sạch các key cấu hình lưu trong LocalStorage
+    localStorage.removeItem("clientId");
+    localStorage.removeItem("apiKey");
+    localStorage.removeItem("folderId");
+    localStorage.removeItem("sheetId");
+    localStorage.removeItem("folderName"); // Xóa tên thư mục lưu đệm (nếu có)
+
+    // 5. Reset trực tiếp giá trị của các ô Input về rỗng (Đã đồng bộ ID theo index.html)
+    const inputs = ["clientId", "apiKey", "folderId", "sheetId"];
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    clearInput(inputs[0]);
+    clearInput(inputs[1]);
+
+    // 6. Dọn dẹp trạng thái hiển thị (tích xanh, lỗi cũ) của Thư mục và Sheets
+    const folderDisplay = document.getElementById("folderNameDisplay");
+    if (folderDisplay) {
+      folderDisplay.innerHTML = "";
+      folderDisplay.removeAttribute("data-status");
+      folderDisplay.removeAttribute("data-error-type");
+    }
+    
+    const sheetStatus = document.getElementById("sheetNameDisplay");
+    if (sheetStatus) sheetStatus.innerHTML = "";
+    
+    const sheetError = document.getElementById("sheetCodeErrorMessage");
+    if (sheetError) sheetError.classList.add("hidden");
+
+    // 7. Thông báo thành công bằng showCustomAlert với key 'clearSuccess'
+    showCustomAlert("clearSuccess", "success");
+  }
+}
 
 /**
  * Hàm xử lý phím tắt Alt + C hoặc Option + C
  */
 function handleShortcutConnect(event) {
   // 1. Nếu đang gõ trong ô Input hoặc Textarea thì bỏ qua để không bị lỗi khi nhập liệu
-  if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+  if (
+    document.activeElement.tagName === "INPUT" ||
+    document.activeElement.tagName === "TEXTAREA"
+  ) {
     return;
   }
 
   // 2. Sử dụng event.code === 'KeyC' để nhận diện chuẩn xác phím C vật lý
-  if (event.altKey && event.code === 'KeyC') {
+  if (event.altKey && event.code === "KeyC") {
     // Ngăn chặn ngay lập tức hành vi mở Menu mặc định của phím Alt trên trình duyệt
     event.preventDefault();
     event.stopPropagation();
@@ -193,7 +259,7 @@ function updateDriveStatus(isConnected, message) {
     const soundSelector = document.getElementById("soundSelector");
     if (soundSelector) {
       soundSelector.classList.remove("hidden");
-      
+
       const savedSound = localStorage.getItem("preferredSound") || "none";
       soundSelector.value = savedSound; // Đồng bộ lại giao diện dropdown từ localStorage
 
@@ -487,7 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (soundSelector) {
     const savedSound = localStorage.getItem("preferredSound") || "none";
     soundSelector.value = savedSound;
-    
+
     soundSelector.addEventListener("change", (e) => {
       const selectedSound = e.target.value;
       localStorage.setItem("preferredSound", selectedSound);
@@ -499,7 +565,9 @@ document.addEventListener("DOMContentLoaded", () => {
         globalAudio.pause();
         globalAudio.src = `Sounds/${selectedSound}.mp3`;
         globalAudio.loop = false;
-        globalAudio.play().catch(err => console.error("Lỗi khi phát thử âm thanh:", err));
+        globalAudio
+          .play()
+          .catch((err) => console.error("Lỗi khi phát thử âm thanh:", err));
       }
     });
   }

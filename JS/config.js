@@ -9,6 +9,7 @@ tailwind.config = {
         inputBg: "#1e2238",
         primaryBlue: "#0284c7", // Tone xanh Sky đậm giúp text trắng cực kỳ rõ ràng
         dangerRed: "#f43f5e",
+        darkFocus: "#fff",
       },
       // Cấu hình font Comfortaa làm mặc định cho class font-sans
       fontFamily: {

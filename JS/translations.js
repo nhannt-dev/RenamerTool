@@ -1,5 +1,7 @@
 const translations = {
   vi: {
+    confirmClearConfig: "Bạn có chắc chắn muốn xóa toàn bộ cấu hình không?",
+    clearSuccess: "✅ Đã xóa toàn bộ cấu hình thành công!",
     soundNone: "🔕 Tắt tiếng",
     title: "Đổi tên & Tải lên Drive",
     prefix: "Tiền tố",
@@ -65,9 +67,11 @@ const translations = {
     exBack: "⬅ Quay lại",
     exLoading: "Đang tải dữ liệu...",
     shortcutActive: "Đã kích hoạt chế độ phím tắt",
-    buildingTree: "🔍 Đang kiểm tra cây thư mục..."
+    buildingTree: "🔍 Đang kiểm tra cây thư mục...",
   },
   en: {
+    confirmClearConfig: "Are you sure you want to clear all configurations?",
+    clearSuccess: "✅ All configurations have been successfully cleared!",
     soundNone: "🔕 Mute",
     title: "Rename & Upload to Drive",
     prefix: "Prefix",
@@ -133,9 +137,11 @@ const translations = {
     exBack: "⬅ Back",
     exLoading: "Loading data...",
     shortcutActive: "Shortcuts mode activated",
-    buildingTree: "🔍 Checking folder tree..."
+    buildingTree: "🔍 Checking folder tree...",
   },
   th: {
+    confirmClearConfig: "คุณแน่ใจหรือไม่ว่าต้องการล้างการตั้งค่าทั้งหมด?",
+    clearSuccess: "✅ ล้างการตั้งค่าทั้งหมดเรียบร้อยแล้ว!",
     soundNone: "🔕 ปิดเสียง",
     title: "เปลี่ยนชื่อ & อัปโหลดไปยัง Drive",
     prefix: "คำนำหน้า",
@@ -201,9 +207,11 @@ const translations = {
     exBack: "⬅ ย้อนกลับ",
     exLoading: "กำลังโหลดข้อมูล...",
     shortcutActive: "เปิดใช้งานโหมดทางลัดแล้ว",
-    buildingTree: "🔍 กำลังตรวจสอบแผนผังโฟลเดอร์..."
+    buildingTree: "🔍 กำลังตรวจสอบแผนผังโฟลเดอร์...",
   },
   ja: {
+    confirmClearConfig: "すべての設定を削除してもよろしいですか？",
+    clearSuccess: "✅ すべての設定が正常に削除されました！",
     soundNone: "🔕 消音",
     title: "名前変更＆Driveアップロード",
     prefix: "接頭辞",
@@ -269,9 +277,11 @@ const translations = {
     exBack: "⬅ 戻る",
     exLoading: "データを読み込み中...",
     shortcutActive: "ショートカットモードが有効になりました",
-    buildingTree: "🔍 フォルダツリーを検証中..."
+    buildingTree: "🔍 フォルダツリーを検証中...",
   },
   zh: {
+    confirmClearConfig: "您确定要清除所有配置吗？",
+    clearSuccess: "✅ 所有配置已成功清除！",
     soundNone: "🔕 静音",
     title: "重命名并上传至云端硬盘",
     prefix: "前缀",
@@ -337,9 +347,12 @@ const translations = {
     exBack: "⬅ 返回",
     exLoading: "正在加载数据...",
     shortcutActive: "快捷键模式已激活",
-    buildingTree: "🔍 正在检查文件夹树..."
+    buildingTree: "🔍 正在检查文件夹树...",
   },
   fr: {
+    confirmClearConfig:
+      "Êtes-vous sûr de vouloir effacer toutes les configurations ?",
+    clearSuccess: "✅ Toutes les configurations ont été effacées avec succès !",
     soundNone: "🔕 Muet",
     title: "Renommer & Importer sur Drive",
     prefix: "Préfixe",
@@ -405,6 +418,6 @@ const translations = {
     exBack: "⬅ Retour",
     exLoading: "Chargement des données...",
     shortcutActive: "Mode raccourcis activé",
-    buildingTree: "🔍 Vérification de l'arborescence..."
-  }
+    buildingTree: "🔍 Vérification de l'arborescence...",
+  },
 };
