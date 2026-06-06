@@ -479,3 +479,23 @@ document.addEventListener("keydown", async (event) => {
     }
   }
 });
+
+// =========================================================================
+// PHÍM TẮT TOÀN CỤC: Option + Space (Mac) hoặc Alt + Space (Win/Linux)
+// =========================================================================
+document.addEventListener("keydown", (event) => {
+  // Kiểm tra nếu phím được nhấn là Space (Khoảng trắng) và đi kèm phím Alt/Option
+  if (event.altKey && (event.key === " " || event.code === "Space")) {
+    
+    // Ngăn chặn hành vi mặc định của trình duyệt/hệ điều hành (nếu có thể)
+    event.preventDefault();
+
+    // Lấy phần tử input file (đã được định nghĩa ở đầu file của bạn)
+    const fileInput = document.getElementById("fileInput");
+    
+    if (fileInput) {
+      // Kích hoạt hộp thoại chọn file
+      fileInput.click();
+    }
+  }
+});
