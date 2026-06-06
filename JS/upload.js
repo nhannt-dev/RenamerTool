@@ -79,6 +79,23 @@ document
     if (btnUploadDrive) {
       btnUploadDrive.disabled = true;
       btnUploadDrive.classList.add("opacity-75", "pointer-events-none");
+
+      // LƯU LẠI CHỮ GỐC để tí nữa khôi phục (ví dụ: "Tải lên Drive")
+      if (btnUploadText && !btnUploadDrive.getAttribute("data-original-text")) {
+        btnUploadDrive.setAttribute("data-original-text", btnUploadText.innerHTML);
+      }
+
+      if (btnUploadText) {
+        btnUploadText.innerHTML = `
+          <div class="flex items-center justify-center gap-2">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>${textUploading}</span>
+          </div>
+        `;
+      }
     }
     // LỖI #3: KHÓA TOÀN BỘ TƯƠNG TÁC (Input, Button, Dropzone, Nút Remove)
     const elementsToDisable = [
@@ -296,6 +313,13 @@ document
       if (btnUploadDrive) {
         btnUploadDrive.disabled = false;
         btnUploadDrive.classList.remove("opacity-75", "pointer-events-none");
+
+        // KHÔI PHỤC LẠI CHỮ GỐC CỦA NÚT BẤM
+        const btnUploadText = document.getElementById("btnUploadText") || btnUploadDrive.querySelector("span");
+        const originalText = btnUploadDrive.getAttribute("data-original-text");
+        if (btnUploadText && originalText) {
+          btnUploadText.innerHTML = originalText;
+        }
       }
 
       // Mở khóa toàn bộ input và button
@@ -404,6 +428,30 @@ document.addEventListener("visibilitychange", () => {
       globalAudio.pause();       // Dừng phát âm thanh ngay lập tức
       globalAudio.currentTime = 0; // Đưa thời gian phát về vạch xuất phát
       globalAudio.loop = false;    // Tắt chế độ lặp lại
+    }
+  }
+});
+
+// =========================================================================
+// PHÍM TẮT TOÀN CỤC: Command + Enter (Mac) hoặc Ctrl + Enter (Win/Linux) để Upload
+// =========================================================================
+document.addEventListener("keydown", (event) => {
+  // Kiểm tra nếu phím được nhấn là Enter
+  if (event.key === "Enter" || event.code === "Enter") {
+    
+    // Kiểm tra xem có nhấn kèm phím Command (Mac) hoặc Ctrl (Windows/Linux) không
+    if (event.metaKey || event.ctrlKey) {
+      
+      // Ngăn chặn hành vi mặc định (ví dụ: xuống dòng nếu đang focus vào ô nhập liệu)
+      event.preventDefault();
+
+      // Tìm phần tử nút bấm Upload Drive
+      const btnUploadDrive = document.getElementById("btnUploadDrive");
+      
+      if (btnUploadDrive) {
+        // Giả lập hành vi click vào nút Upload để kích hoạt logic tải lên
+        btnUploadDrive.click();
+      }
     }
   }
 });
