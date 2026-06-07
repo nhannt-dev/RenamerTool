@@ -288,3 +288,174 @@ window.addEventListener("keydown", (e) => {
     }
   }
 });
+
+/**
+ * Hàm sinh nội dung HTML chi tiết cho danh sách phím tắt dựa trên ngôn ngữ hiện tại
+ * @param {Object} t - Đối tượng dịch thuật (translations[lang])
+ * @param {boolean} isMac - Kiểm tra hệ điều hành có phải Mac không
+ * @returns {string} Chuỗi HTML danh sách phím tắt
+ */
+function renderShortcutContent(t, isMac) {
+  let shortcutData = [];
+
+  if (isMac) {
+    shortcutData = [
+      { keys: ["⌘", "Enter"], desc: t.scUpload || "Tải file lên Drive" },
+      { keys: ["⌘", "Backspace"], desc: t.scClearAll || "Xoá toàn bộ file được tải từ máy tính lên" },
+      { keys: ["⌥ Option", "⌘", "Backspace"], desc: t.scClearConfig || "Xoá toàn bộ cấu hình kết nối Drive, Sheets và thư mục" },
+      { keys: ["⌥ Option", "⌘", "O"], desc: t.scOpenPicker || "Chỉ định thư mục Drive cần được tải lên" },
+      { keys: ["⌥ Option", "Backspace"], desc: t.btnReset || "Trả toàn bộ tên file về tên ban đầu" },
+      { keys: ["⌥ Option", "C"], desc: t.scConnect || "Kết nối đến Drive API" },
+      { keys: ["⌥ Option", "H"], desc: t.scShowThis || "Hiển thị danh sách phím tắt này" },
+      { keys: ["Esc"], desc: t.scCloseEsc || "Đóng nhanh cửa sổ (Esc)" }
+    ];
+  } else {
+    shortcutData = [
+      { keys: ["Control", "Enter"], desc: t.scUpload || "Tải file lên Drive" },
+      { keys: ["Control", "Backspace"], desc: t.scClearAll || "Xoá toàn bộ file được tải từ máy tính lên" },
+      { keys: ["Control", "Alt", "Backspace"], desc: t.scClearConfig || "Xoá toàn bộ cấu hình kết nối Drive, Sheets và thư mục" },
+      { keys: ["Control", "Alt", "O"], desc: t.scOpenPicker || "Chỉ định thư mục Drive cần được tải lên" },
+      { keys: ["Alt", "Backspace"], desc: t.btnClearAll || "Trả toàn bộ tên file về tên ban đầu" },
+      { keys: ["Alt", "C"], desc: t.scConnect || "Kết nối đến Drive API" },
+      { keys: ["Alt", "H"], desc: t.scShowThis || "Hiển thị danh sách phím tắt này" },
+      { keys: ["Esc"], desc: t.scCloseEsc || "Đóng nhanh cửa sổ (Esc)" }
+    ];
+  }
+
+  return shortcutData.map(item => {
+    const keysBadge = item.keys.map(k => `
+      <kbd class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-300 rounded-md shadow-sm dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 font-sans">
+        ${k}
+      </kbd>
+    `).join('<span class="text-gray-400 dark:text-zinc-600 font-light">+</span>');
+
+    return `
+      <div class="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/60 last:border-0 hover:bg-gray-50/50 dark:hover:bg-zinc-850/40 px-1 rounded-lg transition">
+        <span class="text-gray-600 dark:text-zinc-400 font-medium text-[13px] pr-4">${item.desc}</span>
+        <div class="flex items-center gap-1.5 shrink-0 select-none">
+          ${keysBadge}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/**
+ * Hàm hiển thị danh sách phím tắt (Keyboard Shortcuts Modal)
+ */
+window.showShortcutList = function () {
+  const lang = localStorage.getItem("preferredLanguage") || localStorage.getItem("lang") || "vi";
+  const t = translations[lang] || translations["vi"];
+
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
+                (navigator.userAgentData && navigator.userAgentData.platform === "macOS");
+
+  let modal = document.getElementById("shortcutModal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "shortcutModal";
+    modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300";
+    
+    modal.onclick = function (e) {
+      if (e.target === modal) window.closeShortcutModal();
+    };
+
+    document.body.appendChild(modal);
+  }
+
+  // Đổ khung cấu trúc Modal chính
+  modal.innerHTML = `
+    <div class="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-6 transform scale-95 transition-transform duration-300 animate__animated animate__zoomIn" onclick="event.stopPropagation()">
+      <button 
+        onclick="window.closeShortcutModal()" 
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800"
+      >
+        &times;
+      </button>
+
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        ⌨️ <span id="shortcutModalTitle">${t.scTitle || "Phím tắt bàn phím"}</span>
+        <span class="text-xs font-normal text-sky-500 bg-sky-50 dark:bg-sky-950/40 dark:text-sky-400 px-2 py-0.5 rounded-full border border-sky-100 dark:border-sky-900/30">
+          ${isMac ? "macOS" : "Windows/Linux"}
+        </span>
+      </h3>
+
+      <div id="shortcutListContainer" class="space-y-1 max-h-[60vh] overflow-y-auto pr-1 text-sm">
+        ${renderShortcutContent(t, isMac)}
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800 flex justify-end">
+        <button 
+          id=\"btn-shortcut-close\"
+          onclick="window.closeShortcutModal()" 
+          class="bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-xl shadow transition"
+        >
+          ${t.close || "Đóng"}
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+  void modal.offsetWidth; 
+  modal.classList.add("opacity-100");
+  document.body.classList.add("overflow-hidden");
+};
+
+/**
+ * Hàm hỗ trợ cập nhật ngôn ngữ nóng cho Modal phím tắt khi người dùng đổi ngôn ngữ từ thanh Select
+ */
+window.updateShortcutModalLanguage = function (lang) {
+  const modal = document.getElementById("shortcutModal");
+  // Nếu modal không tồn tại hoặc đang ẩn thì không cần cập nhật
+  if (!modal || modal.classList.contains("hidden")) return;
+
+  const t = translations[lang] || translations["vi"];
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
+                (navigator.userAgentData && navigator.userAgentData.platform === "macOS");
+
+  // Cập nhật tiêu đề
+  const titleEl = document.getElementById("shortcutModalTitle");
+  if (titleEl) titleEl.innerText = t.scTitle || "Phím tắt bàn phím";
+
+  // Cập nhật nút đóng
+  const closeBtn = document.getElementById("btn-shortcut-close");
+  if (closeBtn) closeBtn.innerText = t.close || "Đóng";
+
+  // Kết xuất lại danh sách phím tắt bằng ngôn ngữ mới
+  const container = document.getElementById("shortcutListContainer");
+  if (container) {
+    container.innerHTML = renderShortcutContent(t, isMac);
+  }
+};
+
+window.closeShortcutModal = function () {
+  const modal = document.getElementById("shortcutModal");
+  if (!modal) return;
+
+  modal.classList.remove("opacity-100");
+  const innerContainer = modal.querySelector(".animate__animated");
+  if (innerContainer) {
+    innerContainer.classList.remove("animate__zoomIn");
+    innerContainer.classList.add("animate__zoomOut");
+  }
+
+  setTimeout(() => {
+    modal.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+  }, 300);
+};
+
+// Sự kiện keydown toàn cục
+document.addEventListener("keydown", (event) => {
+  if (event.altKey && event.code === "KeyH") {
+    event.preventDefault(); 
+    window.showShortcutList();
+  }
+  if (event.key === "Escape") {
+    const shortcutModal = document.getElementById("shortcutModal");
+    if (shortcutModal && !shortcutModal.classList.contains("hidden")) {
+      window.closeShortcutModal();
+    }
+  }
+});

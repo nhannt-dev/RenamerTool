@@ -1,5 +1,6 @@
 const translations = {
   vi: {
+    btnReset: "Trả toàn bộ tên file về tên ban đầu",
     confirmClearConfig: "Bạn có chắc chắn muốn xóa toàn bộ cấu hình không?",
     clearSuccess: "✅ Đã xóa toàn bộ cấu hình thành công!",
     soundNone: "🔕 Tắt tiếng",
@@ -70,6 +71,7 @@ const translations = {
     buildingTree: "🔍 Đang kiểm tra cây thư mục...",
   },
   en: {
+    btnReset: "Restore all file names to original",
     confirmClearConfig: "Are you sure you want to clear all configurations?",
     clearSuccess: "✅ All configurations have been successfully cleared!",
     soundNone: "🔕 Mute",
@@ -140,6 +142,7 @@ const translations = {
     buildingTree: "🔍 Checking folder tree...",
   },
   th: {
+    btnReset: "คืนค่าชื่อไฟล์ทั้งหมดกลับเป็นชื่อเดิม",
     confirmClearConfig: "คุณแน่ใจหรือไม่ว่าต้องการล้างการตั้งค่าทั้งหมด?",
     clearSuccess: "✅ ล้างการตั้งค่าทั้งหมดเรียบร้อยแล้ว!",
     soundNone: "🔕 ปิดเสียง",
@@ -210,6 +213,7 @@ const translations = {
     buildingTree: "🔍 กำลังตรวจสอบแผนผังโฟลเดอร์...",
   },
   ja: {
+    btnReset: "すべてのファイル名を元の名前に戻す",
     confirmClearConfig: "すべての設定を削除してもよろしいですか？",
     clearSuccess: "✅ すべての設定が正常に削除されました！",
     soundNone: "🔕 消音",
@@ -280,6 +284,7 @@ const translations = {
     buildingTree: "🔍 フォルダツリーを検証中...",
   },
   zh: {
+    btnReset: "恢复所有文件名为原始名称",
     confirmClearConfig: "您确定要清除所有配置吗？",
     clearSuccess: "✅ 所有配置已成功清除！",
     soundNone: "🔕 静音",
@@ -350,6 +355,7 @@ const translations = {
     buildingTree: "🔍 正在检查文件夹树...",
   },
   fr: {
+    btnReset: "Restaurer tous les noms de fichiers originaux",
     confirmClearConfig:
       "Êtes-vous sûr de vouloir effacer toutes les configurations ?",
     clearSuccess: "✅ Toutes les configurations ont été effacées avec succès !",

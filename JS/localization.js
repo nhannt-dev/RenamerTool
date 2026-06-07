@@ -126,6 +126,11 @@ function changeLanguage(lang) {
   if (soundNoneOption && translations[lang] && translations[lang].soundNone) {
     soundNoneOption.innerText = translations[lang].soundNone;
   }
+
+  // BỔ SUNG THÊM DÒNG NÀY VÀO CUỐI HÀM:
+  if (typeof window.updateShortcutModalLanguage === "function") {
+    window.updateShortcutModalLanguage(lang);
+  }
 }
 
 /**
@@ -135,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const langSelector = document.getElementById("langSelector");
 
   if (langSelector) {
-    const savedLang = localStorage.getItem("preferredLanguage") || "vi";
+    const savedLang = localStorage.getItem("lang") || "vi";
     langSelector.value = savedLang;
     changeLanguage(savedLang);
 
