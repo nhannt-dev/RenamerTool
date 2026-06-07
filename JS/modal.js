@@ -300,13 +300,14 @@ function renderShortcutContent(t, isMac) {
 
   if (isMac) {
     shortcutData = [
-      { keys: ["⌘", "Enter"], desc: t.scUpload || "Tải file lên Drive" },
-      { keys: ["⌘", "Backspace"], desc: t.scClearAll || "Xoá toàn bộ file được tải từ máy tính lên" },
-      { keys: ["⌥ Option", "⌘", "Backspace"], desc: t.scClearConfig || "Xoá toàn bộ cấu hình kết nối Drive, Sheets và thư mục" },
-      { keys: ["⌥ Option", "⌘", "O"], desc: t.scOpenPicker || "Chỉ định thư mục Drive cần được tải lên" },
-      { keys: ["⌥ Option", "Backspace"], desc: t.btnReset || "Trả toàn bộ tên file về tên ban đầu" },
-      { keys: ["⌥ Option", "C"], desc: t.scConnect || "Kết nối đến Drive API" },
-      { keys: ["⌥ Option", "H"], desc: t.scShowThis || "Hiển thị danh sách phím tắt này" },
+      { keys: ["⌘", "↩"], desc: t.scUpload || "Tải file lên Drive" },
+      { keys: ["⌘", "⌫"], desc: t.scClearAll || "Xoá toàn bộ file được tải từ máy tính lên" },
+      { keys: ["⌥", "⌘", "⌫"], desc: t.scClearConfig || "Xoá toàn bộ cấu hình kết nối Drive, Sheets và thư mục" },
+      { keys: ["⌥", "⌘", "O"], desc: t.scOpenPicker || "Chỉ định thư mục Drive cần được tải lên" },
+      { keys: ["⌥", "⌫"], desc: t.btnReset || "Trả toàn bộ tên file về tên ban đầu" },
+      { keys: ["⌥", "␣"], desc: t.btnSpace || "Chọn file và tải lên từ máy" },
+      { keys: ["⌥", "C"], desc: t.scConnect || "Kết nối đến Drive API" },
+      { keys: ["⌥", "H"], desc: t.scShowThis || "Hiển thị danh sách phím tắt này" },
       { keys: ["Esc"], desc: t.scCloseEsc || "Đóng nhanh cửa sổ (Esc)" }
     ];
   } else {
