@@ -142,7 +142,7 @@ function renderFoldersList(folders) {
                 <span class="text-xl">📁</span>
                 <div class="flex flex-col truncate">
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primaryBlue truncate">${folder.name}</span>
-                    ${isSearchingMode ? `<span class="text-[10px] text-gray-400 italic">Tìm kiếm toàn cục trên Drive</span>` : ""}
+                    ${isSearchingMode ? `<span class="text-[10px] text-gray-400 italic"></span>` : ""}
                 </div>
             </div>
             <span class="text-xs text-gray-400 group-hover:text-primaryBlue font-bold px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">➔</span>
@@ -196,7 +196,7 @@ async function searchFoldersGlobal(keyword) {
 
   // Đổi hiển thị breadcrumb thành text báo trạng thái tìm kiếm
   if (bcContainer) {
-    bcContainer.innerHTML = `<span class="text-gray-400 italic">Kết quả tìm kiếm toàn cục: "${keyword}"</span>`;
+    bcContainer.innerHTML = `<span class="text-gray-400 italic">🔍 "${keyword}"</span>`;
   }
 
   try {
